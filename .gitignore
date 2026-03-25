@@ -1,0 +1,14 @@
+# Node
+app/node_modules/
+app/dist/
+
+# Tauri/Rust
+app/src-tauri/target/
+
+# Go
+backend/*.exe
+backend/*.test
+backend/coverage.out
+
+# IDE
+.vscode/

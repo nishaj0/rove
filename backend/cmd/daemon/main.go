@@ -1,0 +1,32 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"cloud-saver/backend/internal/app"
+)
+
+func main() {
+	var configPath string
+	var noTray bool
+	flag.StringVar(&configPath, "config", "", "path to settings.json")
+	flag.BoolVar(&noTray, "no-tray", false, "run without system tray")
+	flag.Parse()
+
+	application, err := app.New(app.Options{ConfigPath: configPath, NoTray: noTray})
+	if err != nil {
+		log.Fatalf("init app: %v", err)
+	}
+
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	if err := application.Run(ctx, noTray); err != nil {
+		log.Fatalf("run app: %v", err)
+	}
+}

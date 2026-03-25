@@ -1,0 +1,271 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f2eb;
+  --card: #fff9ef;
+  --ink: #1f1a16;
+  --muted: #6f6458;
+  --accent: #bc4d2f;
+  --accent-2: #275f89;
+  --warn: #9b6a00;
+  --ok: #1a6a43;
+  --line: #dccfbf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Trebuchet MS", Tahoma, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 20% 10%, #ffe8c5 0, transparent 38%),
+    radial-gradient(circle at 85% 12%, #d3e9ff 0, transparent 32%),
+    linear-gradient(160deg, #f5f2eb 0%, #efe8dd 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(1180px, 95vw);
+  margin: 1.5rem auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(120deg, #fff8ec, #fde5d6);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 12px 28px rgba(31, 26, 22, 0.08);
+}
+
+.overline {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0.2rem 0;
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+}
+
+h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.15rem;
+}
+
+h3 {
+  margin: 0.7rem 0 0.35rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.sub {
+  margin: 0;
+  color: var(--muted);
+}
+
+.status-pill {
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+
+.status-pill.ok {
+  background: rgba(26, 106, 67, 0.14);
+  color: var(--ok);
+}
+
+.status-pill.warn {
+  background: rgba(155, 106, 0, 0.16);
+  color: var(--warn);
+}
+
+.banner {
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.92rem;
+}
+
+.banner.error {
+  background: #ffe3e3;
+  color: #791f1f;
+  border: 1px solid #f3bbbb;
+}
+
+.banner.toast {
+  background: #dff7eb;
+  color: #1b6b3f;
+  border: 1px solid #b9e7cb;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.two-up {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+dl {
+  margin: 0 0 0.9rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 0.35rem;
+}
+
+dt {
+  color: var(--muted);
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  background: #fffefb;
+  font-size: 0.95rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.inline-check input {
+  width: auto;
+}
+
+.inline-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.8rem;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.52rem 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: #8f341c;
+  color: #fff;
+}
+
+.btn.danger {
+  background: #ffe6de;
+  border-color: #f1b9a9;
+  color: #7d2a19;
+}
+
+.btn:hover {
+  filter: brightness(0.98);
+}
+
+.game-list,
+.log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.game-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.6rem;
+  background: #fff;
+}
+
+.game-list p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.backup-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.log-list li {
+  border-bottom: 1px solid var(--line);
+  padding: 0.45rem 0;
+  display: grid;
+  grid-template-columns: 86px 62px 1fr;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.log-list p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.log-list em {
+  font-style: normal;
+  color: var(--accent-2);
+}
+
+@media (max-width: 900px) {
+  .two-up {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .status-pill {
+    margin-left: 0;
+  }
+}
