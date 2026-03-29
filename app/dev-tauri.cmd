@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 set "PATH=%USERPROFILE%\.cargo\bin;%PATH%"
 
 for /f %%v in ('node -v 2^>nul') do set "NODEVER=%%v"

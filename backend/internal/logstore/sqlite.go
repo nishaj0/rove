@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -16,11 +17,25 @@ type Store struct {
 	path string
 }
 
+const (
+	busyRetryCount = 4
+	busyRetryDelay = 30 * time.Millisecond
+)
+
 func Open(root string) (*Store, error) {
 	dbPath := filepath.Join(root, "sync.db")
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite: %w", err)
+	}
+
+	// keep a single sqlite connection to avoid write lock churn under bursty ui refreshes.
+	db.SetMaxOpenConns(1)
+	db.SetMaxIdleConns(1)
+
+	if err := configure(db); err != nil {
+		db.Close()
+		return nil, err
 	}
 
 	if err := migrate(db); err != nil {
@@ -29,6 +44,19 @@ func Open(root string) (*Store, error) {
 	}
 
 	return &Store{db: db, path: dbPath}, nil
+}
+
+func configure(db *sql.DB) error {
+	if _, err := db.Exec(`PRAGMA journal_mode=WAL;`); err != nil {
+		return fmt.Errorf("set sqlite journal mode: %w", err)
+	}
+	if _, err := db.Exec(`PRAGMA busy_timeout = 5000;`); err != nil {
+		return fmt.Errorf("set sqlite busy timeout: %w", err)
+	}
+	if _, err := db.Exec(`PRAGMA synchronous = NORMAL;`); err != nil {
+		return fmt.Errorf("set sqlite synchronous mode: %w", err)
+	}
+	return nil
 }
 
 func (s *Store) Path() string {
@@ -73,17 +101,29 @@ func (s *Store) Write(level, event, message string) error {
 	if level == "" {
 		level = "info"
 	}
-	_, err := s.db.Exec(`INSERT INTO logs(ts, level, event, message) VALUES (?, ?, ?, ?)`, time.Now().UTC().Format(time.RFC3339), level, event, message)
-	if err != nil {
-		return fmt.Errorf("insert log: %w", err)
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		_, err := s.db.Exec(`INSERT INTO logs(ts, level, event, message) VALUES (?, ?, ?, ?)`, time.Now().UTC().Format(time.RFC3339), level, event, message)
+		if err == nil {
+			return nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return fmt.Errorf("insert log: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
 	}
 	return nil
 }
 
 func (s *Store) WriteConflict(gameID, filePath, strategy, message string) error {
-	_, err := s.db.Exec(`INSERT INTO conflicts(ts, game_id, file_path, strategy, message) VALUES (?, ?, ?, ?, ?)`, time.Now().UTC().Format(time.RFC3339), gameID, filePath, strategy, message)
-	if err != nil {
-		return fmt.Errorf("insert conflict: %w", err)
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		_, err := s.db.Exec(`INSERT INTO conflicts(ts, game_id, file_path, strategy, message) VALUES (?, ?, ?, ?, ?)`, time.Now().UTC().Format(time.RFC3339), gameID, filePath, strategy, message)
+		if err == nil {
+			return nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return fmt.Errorf("insert conflict: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
 	}
 	return nil
 }
@@ -93,9 +133,17 @@ func (s *Store) Recent(limit int) ([]models.LogEntry, error) {
 		limit = 100
 	}
 
-	rows, err := s.db.Query(`SELECT id, ts, level, event, message FROM logs ORDER BY id DESC LIMIT ?`, limit)
-	if err != nil {
-		return nil, fmt.Errorf("query logs: %w", err)
+	var rows *sql.Rows
+	var err error
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		rows, err = s.db.Query(`SELECT id, ts, level, event, message FROM logs ORDER BY id DESC LIMIT ?`, limit)
+		if err == nil {
+			break
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return nil, fmt.Errorf("query logs: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
 	}
 	defer rows.Close()
 
@@ -114,4 +162,12 @@ func (s *Store) Recent(limit int) ([]models.LogEntry, error) {
 		return nil, fmt.Errorf("iterate logs: %w", err)
 	}
 	return result, nil
+}
+
+func isBusyError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "database is locked") || strings.Contains(msg, "database is busy")
 }

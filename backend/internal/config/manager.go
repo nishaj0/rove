@@ -64,8 +64,8 @@ func (m *Manager) Get() models.Settings {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	cloned := m.settings
-	cloned.Games = append([]models.Game(nil), m.settings.Games...)
-	cloned.IgnorePatterns = append([]string(nil), m.settings.IgnorePatterns...)
+	cloned.Games = append([]models.Game{}, m.settings.Games...)
+	cloned.IgnorePatterns = append([]string{}, m.settings.IgnorePatterns...)
 	return cloned
 }
 
@@ -86,7 +86,7 @@ func (m *Manager) Update(next models.Settings) error {
 	m.settings.SyncIntervalSeconds = next.SyncIntervalSeconds
 	m.settings.ConflictPolicy = next.ConflictPolicy
 	m.settings.Autostart = next.Autostart
-	m.settings.IgnorePatterns = append([]string(nil), next.IgnorePatterns...)
+	m.settings.IgnorePatterns = append([]string{}, next.IgnorePatterns...)
 	return m.saveLocked()
 }
 
@@ -211,7 +211,41 @@ func (m *Manager) load() error {
 	if err := json.Unmarshal(payload, &m.settings); err != nil {
 		return fmt.Errorf("decode settings: %w", err)
 	}
+	if normalizeSettings(&m.settings) {
+		return m.saveLocked()
+	}
 	return nil
+}
+
+func normalizeSettings(settings *models.Settings) bool {
+	if settings == nil {
+		return false
+	}
+	changed := false
+	defaults := DefaultSettings()
+
+	if settings.Port == 0 {
+		settings.Port = defaults.Port
+		changed = true
+	}
+	if settings.SyncIntervalSeconds == 0 {
+		settings.SyncIntervalSeconds = defaults.SyncIntervalSeconds
+		changed = true
+	}
+	if settings.ConflictPolicy != models.ConflictLatestWins && settings.ConflictPolicy != models.ConflictKeepBoth {
+		settings.ConflictPolicy = defaults.ConflictPolicy
+		changed = true
+	}
+	if settings.IgnorePatterns == nil {
+		settings.IgnorePatterns = append([]string{}, defaults.IgnorePatterns...)
+		changed = true
+	}
+	if settings.Games == nil {
+		settings.Games = []models.Game{}
+		changed = true
+	}
+
+	return changed
 }
 
 func (m *Manager) saveLocked() error {

@@ -125,7 +125,7 @@ export default function App() {
     if (!status?.lastSyncTime || status.lastSyncTime.startsWith("0001-")) {
       return "Never";
     }
-    return new Date(status.lastSyncTime).toLocaleString();
+    return safeDateTime(status.lastSyncTime);
   }, [status]);
 
   const uptimeLabel = useMemo(() => {
@@ -227,6 +227,22 @@ export default function App() {
       return parts[0].slice(0, 2).toUpperCase();
     }
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  function safeDateTime(input: string): string {
+    const parsed = new Date(input);
+    if (Number.isNaN(parsed.getTime())) {
+      return "Invalid time";
+    }
+    return parsed.toLocaleString();
+  }
+
+  function safeTime(input: string): string {
+    const parsed = new Date(input);
+    if (Number.isNaN(parsed.getTime())) {
+      return "--:--:--";
+    }
+    return parsed.toLocaleTimeString();
   }
 
   return (
@@ -460,7 +476,7 @@ export default function App() {
               <ul className="activity-list">
                 {logs.map((entry) => (
                   <li key={entry.id}>
-                    <span>{new Date(entry.timestamp).toLocaleTimeString()}</span>
+                    <span>{safeTime(entry.timestamp)}</span>
                     <strong>{entry.level.toUpperCase()}</strong>
                     <em>{entry.event}</em>
                     <p>{entry.message}</p>

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strconv"
@@ -60,6 +62,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
 
 	handler := localhostOnly(mux)
+	handler = withLoopbackCORS(handler)
 	if s.debug {
 		handler = s.withDebugRequestLogs(handler)
 	}
@@ -69,13 +72,63 @@ func (s *Server) Handler() http.Handler {
 func localhostOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// keep control endpoints local-only for mvp security.
-		host := r.RemoteAddr
-		if !strings.HasPrefix(host, "127.0.0.1") && !strings.HasPrefix(host, "[::1]") {
-			http.Error(w, "forbidden", http.StatusForbidden)
-			return
+		host, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			host = r.RemoteAddr
+		}
+		if host != "localhost" {
+			ip := net.ParseIP(host)
+			if ip == nil || !ip.IsLoopback() {
+				http.Error(w, "forbidden", http.StatusForbidden)
+				return
+			}
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func withLoopbackCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			if !isLoopbackOrigin(origin) {
+				http.Error(w, "forbidden", http.StatusForbidden)
+				return
+			}
+			allowHeaders := r.Header.Get("Access-Control-Request-Headers")
+			if strings.TrimSpace(allowHeaders) == "" {
+				allowHeaders = "Content-Type"
+			}
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", allowHeaders)
+			w.Header().Set("Access-Control-Max-Age", "3600")
+		}
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func isLoopbackOrigin(origin string) bool {
+	parsed, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	host := parsed.Hostname()
+	if host == "" {
+		return false
+	}
+	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
@@ -289,6 +342,12 @@ func (s *Server) withDebugRequestLogs(next http.Handler) http.Handler {
 		status := http.StatusOK
 		ww := &statusWriter{ResponseWriter: w, status: &status}
 		next.ServeHTTP(ww, r)
+		if r.Method == http.MethodOptions {
+			return
+		}
+		if r.URL.Path == "/status" || r.URL.Path == "/logs/recent" || r.URL.Path == "/debug/info" {
+			return
+		}
 		duration := time.Since(start)
 		_ = s.logs.Write("debug", "http", fmt.Sprintf("%s %s -> %d (%s)", r.Method, r.URL.Path, status, duration.Round(time.Millisecond)))
 	})
