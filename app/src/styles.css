@@ -419,6 +419,36 @@ h3 {
   gap: 0.54rem;
 }
 
+.debug-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.debug-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #111622;
+  padding: 0.55rem 0.65rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.debug-item span {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.debug-item strong {
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.debug-item.full {
+  grid-column: 1 / -1;
+}
+
 .activity-list li {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -513,7 +543,8 @@ label {
 
   .split,
   .settings-grid,
-  .add-game-form {
+  .add-game-form,
+  .debug-grid {
     grid-template-columns: 1fr;
   }
 }

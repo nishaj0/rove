@@ -24,6 +24,7 @@ type fileFingerprint struct {
 type Engine struct {
 	cfg     *config.Manager
 	logs    *logstore.Store
+	debug   bool
 	mu      sync.RWMutex
 	status  models.Status
 	trigger chan string
@@ -34,10 +35,11 @@ type Engine struct {
 	paused  atomic.Bool
 }
 
-func New(cfg *config.Manager, logs *logstore.Store) *Engine {
+func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 	return &Engine{
 		cfg:     cfg,
 		logs:    logs,
+		debug:   debug,
 		trigger: make(chan string, 1),
 		tracked: make(map[string]fileFingerprint),
 	}
@@ -121,11 +123,17 @@ func (e *Engine) runOnce(reason string) {
 	start := time.Now()
 	settings := e.cfg.Get()
 	changed := 0
+	e.setLastError("")
+	if e.debug {
+		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle start: reason=%s games=%d", reason, len(settings.Games)))
+	}
 
 	// detect changes by comparing mtime+size fingerprints per file.
 	for _, game := range settings.Games {
+		root := game.Path
 		_ = filepath.WalkDir(game.Path, func(path string, d fs.DirEntry, walkErr error) error {
 			if walkErr != nil {
+				e.noteError("sync", fmt.Sprintf("scan failed for %s: %v", root, walkErr))
 				return nil
 			}
 			if d.IsDir() {
@@ -140,6 +148,7 @@ func (e *Engine) runOnce(reason string) {
 
 			info, err := d.Info()
 			if err != nil {
+				e.noteError("sync", fmt.Sprintf("file info failed for %s: %v", path, err))
 				return nil
 			}
 			key := game.ID + "::" + path
@@ -158,12 +167,13 @@ func (e *Engine) runOnce(reason string) {
 
 	if changed > 0 {
 		_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s): %d file(s) changed", reason, changed))
+	} else if e.debug {
+		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s): no file changes", reason))
 	}
 
 	e.pending.Store(0)
 	e.mu.Lock()
 	e.status.LastSyncTime = start.UTC()
-	e.status.LastError = ""
 	e.mu.Unlock()
 }
 
@@ -171,6 +181,17 @@ func (e *Engine) setRunning(value bool) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.status.Running = value
+}
+
+func (e *Engine) setLastError(msg string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.status.LastError = msg
+}
+
+func (e *Engine) noteError(event, msg string) {
+	e.setLastError(msg)
+	_ = e.logs.Write("error", event, msg)
 }
 
 func shouldIgnore(path string, patterns []string) bool {

@@ -30,6 +30,17 @@ export interface LogEntry {
   message: string;
 }
 
+export interface DebugInfo {
+  debug: boolean;
+  pid: number;
+  startedAt: string;
+  uptimeSec: number;
+  port: number;
+  configPath: string;
+  sqlitePath: string;
+  exePath: string;
+}
+
 export interface BackupExportRequest {
   gameId: string;
   destinationPath: string;

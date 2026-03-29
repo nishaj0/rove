@@ -74,6 +74,13 @@ cd backend
 go run ./cmd/daemon --no-tray
 ```
 
+For troubleshooting, run with verbose debug output:
+
+```powershell
+cd backend
+go run ./cmd/daemon --no-tray --debug
+```
+
 Terminal B: desktop UI
 
 ```powershell
@@ -134,6 +141,12 @@ Expected result:
 - Click Sync Now
 - Open Logs view and confirm new activity entries
 
+6. Open backend diagnostics endpoint:
+
+- http://127.0.0.1:7331/debug/info
+
+This shows whether debug mode is enabled, current PID, uptime, config file path, and SQLite log DB path.
+
 ## Tray + Startup Apps
 
 Yes, you can run this from tray and enable startup with Windows.
@@ -189,6 +202,8 @@ go build -o cloud-saver-daemon.exe ./cmd/daemon
 	- Install Visual Studio 2022 Build Tools with C++ tools
 - UI cannot connect to backend
 	- Start backend first and confirm service on `127.0.0.1:7331`
+	- Use `go run ./cmd/daemon --no-tray --debug` and watch terminal output for API and watcher errors
+	- Open `http://127.0.0.1:7331/debug/info` to verify backend process details
 
 ## Roadmap (Next)
 

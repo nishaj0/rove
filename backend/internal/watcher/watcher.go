@@ -16,10 +16,11 @@ type Manager struct {
 	mu      sync.Mutex
 	watcher *fsnotify.Watcher
 	cancel  context.CancelFunc
+	onError func(error)
 }
 
-func New() *Manager {
-	return &Manager{}
+func New(onError func(error)) *Manager {
+	return &Manager{onError: onError}
 }
 
 func (m *Manager) Reload(games []models.Game, onEvent func(path string)) error {
@@ -65,9 +66,12 @@ func (m *Manager) Reload(games []models.Game, onEvent func(path string)) error {
 					_ = addRecursive(w, event.Name)
 				}
 				onEvent(event.Name)
-			case _, ok := <-w.Errors:
+			case err, ok := <-w.Errors:
 				if !ok {
 					return
+				}
+				if err != nil && m.onError != nil {
+					m.onError(fmt.Errorf("watcher event error: %w", err))
 				}
 			}
 		}

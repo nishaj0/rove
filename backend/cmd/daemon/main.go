@@ -14,11 +14,17 @@ import (
 func main() {
 	var configPath string
 	var noTray bool
+	var debug bool
 	flag.StringVar(&configPath, "config", "", "path to settings.json")
 	flag.BoolVar(&noTray, "no-tray", false, "run without system tray")
+	flag.BoolVar(&debug, "debug", false, "enable verbose debug logs")
 	flag.Parse()
 
-	application, err := app.New(app.Options{ConfigPath: configPath, NoTray: noTray})
+	if !debug {
+		debug = os.Getenv("CLOUD_SAVER_DEBUG") == "1"
+	}
+
+	application, err := app.New(app.Options{ConfigPath: configPath, NoTray: noTray, Debug: debug})
 	if err != nil {
 		log.Fatalf("init app: %v", err)
 	}

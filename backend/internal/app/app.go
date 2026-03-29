@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -26,6 +27,7 @@ type Application struct {
 	watcher *watcher.Manager
 	tray    *tray.Manager
 	backup  *backup.Service
+	debug   bool
 	httpSrv *http.Server
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
@@ -34,6 +36,7 @@ type Application struct {
 type Options struct {
 	ConfigPath string
 	NoTray     bool
+	Debug      bool
 }
 
 func New(opts Options) (*Application, error) {
@@ -48,8 +51,15 @@ func New(opts Options) (*Application, error) {
 		return nil, err
 	}
 
-	engine := syncer.New(cfg, logs)
-	watchMgr := watcher.New()
+	engine := syncer.New(cfg, logs, opts.Debug)
+	watchMgr := watcher.New(func(err error) {
+		if err != nil {
+			_ = logs.Write("error", "watcher", err.Error())
+			if opts.Debug {
+				log.Printf("[watcher:error] %v", err)
+			}
+		}
+	})
 	trayMgr := tray.New()
 	backupSvc := backup.New()
 
@@ -60,7 +70,9 @@ func New(opts Options) (*Application, error) {
 		watcher: watchMgr,
 		tray:    trayMgr,
 		backup:  backupSvc,
+		debug:   opts.Debug,
 	}
+	a.logEvent("info", "app", fmt.Sprintf("application initialized (config=%s db=%s debug=%t)", cfg.Path(), logs.Path(), opts.Debug))
 	return a, nil
 }
 
@@ -69,12 +81,13 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	a.cancel = cancel
 
 	a.engine.Start(ctx)
+	a.logEvent("info", "app", fmt.Sprintf("application starting (noTray=%t)", noTray))
 
 	// reload watcher roots from persisted games on startup.
 	if err := a.watcher.Reload(a.cfg.Get().Games, func(path string) {
 		a.engine.NotifyFileEvent(path)
 	}); err != nil {
-		_ = a.logs.Write("error", "watcher", err.Error())
+		a.logEvent("error", "watcher", err.Error())
 	}
 
 	exePath, _ := os.Executable()
@@ -85,14 +98,16 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.logs,
 		a.backup,
 		exePath,
+		a.debug,
 		func(games []models.Game) {
 			if err := a.watcher.Reload(games, func(path string) {
 				a.engine.NotifyFileEvent(path)
 			}); err != nil {
-				_ = a.logs.Write("error", "watcher", err.Error())
+				a.logEvent("error", "watcher", err.Error())
 			}
 		},
 	)
+	a.logEvent("info", "http", fmt.Sprintf("api listening on %s", a.httpSrvAddr()))
 	a.httpSrv = &http.Server{
 		Addr:    fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port),
 		Handler: apiSvc.Handler(),
@@ -102,7 +117,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	go func() {
 		defer a.wg.Done()
 		if err := a.httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			_ = a.logs.Write("error", "http", err.Error())
+			a.logEvent("error", "http", err.Error())
 		}
 	}()
 
@@ -134,6 +149,7 @@ func (a *Application) Stop() error {
 	if a.cancel != nil {
 		a.cancel()
 	}
+	a.logEvent("info", "app", "application stopping")
 	if a.watcher != nil {
 		_ = a.watcher.Close()
 	}
@@ -146,6 +162,19 @@ func (a *Application) Stop() error {
 	}
 	a.wg.Wait()
 	return nil
+}
+
+func (a *Application) httpSrvAddr() string {
+	return fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port)
+}
+
+func (a *Application) logEvent(level, event, message string) {
+	if a.logs != nil {
+		_ = a.logs.Write(level, event, message)
+	}
+	if a.debug {
+		log.Printf("[%s:%s] %s", level, event, message)
+	}
 }
 
 func openUI() error {

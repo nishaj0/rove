@@ -12,7 +12,8 @@ import (
 )
 
 type Store struct {
-	db *sql.DB
+	db   *sql.DB
+	path string
 }
 
 func Open(root string) (*Store, error) {
@@ -27,7 +28,14 @@ func Open(root string) (*Store, error) {
 		return nil, err
 	}
 
-	return &Store{db: db}, nil
+	return &Store{db: db, path: dbPath}, nil
+}
+
+func (s *Store) Path() string {
+	if s == nil {
+		return ""
+	}
+	return s.path
 }
 
 func migrate(db *sql.DB) error {

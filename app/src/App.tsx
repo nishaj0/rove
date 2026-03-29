@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api";
-import type { ConflictPolicy, Game, LogEntry, Settings, Status } from "./types";
+import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 
 type View = "home" | "games" | "backup" | "activity" | "settings";
 
@@ -40,6 +40,7 @@ export default function App() {
   const [games, setGames] = useState<Game[]>([]);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
 
@@ -55,7 +56,7 @@ export default function App() {
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
-      return "Cannot reach backend service. Start backend with 'go run ./cmd/daemon --no-tray' and click Refresh.";
+      return "Cannot reach backend service. Start backend with 'go run ./cmd/daemon --no-tray --debug', then open http://127.0.0.1:7331/debug/info to confirm it is alive.";
     }
     return raw;
   }
@@ -69,12 +70,15 @@ export default function App() {
         api.getSettings(),
         api.getRecentLogs(25),
       ]);
+      const nextDebugInfo = await api.getDebugInfo().catch(() => null);
       setStatus(nextStatus);
       setGames(nextGames);
       setSettings(nextSettings);
       setLogs(nextLogs);
+      setDebugInfo(nextDebugInfo);
     } catch (e) {
       setError(toFriendlyError(e));
+      setDebugInfo(null);
     }
   }
 
@@ -123,6 +127,17 @@ export default function App() {
     }
     return new Date(status.lastSyncTime).toLocaleString();
   }, [status]);
+
+  const uptimeLabel = useMemo(() => {
+    if (!debugInfo) {
+      return "-";
+    }
+    const total = Math.max(0, debugInfo.uptimeSec);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    return `${h}h ${m}m ${s}s`;
+  }, [debugInfo]);
 
   async function onAddGame(e: React.FormEvent) {
     e.preventDefault();
@@ -411,6 +426,34 @@ export default function App() {
               <h2>Recent Activity</h2>
               <button className="btn" type="button" onClick={() => void refreshAll()}>Refresh</button>
             </div>
+
+              <div className="debug-grid">
+                <div className="debug-item">
+                  <span>Backend debug</span>
+                  <strong>{debugInfo ? (debugInfo.debug ? "enabled" : "disabled") : "offline"}</strong>
+                </div>
+                <div className="debug-item">
+                  <span>PID</span>
+                  <strong>{debugInfo?.pid ?? "-"}</strong>
+                </div>
+                <div className="debug-item">
+                  <span>Uptime</span>
+                  <strong>{uptimeLabel}</strong>
+                </div>
+                <div className="debug-item full">
+                  <span>Config file</span>
+                  <strong>{debugInfo?.configPath ?? "-"}</strong>
+                </div>
+                <div className="debug-item full">
+                  <span>Log database</span>
+                  <strong>{debugInfo?.sqlitePath ?? "-"}</strong>
+                </div>
+              </div>
+
+              {status?.lastError ? (
+                <div className="banner error">Last backend error: {status.lastError}</div>
+              ) : null}
+
             {logs.length === 0 ? (
               <p className="empty-state">No logs yet.</p>
             ) : (

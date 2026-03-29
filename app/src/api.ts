@@ -1,6 +1,7 @@
 import type {
   BackupExportRequest,
   BackupImportRequest,
+  DebugInfo,
   Game,
   LogEntry,
   Settings,
@@ -78,6 +79,9 @@ export const api = {
   },
   getRecentLogs(limit = 50) {
     return request<LogEntry[]>(`/logs/recent?limit=${limit}`);
+  },
+  getDebugInfo() {
+    return request<DebugInfo>("/debug/info");
   },
   exportBackup(payload: BackupExportRequest) {
     return request<{ status: string }>("/backup/export", {

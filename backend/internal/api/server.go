@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud-saver/backend/internal/autostart"
 	"cloud-saver/backend/internal/backup"
@@ -22,16 +24,24 @@ type Server struct {
 	engine         *syncer.Engine
 	logs           *logstore.Store
 	backup         *backup.Service
+	debug          bool
+	startedAt      time.Time
+	configPath     string
+	sqlitePath     string
 	onGamesChanged func([]models.Game)
 	exePath        string
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, exePath string, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, exePath string, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
 		logs:           logs,
 		backup:         backupSvc,
+		debug:          debug,
+		startedAt:      time.Now().UTC(),
+		configPath:     cfg.Path(),
+		sqlitePath:     logs.Path(),
 		onGamesChanged: onGamesChanged,
 		exePath:        exePath,
 	}
@@ -45,9 +55,15 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/status", s.handleStatus)
 	mux.HandleFunc("/settings", s.handleSettings)
 	mux.HandleFunc("/logs/recent", s.handleLogsRecent)
+	mux.HandleFunc("/debug/info", s.handleDebugInfo)
 	mux.HandleFunc("/backup/export", s.handleBackupExport)
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
-	return localhostOnly(mux)
+
+	handler := localhostOnly(mux)
+	if s.debug {
+		handler = s.withDebugRequestLogs(handler)
+	}
+	return handler
 }
 
 func localhostOnly(next http.Handler) http.Handler {
@@ -180,6 +196,25 @@ func (s *Server) handleLogsRecent(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, entries)
 }
 
+func (s *Server) handleDebugInfo(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	uptime := int64(time.Since(s.startedAt).Seconds())
+	writeJSON(w, http.StatusOK, map[string]any{
+		"debug":      s.debug,
+		"pid":        os.Getpid(),
+		"startedAt":  s.startedAt,
+		"uptimeSec":  uptime,
+		"port":       s.cfg.Get().Port,
+		"configPath": s.configPath,
+		"sqlitePath": s.sqlitePath,
+		"exePath":    s.exePath,
+	})
+}
+
 func (s *Server) handleBackupExport(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -246,4 +281,25 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 
 func writeErr(w http.ResponseWriter, status int, err error) {
 	writeJSON(w, status, map[string]string{"error": err.Error()})
+}
+
+func (s *Server) withDebugRequestLogs(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		status := http.StatusOK
+		ww := &statusWriter{ResponseWriter: w, status: &status}
+		next.ServeHTTP(ww, r)
+		duration := time.Since(start)
+		_ = s.logs.Write("debug", "http", fmt.Sprintf("%s %s -> %d (%s)", r.Method, r.URL.Path, status, duration.Round(time.Millisecond)))
+	})
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status *int
+}
+
+func (w *statusWriter) WriteHeader(code int) {
+	*w.status = code
+	w.ResponseWriter.WriteHeader(code)
 }
