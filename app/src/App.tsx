@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api";
 import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
+import { ActivityView } from "./views/ActivityView";
+import { BackupView } from "./views/BackupView";
+import { GamesView } from "./views/GamesView";
+import { HomeView } from "./views/HomeView";
+import { SettingsView } from "./views/SettingsView";
 
 type View = "home" | "games" | "backup" | "activity" | "settings";
 
@@ -10,11 +15,11 @@ type SyncState = {
 };
 
 const navItems: Array<{ id: View; label: string; icon: string }> = [
-  { id: "home", label: "Home", icon: "⌂" },
-  { id: "games", label: "Games", icon: "▦" },
-  { id: "backup", label: "Backup", icon: "⇅" },
-  { id: "activity", label: "Logs", icon: "◷" },
-  { id: "settings", label: "Settings", icon: "⚙" },
+  { id: "home", label: "Home", icon: "H" },
+  { id: "games", label: "Games", icon: "G" },
+  { id: "backup", label: "Backup", icon: "B" },
+  { id: "activity", label: "Logs", icon: "L" },
+  { id: "settings", label: "Settings", icon: "S" },
 ];
 
 const titleByView: Record<View, string> = {
@@ -98,13 +103,6 @@ export default function App() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
-  const statusLabel = useMemo(() => {
-    if (!status) {
-      return "Connecting";
-    }
-    return status.running ? "Sync Running" : "Sync Paused";
-  }, [status]);
-
   const syncState = useMemo<SyncState>(() => {
     if (error) {
       return { label: "Error", className: "error" };
@@ -147,8 +145,8 @@ export default function App() {
       setNewPath("");
       setToast("Game folder added");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -157,8 +155,8 @@ export default function App() {
       await api.deleteGame(id);
       setToast("Game removed");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -167,8 +165,8 @@ export default function App() {
       await api.saveSettings({ ...settings, games });
       setToast("Settings saved");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -177,8 +175,8 @@ export default function App() {
       await api.triggerSync();
       setToast("Sync queued");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -187,18 +185,18 @@ export default function App() {
       await api.exportBackup({ gameId: exportGameId, destinationPath: exportPath });
       setToast("Backup exported");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
-  async function onQuickExport(gameId: string) {
+  function onQuickExport(gameId: string) {
     setExportGameId(gameId);
     setActiveView("backup");
     setToast("Selected game for export");
   }
 
-  async function onQuickImport(gameId: string) {
+  function onQuickImport(gameId: string) {
     setImportGameId(gameId);
     setActiveView("backup");
     setToast("Selected game for import");
@@ -213,8 +211,8 @@ export default function App() {
       await api.importBackup({ gameId: importGameId, sourcePath: importPath, merge: mergeOnImport });
       setToast("Backup imported");
       await refreshAll();
-    } catch (e) {
-      setError(toFriendlyError(e));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -291,248 +289,74 @@ export default function App() {
         {toast ? <div className="banner toast">{toast}</div> : null}
 
         {activeView === "home" ? (
-          <>
-            <section className="stats-grid">
-              <article className="stat-card">
-                <h3>Pending events</h3>
-                <p>{status?.pending ?? 0}</p>
-              </article>
-              <article className="stat-card">
-                <h3>Tracked games</h3>
-                <p>{games.length}</p>
-              </article>
-              <article className="stat-card">
-                <h3>Last sync</h3>
-                <p>{lastSyncLabel}</p>
-              </article>
-              <article className="stat-card">
-                <h3>Autostart</h3>
-                <p>{settings.autostart ? "Enabled" : "Disabled"}</p>
-              </article>
-              <article className="stat-card">
-                <h3>Sync state</h3>
-                <p className={`state-text ${syncState.className}`}>{syncState.label}</p>
-              </article>
-            </section>
-
-            <section className="panel">
-              <div className="panel-head">
-                <h2>Library</h2>
-                <button className="btn" onClick={() => setActiveView("games")} type="button">Manage</button>
-              </div>
-              {games.length === 0 ? (
-                <p className="empty-state">No games tracked yet. Open Games to add your first save folder.</p>
-              ) : (
-                <div className="game-grid">
-                  {games.slice(0, 6).map((g) => (
-                    <article className="game-card" key={g.id}>
-                      <div className="game-cover">
-                        <span>{initials(g.name)}</span>
-                      </div>
-                      <div className="game-meta">
-                        <strong>{g.name}</strong>
-                        <p title={g.path}>{g.path}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-          </>
+          <HomeView
+            pending={status?.pending ?? 0}
+            games={games}
+            autostart={settings.autostart}
+            lastSyncLabel={lastSyncLabel}
+            syncLabel={syncState.label}
+            syncClass={syncState.className}
+            onManageGames={() => setActiveView("games")}
+            initials={initials}
+          />
         ) : null}
 
         {activeView === "games" ? (
-          <>
-            <section className="panel">
-              <h2>Add New Game Folder</h2>
-              <form className="add-game-form" onSubmit={onAddGame}>
-                <input placeholder="Game name" value={newName} onChange={(e) => setNewName(e.target.value)} />
-                <input placeholder="Save folder path (e.g. D:\\Games\\EldenRing\\Save)" value={newPath} onChange={(e) => setNewPath(e.target.value)} />
-                <button className="btn primary" type="submit">Add Game</button>
-              </form>
-            </section>
-
-            <section className="panel">
-              <h2>Tracked Games</h2>
-              {games.length === 0 ? (
-                <p className="empty-state">No games added yet.</p>
-              ) : (
-                <div className="game-grid">
-                  {games.map((g) => (
-                    <article className="game-card" key={g.id}>
-                      <div className="game-cover">
-                        <span>{initials(g.name)}</span>
-                        <span className={`game-state ${syncState.className}`}>{syncState.label}</span>
-                      </div>
-                      <div className="game-meta">
-                        <strong>{g.name}</strong>
-                        <p title={g.path}>{g.path}</p>
-                      </div>
-                      <div className="game-actions">
-                        <button className="btn" onClick={() => void onQuickExport(g.id)} type="button">Export</button>
-                        <button className="btn" onClick={() => void onQuickImport(g.id)} type="button">Import</button>
-                        <button className="btn primary" onClick={() => void onQuickEnableSync()} type="button">Enable Sync</button>
-                      </div>
-                      <div className="game-actions game-actions-danger">
-                        <button className="btn danger" onClick={() => void onDeleteGame(g.id)} type="button">Remove</button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-          </>
+          <GamesView
+            games={games}
+            newName={newName}
+            newPath={newPath}
+            syncLabel={syncState.label}
+            syncClass={syncState.className}
+            onNewNameChange={setNewName}
+            onNewPathChange={setNewPath}
+            onAddGame={onAddGame}
+            onQuickExport={onQuickExport}
+            onQuickImport={onQuickImport}
+            onQuickEnableSync={() => void onQuickEnableSync()}
+            onDeleteGame={(id) => void onDeleteGame(id)}
+            initials={initials}
+          />
         ) : null}
 
         {activeView === "backup" ? (
-          <section className="panel split">
-            <div>
-              <h2>Export ZIP</h2>
-              <label>
-                Game
-                <select value={exportGameId} onChange={(e) => setExportGameId(e.target.value)}>
-                  <option value="">Select game</option>
-                  {games.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Destination path
-                <input
-                  placeholder="D:\\Backups\\my-game.zip"
-                  value={exportPath}
-                  onChange={(e) => setExportPath(e.target.value)}
-                />
-              </label>
-              <button className="btn primary" onClick={() => void onExportBackup()} type="button">Export Backup</button>
-            </div>
-
-            <div>
-              <h2>Import ZIP</h2>
-              <label>
-                Game
-                <select value={importGameId} onChange={(e) => setImportGameId(e.target.value)}>
-                  <option value="">Select game</option>
-                  {games.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                ZIP source path
-                <input
-                  placeholder="D:\\Backups\\my-game.zip"
-                  value={importPath}
-                  onChange={(e) => setImportPath(e.target.value)}
-                />
-              </label>
-              <label className="inline-check">
-                <input type="checkbox" checked={mergeOnImport} onChange={(e) => setMergeOnImport(e.target.checked)} />
-                Merge into existing folder
-              </label>
-              <button className="btn primary" onClick={() => void onImportBackup()} type="button">Import Backup</button>
-            </div>
-          </section>
+          <BackupView
+            games={games}
+            exportGameId={exportGameId}
+            exportPath={exportPath}
+            importGameId={importGameId}
+            importPath={importPath}
+            mergeOnImport={mergeOnImport}
+            onExportGameChange={setExportGameId}
+            onExportPathChange={setExportPath}
+            onImportGameChange={setImportGameId}
+            onImportPathChange={setImportPath}
+            onMergeChange={setMergeOnImport}
+            onExportBackup={() => void onExportBackup()}
+            onImportBackup={() => void onImportBackup()}
+          />
         ) : null}
 
         {activeView === "activity" ? (
-          <section className="panel">
-            <div className="panel-head">
-              <h2>Recent Activity</h2>
-              <button className="btn" type="button" onClick={() => void refreshAll()}>Refresh</button>
-            </div>
-
-              <div className="debug-grid">
-                <div className="debug-item">
-                  <span>Backend debug</span>
-                  <strong>{debugInfo ? (debugInfo.debug ? "enabled" : "disabled") : "offline"}</strong>
-                </div>
-                <div className="debug-item">
-                  <span>PID</span>
-                  <strong>{debugInfo?.pid ?? "-"}</strong>
-                </div>
-                <div className="debug-item">
-                  <span>Uptime</span>
-                  <strong>{uptimeLabel}</strong>
-                </div>
-                <div className="debug-item full">
-                  <span>Config file</span>
-                  <strong>{debugInfo?.configPath ?? "-"}</strong>
-                </div>
-                <div className="debug-item full">
-                  <span>Log database</span>
-                  <strong>{debugInfo?.sqlitePath ?? "-"}</strong>
-                </div>
-              </div>
-
-              {status?.lastError ? (
-                <div className="banner error">Last backend error: {status.lastError}</div>
-              ) : null}
-
-            {logs.length === 0 ? (
-              <p className="empty-state">No logs yet.</p>
-            ) : (
-              <ul className="activity-list">
-                {logs.map((entry) => (
-                  <li key={entry.id}>
-                    <span>{safeTime(entry.timestamp)}</span>
-                    <strong>{entry.level.toUpperCase()}</strong>
-                    <em>{entry.event}</em>
-                    <p>{entry.message}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <ActivityView
+            debugInfo={debugInfo}
+            uptimeLabel={uptimeLabel}
+            lastError={status?.lastError ?? ""}
+            logs={logs}
+            onRefresh={() => void refreshAll()}
+            safeTime={safeTime}
+          />
         ) : null}
 
         {activeView === "settings" ? (
-          <section className="panel">
-            <h2>Global Settings</h2>
-            <div className="settings-grid">
-              <label>
-                Sync interval (seconds)
-                <input
-                  type="number"
-                  min={5}
-                  value={settings.syncIntervalSeconds}
-                  onChange={(e) => setSettings((s) => ({ ...s, syncIntervalSeconds: Number(e.target.value) }))}
-                />
-              </label>
-              <label>
-                Conflict policy
-                <select
-                  value={settings.conflictPolicy}
-                  onChange={(e) => setSettings((s) => ({ ...s, conflictPolicy: e.target.value as ConflictPolicy }))}
-                >
-                  <option value="latest_wins">Latest modified wins</option>
-                  <option value="keep_both">Keep both copies</option>
-                </select>
-              </label>
-              <label className="inline-check">
-                <input
-                  type="checkbox"
-                  checked={settings.autostart}
-                  onChange={(e) => setSettings((s) => ({ ...s, autostart: e.target.checked }))}
-                />
-                Start on Windows login
-              </label>
-              <label>
-                Ignore patterns (comma separated)
-                <input
-                  value={settings.ignorePatterns.join(",")}
-                  onChange={(e) =>
-                    setSettings((s) => ({
-                      ...s,
-                      ignorePatterns: e.target.value.split(",").map((v) => v.trim()).filter(Boolean),
-                    }))
-                  }
-                />
-              </label>
-            </div>
-            <button className="btn primary" onClick={() => void onSaveSettings()} type="button">Save Settings</button>
-          </section>
+          <SettingsView
+            settings={settings}
+            onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
+            onConflictPolicyChange={(value: ConflictPolicy) => setSettings((s) => ({ ...s, conflictPolicy: value }))}
+            onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
+            onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
+            onSaveSettings={() => void onSaveSettings()}
+          />
         ) : null}
       </main>
     </div>
