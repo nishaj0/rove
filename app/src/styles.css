@@ -63,43 +63,6 @@ label {
   overflow: hidden;
 }
 
-.brand {
-  display: grid;
-  justify-items: center;
-  gap: 0.3rem;
-  padding: 0.15rem 0.3rem 0.45rem;
-  border-bottom: 1px solid #1a1d23;
-}
-
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: #15171b;
-  border: 1px solid #2a2e36;
-  color: #e7e9ee;
-  font-weight: 800;
-  display: grid;
-  place-items: center;
-}
-
-.brand-copy {
-  text-align: center;
-}
-
-.brand-copy strong {
-  display: block;
-  font-size: 0.64rem;
-  color: #d7dce6;
-  letter-spacing: 0.02em;
-}
-
-.brand-copy p {
-  margin: 0;
-  font-size: 0.56rem;
-  color: var(--text-muted);
-}
-
 .side-nav {
   width: 100%;
   display: grid;
@@ -141,8 +104,8 @@ label {
 }
 
 .side-link.active {
-  background: #1d2026;
-  color: #f1f3f8;
+  background: transparent;
+  color: var(--text-secondary);
 }
 
 .side-link.active::before {
@@ -151,15 +114,17 @@ label {
 }
 
 .side-icon {
-  font-size: 0.78rem;
-  font-weight: 700;
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 4px;
-  border: 1px solid #2f343e;
-  background: #121418;
+  color: inherit;
+  width: 1.2rem;
+  height: 1.2rem;
   display: grid;
   place-items: center;
+  line-height: 0;
+}
+
+.side-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .side-label {
@@ -648,16 +613,6 @@ label {
     align-items: center;
     gap: 0.7rem;
     padding: 0.75rem;
-  }
-
-  .brand {
-    justify-items: start;
-    grid-auto-flow: column;
-    align-items: center;
-  }
-
-  .brand-copy {
-    text-align: left;
   }
 
   .side-nav {

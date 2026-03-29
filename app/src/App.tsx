@@ -14,12 +14,12 @@ type SyncState = {
   className: "success" | "warning" | "error" | "syncing";
 };
 
-const navItems: Array<{ id: View; label: string; icon: string }> = [
-  { id: "home", label: "Home", icon: "H" },
-  { id: "games", label: "Games", icon: "G" },
-  { id: "backup", label: "Backup", icon: "B" },
-  { id: "activity", label: "Logs", icon: "L" },
-  { id: "settings", label: "Settings", icon: "S" },
+const navItems: Array<{ id: View; label: string }> = [
+  { id: "home", label: "Home" },
+  { id: "games", label: "Games" },
+  { id: "backup", label: "Backup" },
+  { id: "activity", label: "Logs" },
+  { id: "settings", label: "Settings" },
 ];
 
 const titleByView: Record<View, string> = {
@@ -38,6 +38,59 @@ const defaultSettings: Settings = {
   ignorePatterns: ["*.tmp", "*.log", "cache"],
   games: [],
 };
+
+function NavIcon({ view }: { view: View }) {
+  if (view === "home") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 10.5L12 3l9 7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6 9.8V20h12V9.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (view === "games") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="4" y="7.5" width="16" height="9" rx="3" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M9 10.5v3M7.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="15.7" cy="11.2" r="1" fill="currentColor" />
+        <circle cx="17.8" cy="13.3" r="1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (view === "backup") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 8h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M12 11v5M10.2 14.2L12 16l1.8-1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (view === "activity") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M19.5 12a7.5 7.5 0 0 0-.08-1.08l2.04-1.58-2-3.46-2.45.7a7.72 7.72 0 0 0-1.88-1.08L14.7 3h-4.02l-.43 2.5a7.72 7.72 0 0 0-1.88 1.08l-2.45-.7-2 3.46 2.04 1.58a7.5 7.5 0 0 0 0 2.16L3.92 14.66l2 3.46 2.45-.7a7.72 7.72 0 0 0 1.88 1.08l.43 2.5h4.02l.43-2.5a7.72 7.72 0 0 0 1.88-1.08l2.45.7 2-3.46-2.04-1.58c.05-.35.08-.71.08-1.08z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>("home");
@@ -246,13 +299,6 @@ export default function App() {
   return (
     <div className="app-layout">
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">CS</div>
-          <div className="brand-copy">
-            <strong>Cloud Saver</strong>
-            <p>Desktop sync</p>
-          </div>
-        </div>
         <nav className="side-nav">
           {navItems.map((item) => (
             <button
@@ -261,7 +307,9 @@ export default function App() {
               onClick={() => setActiveView(item.id)}
               type="button"
             >
-              <span className="side-icon">{item.icon}</span>
+              <span className="side-icon">
+                <NavIcon view={item.id} />
+              </span>
               <span className="side-label">{item.label}</span>
             </button>
           ))}
