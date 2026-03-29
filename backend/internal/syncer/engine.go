@@ -74,6 +74,7 @@ func (e *Engine) Trigger(reason string) {
 	if reason == "" {
 		reason = "manual"
 	}
+	// keep trigger queue bounded; a single queued run is enough.
 	select {
 	case e.trigger <- reason:
 	default:
@@ -121,6 +122,7 @@ func (e *Engine) runOnce(reason string) {
 	settings := e.cfg.Get()
 	changed := 0
 
+	// detect changes by comparing mtime+size fingerprints per file.
 	for _, game := range settings.Games {
 		_ = filepath.WalkDir(game.Path, func(path string, d fs.DirEntry, walkErr error) error {
 			if walkErr != nil {

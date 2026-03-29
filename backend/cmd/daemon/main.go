@@ -23,6 +23,7 @@ func main() {
 		log.Fatalf("init app: %v", err)
 	}
 
+	// tie app lifetime to ctrl+c and termination signals.
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 

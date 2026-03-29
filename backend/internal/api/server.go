@@ -52,6 +52,7 @@ func (s *Server) Handler() http.Handler {
 
 func localhostOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// keep control endpoints local-only for mvp security.
 		host := r.RemoteAddr
 		if !strings.HasPrefix(host, "127.0.0.1") && !strings.HasPrefix(host, "[::1]") {
 			http.Error(w, "forbidden", http.StatusForbidden)
@@ -229,6 +230,7 @@ func (s *Server) handleBackupImport(w http.ResponseWriter, r *http.Request) {
 func decodeJSON(r *http.Request, out any) error {
 	defer r.Body.Close()
 	dec := json.NewDecoder(r.Body)
+	// reject unknown payload fields to surface client mistakes early.
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(out); err != nil {
 		return err

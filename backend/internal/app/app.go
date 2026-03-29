@@ -70,6 +70,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 
 	a.engine.Start(ctx)
 
+	// reload watcher roots from persisted games on startup.
 	if err := a.watcher.Reload(a.cfg.Get().Games, func(path string) {
 		a.engine.NotifyFileEvent(path)
 	}); err != nil {
@@ -77,6 +78,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	}
 
 	exePath, _ := os.Executable()
+	// keep watcher roots in sync when game list changes via api.
 	apiSvc := api.New(
 		a.cfg,
 		a.engine,
@@ -105,6 +107,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	}()
 
 	if noTray {
+		// allow headless mode for local dev and testing.
 		<-ctx.Done()
 		return a.Stop()
 	}
@@ -135,6 +138,7 @@ func (a *Application) Stop() error {
 		_ = a.watcher.Close()
 	}
 	if a.httpSrv != nil {
+		// stop accepting api traffic before waiting on goroutines.
 		_ = a.httpSrv.Shutdown(context.Background())
 	}
 	if a.logs != nil {
