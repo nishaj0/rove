@@ -41,8 +41,8 @@ export function HomeView(props: HomeViewProps) {
 
       <section className="panel">
         <div className="panel-head">
-          <h2>Library</h2>
-          <button className="btn" onClick={onManageGames} type="button">Manage</button>
+          <h2>Game Library</h2>
+          <button className="btn" onClick={onManageGames} type="button">See all</button>
         </div>
         {games.length === 0 ? (
           <p className="empty-state">No games tracked yet. Open Games to add your first save folder.</p>

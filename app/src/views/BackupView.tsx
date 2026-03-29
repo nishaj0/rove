@@ -35,7 +35,7 @@ export function BackupView(props: BackupViewProps) {
 
   return (
     <section className="panel split">
-      <div>
+      <div className="backup-pane">
         <h2>Export ZIP</h2>
         <label>
           Game
@@ -54,10 +54,10 @@ export function BackupView(props: BackupViewProps) {
             onChange={(e) => onExportPathChange(e.target.value)}
           />
         </label>
-        <button className="btn primary" onClick={onExportBackup} type="button">Export Backup</button>
+        <button className="btn primary backup-action" onClick={onExportBackup} type="button">Export Backup</button>
       </div>
 
-      <div>
+      <div className="backup-pane">
         <h2>Import ZIP</h2>
         <label>
           Game
@@ -80,7 +80,7 @@ export function BackupView(props: BackupViewProps) {
           <input type="checkbox" checked={mergeOnImport} onChange={(e) => onMergeChange(e.target.checked)} />
           Merge into existing folder
         </label>
-        <button className="btn primary" onClick={onImportBackup} type="button">Import Backup</button>
+        <button className="btn primary backup-action" onClick={onImportBackup} type="button">Import Backup</button>
       </div>
     </section>
   );
