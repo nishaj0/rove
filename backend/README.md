@@ -22,6 +22,21 @@ go mod tidy
 go run ./cmd/daemon --no-tray
 ```
 
+or with Make:
+
+```powershell
+cd backend
+make tidy
+make run
+```
+
+for debug logs:
+
+```powershell
+cd backend
+make debug
+```
+
 By default, settings are stored at:
 
 - `%AppData%/CloudSaver/settings.json`
