@@ -2,7 +2,10 @@ package models
 
 import "time"
 
+// defines strategies for resolving save conflicts during sync/import.
 type ConflictPolicy string
+
+// defines ui theme behavior as dark, light, or system-driven.
 type ThemeMode string
 
 const (
@@ -13,6 +16,7 @@ const (
 	ThemeSystem        ThemeMode      = "system"
 )
 
+// stores tracked title metadata and local filesystem paths.
 type Game struct {
 	ID             string `json:"id"`
 	Name           string `json:"name"`
@@ -21,11 +25,13 @@ type Game struct {
 	CoverImageData string `json:"coverImageData,omitempty"`
 }
 
+// stores persisted runtime totals used by status views.
 type GameStats struct {
 	PlaytimeSeconds int64
 	LastPlayedAt    time.Time
 }
 
+// stores persisted daemon configuration from settings.json.
 type Settings struct {
 	Port                int            `json:"port"`
 	SyncIntervalSeconds int            `json:"syncIntervalSeconds"`
@@ -36,6 +42,7 @@ type Settings struct {
 	Games               []Game         `json:"games"`
 }
 
+// reports current engine state for api status responses.
 type Status struct {
 	Running      bool      `json:"running"`
 	LastSyncTime time.Time `json:"lastSyncTime"`
@@ -43,6 +50,7 @@ type Status struct {
 	Pending      int       `json:"pending"`
 }
 
+// stores a single sqlite-backed event returned by log endpoints.
 type LogEntry struct {
 	ID        int64     `json:"id"`
 	Timestamp time.Time `json:"timestamp"`
@@ -51,11 +59,13 @@ type LogEntry struct {
 	Message   string    `json:"message"`
 }
 
+// carries game selection and destination for backup export.
 type BackupExportRequest struct {
 	GameID          string `json:"gameId"`
 	DestinationPath string `json:"destinationPath"`
 }
 
+// carries game selection and source archive for backup import.
 type BackupImportRequest struct {
 	GameID     string `json:"gameId"`
 	SourcePath string `json:"sourcePath"`

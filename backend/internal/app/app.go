@@ -21,6 +21,7 @@ import (
 	"cloud-saver/backend/internal/watcher"
 )
 
+// coordinates daemon services and runtime lifecycle.
 type Application struct {
 	cfg     *config.Manager
 	logs    *logstore.Store
@@ -35,12 +36,14 @@ type Application struct {
 	wg      sync.WaitGroup
 }
 
+// captures startup configuration for daemon runtime.
 type Options struct {
 	ConfigPath string
 	NoTray     bool
 	Debug      bool
 }
 
+// initializes config, storage, sync engine, monitor, watcher, api, and tray wiring.
 func New(opts Options) (*Application, error) {
 	cfg, err := config.New(opts.ConfigPath)
 	if err != nil {
@@ -92,6 +95,7 @@ func New(opts Options) (*Application, error) {
 	return a, nil
 }
 
+// starts background services and blocks until shutdown or tray exit.
 func (a *Application) Run(ctx context.Context, noTray bool) error {
 	ctx, cancel := context.WithCancel(ctx)
 	a.cancel = cancel
@@ -159,6 +163,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	return nil
 }
 
+// gracefully tears down watcher, http server, logging, and worker goroutines.
 func (a *Application) Stop() error {
 	if a.cancel != nil {
 		a.cancel()
@@ -178,10 +183,12 @@ func (a *Application) Stop() error {
 	return nil
 }
 
+// builds the loopback bind address from current config port.
 func (a *Application) httpSrvAddr() string {
 	return fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port)
 }
 
+// limits watcher roots to currently running tracked games.
 func (a *Application) reloadWatcherForRunningGames(runningIDs []string) error {
 	if len(runningIDs) == 0 {
 		return a.watcher.Reload(nil, func(path string) {
@@ -196,6 +203,7 @@ func (a *Application) reloadWatcherForRunningGames(runningIDs []string) error {
 
 	settings := a.cfg.Get()
 	activeGames := make([]models.Game, 0, len(runningSet))
+	// filter tracked games against running ids so watcher load stays minimal.
 	for _, game := range settings.Games {
 		if _, ok := runningSet[game.ID]; ok {
 			activeGames = append(activeGames, game)
@@ -207,6 +215,7 @@ func (a *Application) reloadWatcherForRunningGames(runningIDs []string) error {
 	})
 }
 
+// writes structured logs and mirrors to stdout when debug is enabled.
 func (a *Application) logEvent(level, event, message string) {
 	if a.logs != nil {
 		_ = a.logs.Write(level, event, message)
@@ -216,6 +225,7 @@ func (a *Application) logEvent(level, event, message string) {
 	}
 }
 
+// asks windows shell to open the local status page in the default browser.
 func openUI() error {
 	cmd := exec.Command("rundll32", "url.dll,FileProtocolHandler", "http://127.0.0.1:7331/status")
 	return cmd.Start()

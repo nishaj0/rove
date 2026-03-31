@@ -12,12 +12,14 @@ import (
 	"cloud-saver/backend/internal/models"
 )
 
+// coordinates in-memory settings state with on-disk persistence.
 type Manager struct {
 	mu       sync.RWMutex
 	path     string
 	settings models.Settings
 }
 
+// creates a manager and loads settings from disk, creating defaults when missing.
 func New(path string) (*Manager, error) {
 	if path == "" {
 		resolved, err := defaultPath()
@@ -34,6 +36,7 @@ func New(path string) (*Manager, error) {
 	return m, nil
 }
 
+// resolves the per-user settings.json location under CloudSaver.
 func defaultPath() (string, error) {
 	base, err := os.UserConfigDir()
 	if err != nil {
@@ -42,6 +45,7 @@ func defaultPath() (string, error) {
 	return filepath.Join(base, "CloudSaver", "settings.json"), nil
 }
 
+// returns baseline values used for first run and normalization fallback.
 func DefaultSettings() models.Settings {
 	return models.Settings{
 		Port:                7331,
@@ -54,12 +58,14 @@ func DefaultSettings() models.Settings {
 	}
 }
 
+// returns the active settings file path.
 func (m *Manager) Path() string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return m.path
 }
 
+// returns a safe cloned copy of in-memory settings.
 func (m *Manager) Get() models.Settings {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -69,6 +75,7 @@ func (m *Manager) Get() models.Settings {
 	return cloned
 }
 
+// validates and persists mutable settings fields from api input.
 func (m *Manager) Update(next models.Settings) error {
 	if next.Port <= 0 || next.Port > 65535 {
 		return errors.New("port must be between 1 and 65535")
@@ -94,6 +101,7 @@ func (m *Manager) Update(next models.Settings) error {
 	return m.saveLocked()
 }
 
+// reads settings from disk and normalizes missing or legacy fields.
 func (m *Manager) load() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -117,6 +125,7 @@ func (m *Manager) load() error {
 		return m.saveLocked()
 	}
 
+	// trim utf-8 bom so settings written by some windows tools still decode.
 	if bytes.HasPrefix(payload, []byte{0xEF, 0xBB, 0xBF}) {
 		payload = payload[3:]
 	}
@@ -130,6 +139,7 @@ func (m *Manager) load() error {
 	return nil
 }
 
+// backfills defaults for zero, nil, or invalid fields from older files.
 func normalizeSettings(settings *models.Settings) bool {
 	if settings == nil {
 		return false
@@ -165,6 +175,7 @@ func normalizeSettings(settings *models.Settings) bool {
 	return changed
 }
 
+// writes in-memory settings to disk and assumes caller holds manager lock.
 func (m *Manager) saveLocked() error {
 	payload, err := json.MarshalIndent(m.settings, "", "  ")
 	if err != nil {

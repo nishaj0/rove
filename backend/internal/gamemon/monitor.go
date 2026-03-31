@@ -20,9 +20,11 @@ import (
 const (
 	defaultPollInterval  = 3 * time.Second
 	defaultFlushInterval = 15 * time.Second
-	maxClockGap          = 60 * time.Second
+	// guard against unrealistic jumps to avoid overcounting playtime on clock skew/sleep.
+	maxClockGap = 60 * time.Second
 )
 
+// tracks transient runtime playtime state for one game.
 type session struct {
 	running        bool
 	lastTick       time.Time
@@ -30,12 +32,14 @@ type session struct {
 	pendingSeconds int64
 }
 
+// represents a pending playtime write to sqlite.
 type flushOp struct {
 	gameID  string
 	seconds int64
 	at      time.Time
 }
 
+// polls running processes and accumulates per-game playtime.
 type Monitor struct {
 	cfg              *config.Manager
 	logs             *logstore.Store
@@ -51,6 +55,7 @@ type Monitor struct {
 	started    atomic.Bool
 }
 
+// creates a monitor with optional callbacks for running-set changes and errors.
 func New(cfg *config.Manager, logs *logstore.Store, onRunningChanged func([]string), onError func(error)) *Monitor {
 	return &Monitor{
 		cfg:              cfg,
@@ -64,6 +69,7 @@ func New(cfg *config.Manager, logs *logstore.Store, onRunningChanged func([]stri
 	}
 }
 
+// begins polling and flushes outstanding playtime when context is canceled.
 func (m *Monitor) Start(ctx context.Context) {
 	if !m.started.CompareAndSwap(false, true) {
 		return
@@ -85,12 +91,14 @@ func (m *Monitor) Start(ctx context.Context) {
 	}()
 }
 
+// updates the callback fired when running game ids change.
 func (m *Monitor) SetOnRunningChanged(onRunningChanged func([]string)) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.onRunningChanged = onRunningChanged
 }
 
+// triggers an immediate process snapshot when monitor is active.
 func (m *Monitor) ForcePoll() {
 	if !m.started.Load() {
 		return
@@ -98,6 +106,7 @@ func (m *Monitor) ForcePoll() {
 	m.pollOnce(time.Now())
 }
 
+// reports whether a specific game is currently detected as running.
 func (m *Monitor) IsRunning(gameID string) bool {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -105,6 +114,7 @@ func (m *Monitor) IsRunning(gameID string) bool {
 	return ok
 }
 
+// returns unflushed playtime currently buffered in memory.
 func (m *Monitor) PendingSeconds(gameID string) int64 {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -115,6 +125,7 @@ func (m *Monitor) PendingSeconds(gameID string) int64 {
 	return s.pendingSeconds
 }
 
+// returns a stable sorted copy of detected running game ids.
 func (m *Monitor) RunningIDs() []string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -126,6 +137,7 @@ func (m *Monitor) RunningIDs() []string {
 	return ids
 }
 
+// updates sessions from process snapshots and schedules playtime flushes.
 func (m *Monitor) pollOnce(now time.Time) {
 	games := m.cfg.Get().Games
 	runningByExecutable := m.snapshotRunningExecutables()
@@ -161,12 +173,14 @@ func (m *Monitor) pollOnce(now time.Time) {
 		}
 
 		if s.running && running {
+			// accumulate elapsed time only for sane deltas between poll ticks.
 			delta := now.Sub(s.lastTick)
 			if delta > 0 && delta <= maxClockGap {
 				s.pendingSeconds += int64(delta.Seconds())
 			}
 		}
 		if s.running && !running {
+			// flush immediately on transition to stopped so no session time is lost.
 			if s.pendingSeconds > 0 {
 				flushes = append(flushes, flushOp{gameID: game.ID, seconds: s.pendingSeconds, at: now})
 				s.pendingSeconds = 0
@@ -174,6 +188,7 @@ func (m *Monitor) pollOnce(now time.Time) {
 		}
 		if running {
 			nextRunning[game.ID] = struct{}{}
+			// periodically persist while game keeps running to reduce buffered time on crash.
 			if now.Sub(s.lastFlush) >= m.flushInterval && s.pendingSeconds > 0 {
 				flushes = append(flushes, flushOp{gameID: game.ID, seconds: s.pendingSeconds, at: now})
 				s.pendingSeconds = 0
@@ -202,6 +217,7 @@ func (m *Monitor) pollOnce(now time.Time) {
 	}
 }
 
+// writes all buffered playtime and clears running state.
 func (m *Monitor) flushAll(now time.Time) {
 	m.mu.Lock()
 	flushes := make([]flushOp, 0, len(m.sessions))
@@ -217,6 +233,7 @@ func (m *Monitor) flushAll(now time.Time) {
 	m.flushOps(flushes)
 }
 
+// persists buffered playtime and requeues on write failure.
 func (m *Monitor) flushOps(flushes []flushOp) {
 	for _, op := range flushes {
 		if op.seconds <= 0 {
@@ -235,6 +252,7 @@ func (m *Monitor) flushOps(flushes []flushOp) {
 	}
 }
 
+// returns normalized executable paths for active processes.
 func (m *Monitor) snapshotRunningExecutables() map[string]bool {
 	running := make(map[string]bool)
 	procs, err := process.Processes()
@@ -254,6 +272,7 @@ func (m *Monitor) snapshotRunningExecutables() map[string]bool {
 	return running
 }
 
+// canonicalizes executable path values for consistent map keys.
 func normalizePath(path string) string {
 	trimmed := strings.TrimSpace(path)
 	if trimmed == "" {
@@ -262,6 +281,7 @@ func normalizePath(path string) string {
 	return strings.ToLower(filepath.Clean(trimmed))
 }
 
+// compares running-id sets to detect change notifications.
 func sameSet(a map[string]struct{}, b map[string]struct{}) bool {
 	if len(a) != len(b) {
 		return false

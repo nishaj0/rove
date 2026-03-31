@@ -16,16 +16,19 @@ import (
 	"cloud-saver/backend/internal/models"
 )
 
+// stores lightweight metadata used for change detection.
 type fileFingerprint struct {
 	ModTime int64
 	Size    int64
 }
 
+// carries queue metadata for manual, watcher, or interval requests.
 type syncTrigger struct {
 	reason string
 	gameID string
 }
 
+// schedules sync cycles and tracks runtime status.
 type Engine struct {
 	cfg     *config.Manager
 	logs    *logstore.Store
@@ -40,6 +43,7 @@ type Engine struct {
 	paused  atomic.Bool
 }
 
+// constructs an engine bound to config and sqlite log storage.
 func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 	return &Engine{
 		cfg:     cfg,
@@ -50,6 +54,7 @@ func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 	}
 }
 
+// launches the background loop and marks engine as running.
 func (e *Engine) Start(ctx context.Context) {
 	if !e.started.CompareAndSwap(false, true) {
 		e.Resume()
@@ -62,6 +67,7 @@ func (e *Engine) Start(ctx context.Context) {
 	go e.loop(ctx)
 }
 
+// pauses sync execution without tearing down the loop goroutine.
 func (e *Engine) Stop() {
 	e.paused.Store(true)
 	e.running.Store(false)
@@ -69,6 +75,7 @@ func (e *Engine) Stop() {
 	_ = e.logs.Write("info", "sync", "sync engine paused")
 }
 
+// re-enables sync processing and enqueues a catch-up cycle.
 func (e *Engine) Resume() {
 	e.paused.Store(false)
 	e.running.Store(true)
@@ -77,6 +84,7 @@ func (e *Engine) Resume() {
 	_ = e.logs.Write("info", "sync", "sync engine resumed")
 }
 
+// requests a full sync cycle and coalesces duplicate queue entries.
 func (e *Engine) Trigger(reason string) {
 	if reason == "" {
 		reason = "manual"
@@ -88,6 +96,7 @@ func (e *Engine) Trigger(reason string) {
 	}
 }
 
+// requests a game-scoped sync cycle when a specific game changes.
 func (e *Engine) TriggerGame(gameID, reason string) {
 	if gameID == "" {
 		return
@@ -101,11 +110,13 @@ func (e *Engine) TriggerGame(gameID, reason string) {
 	}
 }
 
+// increments pending count and nudges the engine via watcher reason.
 func (e *Engine) NotifyFileEvent(_ string) {
 	e.pending.Add(1)
 	e.Trigger("watcher")
 }
 
+// returns an immutable snapshot for /status responses.
 func (e *Engine) Status() models.Status {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
@@ -114,6 +125,7 @@ func (e *Engine) Status() models.Status {
 	return copy
 }
 
+// waits for interval ticks or trigger events and runs one cycle per request.
 func (e *Engine) loop(ctx context.Context) {
 	for {
 		settings := e.cfg.Get()
@@ -126,6 +138,7 @@ func (e *Engine) loop(ctx context.Context) {
 			e.Stop()
 			return
 		case req := <-e.trigger:
+			// consume queued trigger immediately and skip waiting for timer tick.
 			timer.Stop()
 			e.runOnce(req.reason, req.gameID)
 		case <-timer.C:
@@ -134,6 +147,7 @@ func (e *Engine) loop(ctx context.Context) {
 	}
 }
 
+// performs one sync pass, optionally scoped to a single game id.
 func (e *Engine) runOnce(reason, targetGameID string) {
 	if e.paused.Load() {
 		return
@@ -164,7 +178,7 @@ func (e *Engine) runOnce(reason, targetGameID string) {
 		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle start: reason=%s scope=%s games=%d", reason, scope, len(games)))
 	}
 
-	// detect changes by comparing mtime+size fingerprints per file.
+	// detect changes by comparing mtime+size fingerprints so edits and rewrites are both captured.
 	for _, game := range games {
 		root := game.Path
 		_ = filepath.WalkDir(game.Path, func(path string, d fs.DirEntry, walkErr error) error {
@@ -191,6 +205,7 @@ func (e *Engine) runOnce(reason, targetGameID string) {
 			fp := fileFingerprint{ModTime: info.ModTime().UnixNano(), Size: info.Size()}
 
 			e.mu.Lock()
+			// track fingerprints per game to avoid collisions for same filename across libraries.
 			prev, ok := e.tracked[key]
 			if !ok || prev != fp {
 				e.tracked[key] = fp
@@ -223,23 +238,27 @@ func (e *Engine) runOnce(reason, targetGameID string) {
 	e.mu.Unlock()
 }
 
+// updates status atomically under engine mutex.
 func (e *Engine) setRunning(value bool) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.status.Running = value
 }
 
+// stores latest sync error in status snapshot.
 func (e *Engine) setLastError(msg string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	e.status.LastError = msg
 }
 
+// records a sync error and updates status state.
 func (e *Engine) noteError(event, msg string) {
 	e.setLastError(msg)
 	_ = e.logs.Write("error", event, msg)
 }
 
+// evaluates filename and path patterns from configured ignore rules.
 func shouldIgnore(path string, patterns []string) bool {
 	name := filepath.Base(path)
 	for _, pattern := range patterns {

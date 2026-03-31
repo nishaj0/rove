@@ -17,6 +17,9 @@
 
 - add comments only where logic is non-obvious.
 - always add comments for new functions and exported types.
+- When referencing a function or type in a comment, ensure its name matches the exact case and is wrapped in quotation marks (e.g. "myFunction").
+- avoid comments that simply restate what the code does; instead, focus on explaining why the code does something or any non-obvious implications.
+- never add the function name as first word in a comment for that function. For example, instead of writing "myFunction does X", write "does X" and ensure the comment is directly above the function definition.
 - do not flood files with comments.
 - always start comment text with lowercase.
 - avoid trivial comments that restate the code.
