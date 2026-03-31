@@ -8,9 +8,9 @@ type BackupViewProps = {
   importPath: string;
   mergeOnImport: boolean;
   onExportGameChange: (value: string) => void;
-  onExportPathChange: (value: string) => void;
+  onBrowseExportPath: () => void;
   onImportGameChange: (value: string) => void;
-  onImportPathChange: (value: string) => void;
+  onBrowseImportPath: () => void;
   onMergeChange: (value: boolean) => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
@@ -25,9 +25,9 @@ export function BackupView(props: BackupViewProps) {
     importPath,
     mergeOnImport,
     onExportGameChange,
-    onExportPathChange,
+    onBrowseExportPath,
     onImportGameChange,
-    onImportPathChange,
+    onBrowseImportPath,
     onMergeChange,
     onExportBackup,
     onImportBackup,
@@ -47,11 +47,13 @@ export function BackupView(props: BackupViewProps) {
           </select>
         </label>
         <label>
-          Destination path
+          Destination folder
           <input
-            placeholder="D:\\Backups\\my-game.zip"
+            className="picker-input"
+            placeholder="D:\\Backups"
             value={exportPath}
-            onChange={(e) => onExportPathChange(e.target.value)}
+            readOnly
+            onClick={onBrowseExportPath}
           />
         </label>
         <button className="btn primary backup-action" onClick={onExportBackup} type="button">Export Backup</button>
@@ -71,9 +73,11 @@ export function BackupView(props: BackupViewProps) {
         <label>
           ZIP source path
           <input
+            className="picker-input"
             placeholder="D:\\Backups\\my-game.zip"
             value={importPath}
-            onChange={(e) => onImportPathChange(e.target.value)}
+            readOnly
+            onClick={onBrowseImportPath}
           />
         </label>
         <label className="inline-check">

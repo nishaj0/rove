@@ -8,8 +8,8 @@ type GamesViewProps = {
   newExecutablePath: string;
   newCoverImageData: string;
   onNewNameChange: (value: string) => void;
-  onNewPathChange: (value: string) => void;
-  onNewExecutablePathChange: (value: string) => void;
+  onBrowseSaveFolder: () => void;
+  onBrowseExecutable: () => void;
   onNewCoverImageChange: (value: string) => void;
   onAddGame: (e: FormEvent) => void;
   onOpenGame: (gameId: string) => void;
@@ -25,8 +25,8 @@ export function GamesView(props: GamesViewProps) {
     newExecutablePath,
     newCoverImageData,
     onNewNameChange,
-    onNewPathChange,
-    onNewExecutablePathChange,
+    onBrowseSaveFolder,
+    onBrowseExecutable,
     onNewCoverImageChange,
     onAddGame,
     onOpenGame,
@@ -41,15 +41,31 @@ export function GamesView(props: GamesViewProps) {
         <form className="add-game-form" onSubmit={onAddGame}>
           <input placeholder="Game name" value={newName} onChange={(e) => onNewNameChange(e.target.value)} required />
           <input
+            className="picker-input"
             placeholder="Save folder path (e.g. D:\\Games\\EldenRing\\Save)"
             value={newPath}
-            onChange={(e) => onNewPathChange(e.target.value)}
+            readOnly
+            onClick={onBrowseSaveFolder}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onBrowseSaveFolder();
+              }
+            }}
             required
           />
           <input
+            className="picker-input"
             placeholder="Executable path (e.g. D:\\Games\\EldenRing\\eldenring.exe)"
             value={newExecutablePath}
-            onChange={(e) => onNewExecutablePathChange(e.target.value)}
+            readOnly
+            onClick={onBrowseExecutable}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onBrowseExecutable();
+              }
+            }}
             required
           />
           <label className="file-input-wrap">

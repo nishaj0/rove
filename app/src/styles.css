@@ -653,6 +653,15 @@ select:focus {
   box-shadow: 0 0 0 1px rgba(164, 170, 180, 0.2);
 }
 
+.picker-input {
+  cursor: pointer;
+}
+
+.picker-input:hover {
+  border-color: #3d434d;
+  background: #20242b;
+}
+
 label {
   display: grid;
   gap: 0.36rem;

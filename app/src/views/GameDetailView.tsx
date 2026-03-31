@@ -9,8 +9,8 @@ type GameDetailViewProps = {
   onPlay: () => void;
   onSyncGame: () => void;
   onDelete: () => void;
-  onExportPathChange: (value: string) => void;
-  onImportPathChange: (value: string) => void;
+  onBrowseExportPath: () => void;
+  onBrowseImportPath: () => void;
   onMergeChange: (value: boolean) => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
@@ -29,8 +29,8 @@ export function GameDetailView(props: GameDetailViewProps) {
     onPlay,
     onSyncGame,
     onDelete,
-    onExportPathChange,
-    onImportPathChange,
+    onBrowseExportPath,
+    onBrowseImportPath,
     onMergeChange,
     onExportBackup,
     onImportBackup,
@@ -79,11 +79,19 @@ export function GameDetailView(props: GameDetailViewProps) {
         <div className="backup-pane">
           <h2>Export Save</h2>
           <label>
-            Destination folder or .zip path
+            Destination folder
             <input
-              placeholder="D:\\Backups or D:\\Backups\\my-game.zip"
+              className="picker-input"
+              placeholder="D:\\Backups"
               value={exportPath}
-              onChange={(e) => onExportPathChange(e.target.value)}
+              readOnly
+              onClick={onBrowseExportPath}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onBrowseExportPath();
+                }
+              }}
             />
           </label>
           <button className="btn primary backup-action" onClick={onExportBackup} type="button">Export Backup</button>
@@ -94,9 +102,17 @@ export function GameDetailView(props: GameDetailViewProps) {
           <label>
             ZIP source path
             <input
+              className="picker-input"
               placeholder="D:\\Backups\\my-game.zip"
               value={importPath}
-              onChange={(e) => onImportPathChange(e.target.value)}
+              readOnly
+              onClick={onBrowseImportPath}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onBrowseImportPath();
+                }
+              }}
             />
           </label>
           <label className="inline-check">

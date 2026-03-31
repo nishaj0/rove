@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { api } from "./api";
+import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
@@ -101,6 +102,50 @@ export default function App() {
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
+
+  async function onBrowseNewSaveFolder() {
+    try {
+      const selected = await pickFolder(newPath || undefined);
+      if (selected) {
+        setNewPath(selected);
+      }
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onBrowseNewExecutablePath() {
+    try {
+      const selected = await pickExecutable(newExecutablePath || newPath || undefined);
+      if (selected) {
+        setNewExecutablePath(selected);
+      }
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onBrowseExportPath() {
+    try {
+      const selected = await pickFolder(exportPath || selectedGame?.path || undefined);
+      if (selected) {
+        setExportPath(selected);
+      }
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onBrowseImportPath() {
+    try {
+      const selected = await pickZipFile(importPath || undefined);
+      if (selected) {
+        setImportPath(selected);
+      }
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
 
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
@@ -450,8 +495,8 @@ export default function App() {
             newExecutablePath={newExecutablePath}
             newCoverImageData={newCoverImageData}
             onNewNameChange={setNewName}
-            onNewPathChange={setNewPath}
-            onNewExecutablePathChange={setNewExecutablePath}
+            onBrowseSaveFolder={() => void onBrowseNewSaveFolder()}
+            onBrowseExecutable={() => void onBrowseNewExecutablePath()}
             onNewCoverImageChange={setNewCoverImageData}
             onAddGame={onAddGame}
             onOpenGame={openGame}
@@ -470,8 +515,8 @@ export default function App() {
             onPlay={() => void onPlaySelectedGame()}
             onSyncGame={() => void onSyncSelectedGame()}
             onDelete={() => void onDeleteSelectedGame()}
-            onExportPathChange={setExportPath}
-            onImportPathChange={setImportPath}
+            onBrowseExportPath={() => void onBrowseExportPath()}
+            onBrowseImportPath={() => void onBrowseImportPath()}
             onMergeChange={setMergeOnImport}
             onExportBackup={() => void onExportBackup()}
             onImportBackup={() => void onImportBackup()}
