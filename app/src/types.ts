@@ -1,4 +1,5 @@
 export type ConflictPolicy = "latest_wins" | "keep_both";
+export type ThemeMode = "dark" | "light" | "system";
 
 export interface Game {
   id: string;
@@ -15,6 +16,7 @@ export interface Settings {
   port: number;
   syncIntervalSeconds: number;
   conflictPolicy: ConflictPolicy;
+  themeMode: ThemeMode;
   autostart: boolean;
   ignorePatterns: string[];
   games: Game[];

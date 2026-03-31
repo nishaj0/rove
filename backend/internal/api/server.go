@@ -79,6 +79,15 @@ func decodeJSON(r *http.Request, out any) error {
 	return nil
 }
 
+func decodeJSONLenient(r *http.Request, out any) error {
+	defer r.Body.Close()
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(out); err != nil {
+		return err
+	}
+	return nil
+}
+
 func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

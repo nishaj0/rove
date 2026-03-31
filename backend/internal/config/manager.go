@@ -47,6 +47,7 @@ func DefaultSettings() models.Settings {
 		Port:                7331,
 		SyncIntervalSeconds: 30,
 		ConflictPolicy:      models.ConflictLatestWins,
+		ThemeMode:           models.ThemeDark,
 		Autostart:           false,
 		IgnorePatterns:      []string{"*.tmp", "*.log", "cache"},
 		Games:               []models.Game{},
@@ -78,12 +79,16 @@ func (m *Manager) Update(next models.Settings) error {
 	if next.ConflictPolicy != models.ConflictLatestWins && next.ConflictPolicy != models.ConflictKeepBoth {
 		return errors.New("invalid conflict policy")
 	}
+	if next.ThemeMode != models.ThemeDark && next.ThemeMode != models.ThemeLight && next.ThemeMode != models.ThemeSystem {
+		return errors.New("invalid theme mode")
+	}
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.settings.Port = next.Port
 	m.settings.SyncIntervalSeconds = next.SyncIntervalSeconds
 	m.settings.ConflictPolicy = next.ConflictPolicy
+	m.settings.ThemeMode = next.ThemeMode
 	m.settings.Autostart = next.Autostart
 	m.settings.IgnorePatterns = append([]string{}, next.IgnorePatterns...)
 	return m.saveLocked()
@@ -142,6 +147,10 @@ func normalizeSettings(settings *models.Settings) bool {
 	}
 	if settings.ConflictPolicy != models.ConflictLatestWins && settings.ConflictPolicy != models.ConflictKeepBoth {
 		settings.ConflictPolicy = defaults.ConflictPolicy
+		changed = true
+	}
+	if settings.ThemeMode != models.ThemeDark && settings.ThemeMode != models.ThemeLight && settings.ThemeMode != models.ThemeSystem {
+		settings.ThemeMode = defaults.ThemeMode
 		changed = true
 	}
 	if settings.IgnorePatterns == nil {

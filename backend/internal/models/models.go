@@ -3,10 +3,14 @@ package models
 import "time"
 
 type ConflictPolicy string
+type ThemeMode string
 
 const (
 	ConflictLatestWins ConflictPolicy = "latest_wins"
 	ConflictKeepBoth   ConflictPolicy = "keep_both"
+	ThemeDark          ThemeMode      = "dark"
+	ThemeLight         ThemeMode      = "light"
+	ThemeSystem        ThemeMode      = "system"
 )
 
 type Game struct {
@@ -26,6 +30,7 @@ type Settings struct {
 	Port                int            `json:"port"`
 	SyncIntervalSeconds int            `json:"syncIntervalSeconds"`
 	ConflictPolicy      ConflictPolicy `json:"conflictPolicy"`
+	ThemeMode           ThemeMode      `json:"themeMode"`
 	Autostart           bool           `json:"autostart"`
 	IgnorePatterns      []string       `json:"ignorePatterns"`
 	Games               []Game         `json:"games"`

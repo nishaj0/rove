@@ -1,9 +1,10 @@
-import type { ConflictPolicy, Game, LogEntry, Settings, Status } from "../types";
+import type { ConflictPolicy, Game, LogEntry, Settings, Status, ThemeMode } from "../types";
 
 const defaultSettings: Settings = {
   port: 7331,
   syncIntervalSeconds: 30,
   conflictPolicy: "latest_wins",
+  themeMode: "dark",
   autostart: false,
   ignorePatterns: ["*.tmp", "*.log", "cache"],
   games: [],
@@ -27,6 +28,10 @@ function asBoolean(input: unknown, fallback: boolean): boolean {
 
 function asConflictPolicy(input: unknown, fallback: ConflictPolicy): ConflictPolicy {
   return input === "keep_both" || input === "latest_wins" ? input : fallback;
+}
+
+function asThemeMode(input: unknown, fallback: ThemeMode): ThemeMode {
+  return input === "dark" || input === "light" || input === "system" ? input : fallback;
 }
 
 export function normalizeGames(input: unknown): Game[] {
@@ -84,6 +89,7 @@ export function normalizeSettings(input: unknown): Settings {
     port: asNumber(input.port, defaultSettings.port),
     syncIntervalSeconds: asNumber(input.syncIntervalSeconds, defaultSettings.syncIntervalSeconds),
     conflictPolicy: asConflictPolicy(input.conflictPolicy, defaultSettings.conflictPolicy),
+    themeMode: asThemeMode(input.themeMode, defaultSettings.themeMode),
     autostart: Boolean(input.autostart),
     ignorePatterns,
     games: normalizeGames(input.games),

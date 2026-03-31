@@ -1,9 +1,10 @@
-import type { ConflictPolicy, Settings } from "../types";
+import type { ConflictPolicy, Settings, ThemeMode } from "../types";
 
 type SettingsViewProps = {
   settings: Settings;
   onSyncIntervalChange: (value: number) => void;
   onConflictPolicyChange: (value: ConflictPolicy) => void;
+  onThemeModeChange: (value: ThemeMode) => void;
   onAutostartChange: (value: boolean) => void;
   onIgnorePatternsChange: (value: string[]) => void;
   onSaveSettings: () => void;
@@ -14,6 +15,7 @@ export function SettingsView(props: SettingsViewProps) {
     settings,
     onSyncIntervalChange,
     onConflictPolicyChange,
+    onThemeModeChange,
     onAutostartChange,
     onIgnorePatternsChange,
     onSaveSettings,
@@ -40,6 +42,17 @@ export function SettingsView(props: SettingsViewProps) {
           >
             <option value="latest_wins">Latest modified wins</option>
             <option value="keep_both">Keep both copies</option>
+          </select>
+        </label>
+        <label>
+          Theme
+          <select
+            value={settings.themeMode}
+            onChange={(e) => onThemeModeChange(e.target.value as ThemeMode)}
+          >
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="system">Auto (System)</option>
           </select>
         </label>
         <label className="inline-check">

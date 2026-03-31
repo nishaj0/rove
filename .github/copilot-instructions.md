@@ -16,6 +16,7 @@
 ## comments
 
 - add comments only where logic is non-obvious.
+- always add comments for new functions and exported types.
 - do not flood files with comments.
 - always start comment text with lowercase.
 - avoid trivial comments that restate the code.
@@ -23,7 +24,6 @@
 ## frontend style
 
 - keep the ui clean, minimal, and utility-focused.
-- prefer dark + green theme accents unless the user asks for another theme.
 - maintain readable text contrast and practical spacing.
 
 ## verification

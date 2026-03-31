@@ -13,7 +13,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.cfg.Get())
 	case http.MethodPost:
 		var req models.Settings
-		if err := decodeJSON(r, &req); err != nil {
+		if err := decodeJSONLenient(r, &req); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}

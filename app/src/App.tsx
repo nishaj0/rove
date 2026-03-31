@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "./api";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
@@ -9,10 +9,16 @@ import { HomeView } from "./views/HomeView";
 import { SettingsView } from "./views/SettingsView";
 
 type View = "home" | "games" | "game" | "activity" | "settings";
+type EffectiveTheme = "dark" | "light";
 
 type SyncState = {
   label: string;
   className: "success" | "warning" | "error" | "syncing";
+};
+
+type NavSnapshot = {
+  view: View;
+  selectedGameId: string;
 };
 
 const navItems: Array<{ id: View; label: string }> = [
@@ -22,11 +28,11 @@ const navItems: Array<{ id: View; label: string }> = [
   { id: "settings", label: "Settings" },
 ];
 
-const titleByView: Record<View, string> = {
-  home: "Control Center",
-  games: "Game Library",
-  game: "Game Profile",
-  activity: "Recent Activity",
+const viewTitle: Record<View, string> = {
+  home: "Home",
+  games: "Library",
+  game: "Game",
+  activity: "Activity",
   settings: "Settings",
 };
 
@@ -34,10 +40,18 @@ const defaultSettings: Settings = {
   port: 7331,
   syncIntervalSeconds: 30,
   conflictPolicy: "latest_wins",
+  themeMode: "dark",
   autostart: false,
   ignorePatterns: ["*.tmp", "*.log", "cache"],
   games: [],
 };
+
+function resolveTheme(mode: Settings["themeMode"]): EffectiveTheme {
+  if (mode === "dark" || mode === "light") {
+    return mode;
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function NavIcon({ view }: { view: View }) {
   if (view === "home") {
@@ -86,6 +100,11 @@ export default function App() {
   const [activeView, setActiveView] = useState<View>("home");
   const [selectedGameId, setSelectedGameId] = useState("");
 
+  const navHistoryRef = useRef<NavSnapshot[]>([{ view: "home", selectedGameId: "" }]);
+  const navCursorRef = useRef(0);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [canGoForward, setCanGoForward] = useState(false);
+
   const [status, setStatus] = useState<Status | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -102,6 +121,47 @@ export default function App() {
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
+
+  function syncNavButtonState() {
+    setCanGoBack(navCursorRef.current > 0);
+    setCanGoForward(navCursorRef.current < navHistoryRef.current.length - 1);
+  }
+
+  function pushNavigation(view: View, gameId = "") {
+    const current = navHistoryRef.current[navCursorRef.current];
+    if (current && current.view === view && current.selectedGameId === gameId) {
+      return;
+    }
+    const trimmed = navHistoryRef.current.slice(0, navCursorRef.current + 1);
+    trimmed.push({ view, selectedGameId: gameId });
+    navHistoryRef.current = trimmed;
+    navCursorRef.current = trimmed.length - 1;
+    setActiveView(view);
+    setSelectedGameId(gameId);
+    syncNavButtonState();
+  }
+
+  function goBack() {
+    if (navCursorRef.current === 0) {
+      return;
+    }
+    navCursorRef.current -= 1;
+    const snapshot = navHistoryRef.current[navCursorRef.current];
+    setActiveView(snapshot.view);
+    setSelectedGameId(snapshot.selectedGameId);
+    syncNavButtonState();
+  }
+
+  function goForward() {
+    if (navCursorRef.current >= navHistoryRef.current.length - 1) {
+      return;
+    }
+    navCursorRef.current += 1;
+    const snapshot = navHistoryRef.current[navCursorRef.current];
+    setActiveView(snapshot.view);
+    setSelectedGameId(snapshot.selectedGameId);
+    syncNavButtonState();
+  }
 
   async function onBrowseNewSaveFolder() {
     try {
@@ -200,10 +260,33 @@ export default function App() {
     if (!stillExists) {
       setSelectedGameId("");
       if (activeView === "game") {
-        setActiveView("games");
+        pushNavigation("games");
       }
     }
   }, [activeView, games, selectedGameId]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", resolveTheme(settings.themeMode));
+  }, [settings.themeMode]);
+
+  useEffect(() => {
+    if (settings.themeMode !== "system") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      document.documentElement.setAttribute("data-theme", mediaQuery.matches ? "dark" : "light");
+    };
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, [settings.themeMode]);
 
   const syncState = useMemo<SyncState>(() => {
     if (error) {
@@ -228,11 +311,11 @@ export default function App() {
     return games.find((game) => game.id === selectedGameId) ?? null;
   }, [games, selectedGameId]);
 
-  const pageTitle = useMemo(() => {
+  const currentViewTitle = useMemo(() => {
     if (activeView === "game" && selectedGame) {
       return selectedGame.name;
     }
-    return titleByView[activeView];
+    return viewTitle[activeView];
   }, [activeView, selectedGame]);
 
   const lastSyncLabel = useMemo(() => {
@@ -278,7 +361,7 @@ export default function App() {
       await api.deleteGame(id);
       if (selectedGameId === id) {
         setSelectedGameId("");
-        setActiveView("games");
+        pushNavigation("games");
       }
       setToast("Game removed");
       await refreshAll();
@@ -293,6 +376,23 @@ export default function App() {
       setToast("Settings saved");
       await refreshAll();
     } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onThemeModeChange(value: Settings["themeMode"]) {
+    const previous = settings.themeMode;
+    if (previous === value) {
+      return;
+    }
+
+    setSettings((s) => ({ ...s, themeMode: value }));
+
+    try {
+      const persisted = await api.getSettings();
+      await api.saveSettings({ ...persisted, games, themeMode: value });
+    } catch (err) {
+      setSettings((s) => ({ ...s, themeMode: previous }));
       setError(toFriendlyError(err));
     }
   }
@@ -384,11 +484,10 @@ export default function App() {
   }
 
   function openGame(gameId: string) {
-    setSelectedGameId(gameId);
     setExportPath("");
     setImportPath("");
     setMergeOnImport(true);
-    setActiveView("game");
+    pushNavigation("game", gameId);
   }
 
   function initials(name: string): string {
@@ -438,7 +537,7 @@ export default function App() {
             <button
               key={item.id}
               className={`side-link ${isActive ? "active" : ""}`}
-              onClick={() => setActiveView(item.id)}
+              onClick={() => pushNavigation(item.id)}
               type="button"
             >
               <span className="side-icon">
@@ -457,31 +556,24 @@ export default function App() {
       </aside>
 
       <main className="main-panel">
-        <header className="topbar">
-          <div>
-            <p className="kicker">Cloud Saver Desktop</p>
-            <h1>{pageTitle}</h1>
+        <div className="app-utility">
+          <div className="history-nav">
+            <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back">&#8249;</button>
+            <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward">&#8250;</button>
           </div>
-          <div className="topbar-actions">
-            <button className="btn" onClick={() => void refreshAll()} type="button">Refresh</button>
-            {activeView !== "game" ? (
-              <button className="btn primary" onClick={() => void onTriggerSync()} type="button">Sync All</button>
-            ) : null}
-          </div>
-        </header>
+          <p className="app-utility-title">{currentViewTitle}</p>
+        </div>
 
         {error ? <div className="banner error">{error}</div> : null}
         {toast ? <div className="banner toast">{toast}</div> : null}
 
         {activeView === "home" ? (
           <HomeView
-            pending={status?.pending ?? 0}
             games={games}
-            autostart={settings.autostart}
-            lastSyncLabel={lastSyncLabel}
             syncLabel={syncState.label}
             syncClass={syncState.className}
-            onManageGames={() => setActiveView("games")}
+            onOpenLibrary={() => pushNavigation("games")}
+            onOpenActivity={() => pushNavigation("activity")}
             onOpenGame={openGame}
             initials={initials}
           />
@@ -501,7 +593,6 @@ export default function App() {
             onAddGame={onAddGame}
             onOpenGame={openGame}
             initials={initials}
-            formatPlaytime={formatPlaytime}
           />
         ) : null}
 
@@ -511,7 +602,7 @@ export default function App() {
             exportPath={exportPath}
             importPath={importPath}
             mergeOnImport={mergeOnImport}
-            onBack={() => setActiveView("games")}
+            onBack={() => pushNavigation("games")}
             onPlay={() => void onPlaySelectedGame()}
             onSyncGame={() => void onSyncSelectedGame()}
             onDelete={() => void onDeleteSelectedGame()}
@@ -542,6 +633,7 @@ export default function App() {
             settings={settings}
             onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
             onConflictPolicyChange={(value: ConflictPolicy) => setSettings((s) => ({ ...s, conflictPolicy: value }))}
+            onThemeModeChange={(value) => void onThemeModeChange(value)}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
             onSaveSettings={() => void onSaveSettings()}
