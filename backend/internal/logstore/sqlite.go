@@ -83,6 +83,11 @@ CREATE TABLE IF NOT EXISTS conflicts (
   strategy TEXT NOT NULL,
   message TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS game_stats (
+	game_id TEXT PRIMARY KEY,
+	total_play_seconds INTEGER NOT NULL DEFAULT 0,
+	last_played_at TEXT NOT NULL DEFAULT ''
+);
 `
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("migrate schema: %w", err)
@@ -162,6 +167,92 @@ func (s *Store) Recent(limit int) ([]models.LogEntry, error) {
 		return nil, fmt.Errorf("iterate logs: %w", err)
 	}
 	return result, nil
+}
+
+func (s *Store) AddPlaytime(gameID string, seconds int64, playedAt time.Time) error {
+	if gameID == "" || seconds <= 0 {
+		return nil
+	}
+	ts := playedAt.UTC().Format(time.RFC3339)
+	const q = `
+INSERT INTO game_stats(game_id, total_play_seconds, last_played_at)
+VALUES (?, ?, ?)
+ON CONFLICT(game_id) DO UPDATE SET
+  total_play_seconds = total_play_seconds + excluded.total_play_seconds,
+  last_played_at = excluded.last_played_at;
+`
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		_, err := s.db.Exec(q, gameID, seconds, ts)
+		if err == nil {
+			return nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return fmt.Errorf("upsert game_stats: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	return nil
+}
+
+func (s *Store) GameStats(gameIDs []string) (map[string]models.GameStats, error) {
+	stats := make(map[string]models.GameStats, len(gameIDs))
+	if len(gameIDs) == 0 {
+		return stats, nil
+	}
+
+	placeholders := strings.TrimSuffix(strings.Repeat("?,", len(gameIDs)), ",")
+	q := fmt.Sprintf(`SELECT game_id, total_play_seconds, last_played_at FROM game_stats WHERE game_id IN (%s)`, placeholders)
+	args := make([]any, 0, len(gameIDs))
+	for _, id := range gameIDs {
+		args = append(args, id)
+	}
+
+	var rows *sql.Rows
+	var err error
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		rows, err = s.db.Query(q, args...)
+		if err == nil {
+			break
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return nil, fmt.Errorf("query game_stats: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var gameID string
+		var total int64
+		var lastPlayedRaw string
+		if err := rows.Scan(&gameID, &total, &lastPlayedRaw); err != nil {
+			return nil, fmt.Errorf("scan game_stats: %w", err)
+		}
+		parsed, _ := time.Parse(time.RFC3339, lastPlayedRaw)
+		stats[gameID] = models.GameStats{PlaytimeSeconds: total, LastPlayedAt: parsed}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate game_stats: %w", err)
+	}
+
+	return stats, nil
+}
+
+func (s *Store) DeleteGameStats(gameID string) error {
+	if gameID == "" {
+		return nil
+	}
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		_, err := s.db.Exec(`DELETE FROM game_stats WHERE game_id = ?`, gameID)
+		if err == nil {
+			return nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return fmt.Errorf("delete game_stats: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	return nil
 }
 
 func isBusyError(err error) bool {

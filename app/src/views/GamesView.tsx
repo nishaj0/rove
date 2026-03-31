@@ -5,16 +5,16 @@ type GamesViewProps = {
   games: Game[];
   newName: string;
   newPath: string;
-  syncLabel: string;
-  syncClass: "success" | "warning" | "error" | "syncing";
+  newExecutablePath: string;
+  newCoverImageData: string;
   onNewNameChange: (value: string) => void;
   onNewPathChange: (value: string) => void;
+  onNewExecutablePathChange: (value: string) => void;
+  onNewCoverImageChange: (value: string) => void;
   onAddGame: (e: FormEvent) => void;
-  onQuickExport: (gameId: string) => void;
-  onQuickImport: (gameId: string) => void;
-  onQuickEnableSync: () => void;
-  onDeleteGame: (gameId: string) => void;
+  onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
+  formatPlaytime: (seconds: number) => string;
 };
 
 export function GamesView(props: GamesViewProps) {
@@ -22,16 +22,16 @@ export function GamesView(props: GamesViewProps) {
     games,
     newName,
     newPath,
-    syncLabel,
-    syncClass,
+    newExecutablePath,
+    newCoverImageData,
     onNewNameChange,
     onNewPathChange,
+    onNewExecutablePathChange,
+    onNewCoverImageChange,
     onAddGame,
-    onQuickExport,
-    onQuickImport,
-    onQuickEnableSync,
-    onDeleteGame,
+    onOpenGame,
     initials,
+    formatPlaytime,
   } = props;
 
   return (
@@ -39,12 +39,39 @@ export function GamesView(props: GamesViewProps) {
       <section className="panel">
         <h2>Add New Game Folder</h2>
         <form className="add-game-form" onSubmit={onAddGame}>
-          <input placeholder="Game name" value={newName} onChange={(e) => onNewNameChange(e.target.value)} />
+          <input placeholder="Game name" value={newName} onChange={(e) => onNewNameChange(e.target.value)} required />
           <input
             placeholder="Save folder path (e.g. D:\\Games\\EldenRing\\Save)"
             value={newPath}
             onChange={(e) => onNewPathChange(e.target.value)}
+            required
           />
+          <input
+            placeholder="Executable path (e.g. D:\\Games\\EldenRing\\eldenring.exe)"
+            value={newExecutablePath}
+            onChange={(e) => onNewExecutablePathChange(e.target.value)}
+            required
+          />
+          <label className="file-input-wrap">
+            <span>Cover image (optional)</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) {
+                  onNewCoverImageChange("");
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                  onNewCoverImageChange(typeof reader.result === "string" ? reader.result : "");
+                };
+                reader.readAsDataURL(file);
+              }}
+            />
+          </label>
+          {newCoverImageData ? <img className="cover-preview" src={newCoverImageData} alt="Cover preview" /> : null}
           <button className="btn primary" type="submit">Add Game</button>
         </form>
       </section>
@@ -56,24 +83,19 @@ export function GamesView(props: GamesViewProps) {
         ) : (
           <div className="game-grid">
             {games.map((g) => (
-              <article className="game-card" key={g.id}>
+              <button className="game-card game-card-button" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
                 <div className="game-cover">
-                  <span>{initials(g.name)}</span>
-                  <span className={`game-state ${syncClass}`}>{syncLabel}</span>
+                  {g.coverImageData ? <img className="game-cover-image" src={g.coverImageData} alt={`${g.name} cover`} /> : <span>{initials(g.name)}</span>}
+                  <span className={`game-state ${g.running ? "success" : "warning"}`}>{g.running ? "Running" : "Idle"}</span>
                 </div>
                 <div className="game-meta">
-                  <strong>{g.name}</strong>
-                  <p title={g.path}>{g.path}</p>
+                  <div className="game-meta-main">
+                    <strong>{g.name}</strong>
+                    <p className="game-playtime">Play time: {formatPlaytime(g.playtimeSeconds ?? 0)}</p>
+                  </div>
+                  <span className="open-chip">Open</span>
                 </div>
-                <div className="game-actions">
-                  <button className="btn" onClick={() => onQuickExport(g.id)} type="button">Export</button>
-                  <button className="btn" onClick={() => onQuickImport(g.id)} type="button">Import</button>
-                  <button className="btn primary" onClick={onQuickEnableSync} type="button">Enable Sync</button>
-                </div>
-                <div className="game-actions game-actions-danger">
-                  <button className="btn danger" onClick={() => onDeleteGame(g.id)} type="button">Remove</button>
-                </div>
-              </article>
+              </button>
             ))}
           </div>
         )}

@@ -7,35 +7,40 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"time"
 
 	"cloud-saver/backend/internal/models"
 )
 
 type Service struct{}
 
+var invalidFilenameChars = regexp.MustCompile(`[<>:"/\\|?*]+`)
+
 func New() *Service {
 	return &Service{}
 }
 
-func (s *Service) ExportGame(game models.Game, destinationZip string) error {
-	if destinationZip == "" {
-		return errors.New("destinationPath is required")
+func (s *Service) ExportGame(game models.Game, destinationPath string) (string, error) {
+	resolvedZipPath, err := resolveExportDestinationPath(game.Name, destinationPath)
+	if err != nil {
+		return "", err
 	}
-	if err := os.MkdirAll(filepath.Dir(destinationZip), 0o755); err != nil {
-		return fmt.Errorf("create destination dir: %w", err)
+	if err := os.MkdirAll(filepath.Dir(resolvedZipPath), 0o755); err != nil {
+		return "", fmt.Errorf("create destination dir: %w", err)
 	}
 
-	f, err := os.Create(destinationZip)
+	f, err := os.Create(resolvedZipPath)
 	if err != nil {
-		return fmt.Errorf("create zip file: %w", err)
+		return "", fmt.Errorf("create zip file: %w", err)
 	}
 	defer f.Close()
 
 	zw := zip.NewWriter(f)
 	defer zw.Close()
 
-	return filepath.WalkDir(game.Path, func(path string, d os.DirEntry, walkErr error) error {
+	err = filepath.WalkDir(game.Path, func(path string, d os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -64,6 +69,55 @@ func (s *Service) ExportGame(game models.Game, destinationZip string) error {
 		}
 		return nil
 	})
+	if err != nil {
+		return "", err
+	}
+
+	return resolvedZipPath, nil
+}
+
+func resolveExportDestinationPath(gameName string, destinationPath string) (string, error) {
+	trimmed := strings.TrimSpace(destinationPath)
+	if trimmed == "" {
+		return "", errors.New("destinationPath is required")
+	}
+
+	cleaned := filepath.Clean(trimmed)
+	if strings.EqualFold(filepath.Ext(cleaned), ".zip") {
+		return cleaned, nil
+	}
+
+	if info, err := os.Stat(cleaned); err == nil && info.IsDir() {
+		return filepath.Join(cleaned, generatedExportFilename(gameName)), nil
+	} else if err == nil && !info.IsDir() {
+		return "", errors.New("destinationPath must be a .zip file path or folder path")
+	}
+
+	if strings.HasSuffix(trimmed, "\\") || strings.HasSuffix(trimmed, "/") || filepath.Ext(cleaned) == "" {
+		return filepath.Join(cleaned, generatedExportFilename(gameName)), nil
+	}
+
+	return "", errors.New("destinationPath must be a .zip file path or folder path")
+}
+
+func generatedExportFilename(gameName string) string {
+	safeGameName := sanitizeFilename(gameName)
+	timestamp := time.Now().UTC().Format("20060102_150405")
+	return fmt.Sprintf("%s_%s.zip", safeGameName, timestamp)
+}
+
+func sanitizeFilename(input string) string {
+	trimmed := strings.TrimSpace(input)
+	if trimmed == "" {
+		return "game"
+	}
+	withoutInvalid := invalidFilenameChars.ReplaceAllString(trimmed, "_")
+	compactSpaces := strings.Join(strings.Fields(withoutInvalid), "_")
+	compact := strings.Trim(compactSpaces, "._ ")
+	if compact == "" {
+		return "game"
+	}
+	return compact
 }
 
 func (s *Service) ImportGame(game models.Game, sourceZip string, merge bool) error {

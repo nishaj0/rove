@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -109,6 +110,10 @@ func (m *Manager) load() error {
 	if len(payload) == 0 {
 		m.settings = DefaultSettings()
 		return m.saveLocked()
+	}
+
+	if bytes.HasPrefix(payload, []byte{0xEF, 0xBB, 0xBF}) {
+		payload = payload[3:]
 	}
 
 	if err := json.Unmarshal(payload, &m.settings); err != nil {

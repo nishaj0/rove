@@ -21,6 +21,10 @@ function asNumber(input: unknown, fallback: number): number {
   return typeof input === "number" && Number.isFinite(input) ? input : fallback;
 }
 
+function asBoolean(input: unknown, fallback: boolean): boolean {
+  return typeof input === "boolean" ? input : fallback;
+}
+
 function asConflictPolicy(input: unknown, fallback: ConflictPolicy): ConflictPolicy {
   return input === "keep_both" || input === "latest_wins" ? input : fallback;
 }
@@ -38,6 +42,11 @@ export function normalizeGames(input: unknown): Game[] {
         id: asString(value.id),
         name: asString(value.name),
         path: asString(value.path),
+        executablePath: asString(value.executablePath),
+        coverImageData: asString(value.coverImageData),
+        playtimeSeconds: asNumber(value.playtimeSeconds, 0),
+        lastPlayedAt: asString(value.lastPlayedAt),
+        running: asBoolean(value.running, false),
       };
     })
     .filter((value): value is Game => value !== null);

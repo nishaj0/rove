@@ -4,6 +4,11 @@ export interface Game {
   id: string;
   name: string;
   path: string;
+  executablePath: string;
+  coverImageData?: string;
+  playtimeSeconds?: number;
+  lastPlayedAt?: string;
+  running?: boolean;
 }
 
 export interface Settings {
@@ -46,8 +51,21 @@ export interface BackupExportRequest {
   destinationPath: string;
 }
 
+export interface BackupExportResponse {
+  status: string;
+  path: string;
+}
+
 export interface BackupImportRequest {
   gameId: string;
   sourcePath: string;
   merge: boolean;
+}
+
+export interface PlayGameRequest {
+  gameId: string;
+}
+
+export interface SyncGameRequest {
+  gameId: string;
 }

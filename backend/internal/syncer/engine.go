@@ -21,13 +21,18 @@ type fileFingerprint struct {
 	Size    int64
 }
 
+type syncTrigger struct {
+	reason string
+	gameID string
+}
+
 type Engine struct {
 	cfg     *config.Manager
 	logs    *logstore.Store
 	debug   bool
 	mu      sync.RWMutex
 	status  models.Status
-	trigger chan string
+	trigger chan syncTrigger
 	tracked map[string]fileFingerprint
 	pending atomic.Int64
 	started atomic.Bool
@@ -40,7 +45,7 @@ func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 		cfg:     cfg,
 		logs:    logs,
 		debug:   debug,
-		trigger: make(chan string, 1),
+		trigger: make(chan syncTrigger, 1),
 		tracked: make(map[string]fileFingerprint),
 	}
 }
@@ -78,7 +83,20 @@ func (e *Engine) Trigger(reason string) {
 	}
 	// keep trigger queue bounded; a single queued run is enough.
 	select {
-	case e.trigger <- reason:
+	case e.trigger <- syncTrigger{reason: reason}:
+	default:
+	}
+}
+
+func (e *Engine) TriggerGame(gameID, reason string) {
+	if gameID == "" {
+		return
+	}
+	if reason == "" {
+		reason = "manual-game"
+	}
+	select {
+	case e.trigger <- syncTrigger{reason: reason, gameID: gameID}:
 	default:
 	}
 }
@@ -107,29 +125,47 @@ func (e *Engine) loop(ctx context.Context) {
 			timer.Stop()
 			e.Stop()
 			return
-		case reason := <-e.trigger:
+		case req := <-e.trigger:
 			timer.Stop()
-			e.runOnce(reason)
+			e.runOnce(req.reason, req.gameID)
 		case <-timer.C:
-			e.runOnce("interval")
+			e.runOnce("interval", "")
 		}
 	}
 }
 
-func (e *Engine) runOnce(reason string) {
+func (e *Engine) runOnce(reason, targetGameID string) {
 	if e.paused.Load() {
 		return
 	}
 	start := time.Now()
 	settings := e.cfg.Get()
+	games := settings.Games
+	if targetGameID != "" {
+		games = nil
+		for _, game := range settings.Games {
+			if game.ID == targetGameID {
+				games = append(games, game)
+				break
+			}
+		}
+		if len(games) == 0 {
+			e.noteError("sync", fmt.Sprintf("sync target game not found: %s", targetGameID))
+			return
+		}
+	}
 	changed := 0
 	e.setLastError("")
 	if e.debug {
-		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle start: reason=%s games=%d", reason, len(settings.Games)))
+		scope := "all"
+		if targetGameID != "" {
+			scope = "game=" + targetGameID
+		}
+		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle start: reason=%s scope=%s games=%d", reason, scope, len(games)))
 	}
 
 	// detect changes by comparing mtime+size fingerprints per file.
-	for _, game := range settings.Games {
+	for _, game := range games {
 		root := game.Path
 		_ = filepath.WalkDir(game.Path, func(path string, d fs.DirEntry, walkErr error) error {
 			if walkErr != nil {
@@ -166,12 +202,22 @@ func (e *Engine) runOnce(reason string) {
 	}
 
 	if changed > 0 {
-		_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s): %d file(s) changed", reason, changed))
+		if targetGameID != "" {
+			_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s, game=%s): %d file(s) changed", reason, targetGameID, changed))
+		} else {
+			_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s): %d file(s) changed", reason, changed))
+		}
 	} else if e.debug {
-		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s): no file changes", reason))
+		if targetGameID != "" {
+			_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s, game=%s): no file changes", reason, targetGameID))
+		} else {
+			_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s): no file changes", reason))
+		}
 	}
 
-	e.pending.Store(0)
+	if targetGameID == "" {
+		e.pending.Store(0)
+	}
 	e.mu.Lock()
 	e.status.LastSyncTime = start.UTC()
 	e.mu.Unlock()

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"cloud-saver/backend/internal/models"
 )
@@ -23,12 +24,17 @@ func (s *Server) handleBackupExport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
-	if err := s.backup.ExportGame(game, req.DestinationPath); err != nil {
-		writeErr(w, http.StatusInternalServerError, err)
+	outputPath, err := s.backup.ExportGame(game, req.DestinationPath)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if strings.Contains(err.Error(), "destinationPath") {
+			status = http.StatusBadRequest
+		}
+		writeErr(w, status, err)
 		return
 	}
 	_ = s.logs.Write("info", "backup", fmt.Sprintf("exported backup for %s", game.Name))
-	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "path": outputPath})
 }
 
 func (s *Server) handleBackupImport(w http.ResponseWriter, r *http.Request) {

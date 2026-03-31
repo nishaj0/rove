@@ -34,7 +34,7 @@ export function HomeView(props: HomeViewProps) {
           <p>{autostart ? "Enabled" : "Disabled"}</p>
         </article>
         <article className="stat-card">
-          <h3>Sync state</h3>
+          <h3>Service state</h3>
           <p className={`state-text ${syncClass}`}>{syncLabel}</p>
         </article>
       </section>

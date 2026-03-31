@@ -13,6 +13,7 @@ import (
 	"cloud-saver/backend/internal/api"
 	"cloud-saver/backend/internal/backup"
 	"cloud-saver/backend/internal/config"
+	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/syncer"
@@ -25,6 +26,7 @@ type Application struct {
 	logs    *logstore.Store
 	engine  *syncer.Engine
 	watcher *watcher.Manager
+	monitor *gamemon.Monitor
 	tray    *tray.Manager
 	backup  *backup.Service
 	debug   bool
@@ -60,6 +62,14 @@ func New(opts Options) (*Application, error) {
 			}
 		}
 	})
+	monitor := gamemon.New(cfg, logs, nil, func(err error) {
+		if err != nil {
+			_ = logs.Write("error", "gamemon", err.Error())
+			if opts.Debug {
+				log.Printf("[gamemon:error] %v", err)
+			}
+		}
+	})
 	trayMgr := tray.New()
 	backupSvc := backup.New()
 
@@ -68,10 +78,16 @@ func New(opts Options) (*Application, error) {
 		logs:    logs,
 		engine:  engine,
 		watcher: watchMgr,
+		monitor: monitor,
 		tray:    trayMgr,
 		backup:  backupSvc,
 		debug:   opts.Debug,
 	}
+	a.monitor.SetOnRunningChanged(func(runningIDs []string) {
+		if err := a.reloadWatcherForRunningGames(runningIDs); err != nil {
+			a.logEvent("error", "watcher", err.Error())
+		}
+	})
 	a.logEvent("info", "app", fmt.Sprintf("application initialized (config=%s db=%s debug=%t)", cfg.Path(), logs.Path(), opts.Debug))
 	return a, nil
 }
@@ -81,12 +97,10 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	a.cancel = cancel
 
 	a.engine.Start(ctx)
+	a.monitor.Start(ctx)
 	a.logEvent("info", "app", fmt.Sprintf("application starting (noTray=%t)", noTray))
 
-	// reload watcher roots from persisted games on startup.
-	if err := a.watcher.Reload(a.cfg.Get().Games, func(path string) {
-		a.engine.NotifyFileEvent(path)
-	}); err != nil {
+	if err := a.reloadWatcherForRunningGames(a.monitor.RunningIDs()); err != nil {
 		a.logEvent("error", "watcher", err.Error())
 	}
 
@@ -97,12 +111,12 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.engine,
 		a.logs,
 		a.backup,
+		a.monitor,
 		exePath,
 		a.debug,
-		func(games []models.Game) {
-			if err := a.watcher.Reload(games, func(path string) {
-				a.engine.NotifyFileEvent(path)
-			}); err != nil {
+		func(_ []models.Game) {
+			a.monitor.ForcePoll()
+			if err := a.reloadWatcherForRunningGames(a.monitor.RunningIDs()); err != nil {
 				a.logEvent("error", "watcher", err.Error())
 			}
 		},
@@ -166,6 +180,31 @@ func (a *Application) Stop() error {
 
 func (a *Application) httpSrvAddr() string {
 	return fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port)
+}
+
+func (a *Application) reloadWatcherForRunningGames(runningIDs []string) error {
+	if len(runningIDs) == 0 {
+		return a.watcher.Reload(nil, func(path string) {
+			a.engine.NotifyFileEvent(path)
+		})
+	}
+
+	runningSet := make(map[string]struct{}, len(runningIDs))
+	for _, id := range runningIDs {
+		runningSet[id] = struct{}{}
+	}
+
+	settings := a.cfg.Get()
+	activeGames := make([]models.Game, 0, len(runningSet))
+	for _, game := range settings.Games {
+		if _, ok := runningSet[game.ID]; ok {
+			activeGames = append(activeGames, game)
+		}
+	}
+
+	return a.watcher.Reload(activeGames, func(path string) {
+		a.engine.NotifyFileEvent(path)
+	})
 }
 
 func (a *Application) logEvent(level, event, message string) {

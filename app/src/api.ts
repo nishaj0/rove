@@ -1,10 +1,13 @@
 import type {
   BackupExportRequest,
+  BackupExportResponse,
   BackupImportRequest,
   DebugInfo,
   Game,
   LogEntry,
+  PlayGameRequest,
   Settings,
+  SyncGameRequest,
   Status,
 } from "./types";
 import {
@@ -52,13 +55,16 @@ export const api = {
     const payload = await request<unknown>("/games");
     return normalizeGames(payload);
   },
-  addGame(input: { name: string; path: string }) {
+  addGame(input: { name: string; path: string; executablePath: string; coverImageData?: string }) {
     return request<Game>("/games", {
       method: "POST",
       body: JSON.stringify(input),
     });
   },
-  updateGame(id: string, input: { name: string; path: string }) {
+  getGame(id: string) {
+    return request<Game>(`/games/${encodeURIComponent(id)}`);
+  },
+  updateGame(id: string, input: { name: string; path: string; executablePath: string; coverImageData?: string }) {
     return request<Game>(`/games/${encodeURIComponent(id)}`, {
       method: "PUT",
       body: JSON.stringify(input),
@@ -71,6 +77,32 @@ export const api = {
   },
   triggerSync() {
     return request<{ status: string }>("/sync", { method: "POST" });
+  },
+  syncGame(payload: SyncGameRequest) {
+    return request<{ status: string }>("/games/sync", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }).catch((error: unknown) => {
+      if (error instanceof Error && (/^(404|405)\b/.test(error.message) || /method not allowed/i.test(error.message))) {
+        return request<{ status: string }>("/sync/game", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
+      throw error;
+    });
+  },
+  playGame(payload: PlayGameRequest) {
+    return request<{ status: string }>("/games/play", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  updateGameCover(payload: { gameId: string; coverImageData: string }) {
+    return request<Game>("/games/cover", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   },
   async getStatus() {
     const payload = await request<unknown>("/status");
@@ -94,7 +126,7 @@ export const api = {
     return request<DebugInfo>("/debug/info");
   },
   exportBackup(payload: BackupExportRequest) {
-    return request<{ status: string }>("/backup/export", {
+    return request<BackupExportResponse>("/backup/export", {
       method: "POST",
       body: JSON.stringify(payload),
     });

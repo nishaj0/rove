@@ -11,12 +11,15 @@ import (
 	"cloud-saver/backend/internal/models"
 )
 
-func (m *Manager) AddGame(name, path string) (models.Game, error) {
-	if name == "" || path == "" {
-		return models.Game{}, errors.New("name and path are required")
+func (m *Manager) AddGame(name, path, executablePath, coverImageData string) (models.Game, error) {
+	if name == "" || path == "" || executablePath == "" {
+		return models.Game{}, errors.New("name, path, and executablePath are required")
 	}
 	if _, err := os.Stat(path); err != nil {
 		return models.Game{}, fmt.Errorf("invalid path: %w", err)
+	}
+	if _, err := os.Stat(executablePath); err != nil {
+		return models.Game{}, fmt.Errorf("invalid executablePath: %w", err)
 	}
 
 	m.mu.Lock()
@@ -28,9 +31,11 @@ func (m *Manager) AddGame(name, path string) (models.Game, error) {
 	}
 
 	game := models.Game{
-		ID:   uuid.NewString(),
-		Name: name,
-		Path: path,
+		ID:             uuid.NewString(),
+		Name:           name,
+		Path:           path,
+		ExecutablePath: executablePath,
+		CoverImageData: coverImageData,
 	}
 	m.settings.Games = append(m.settings.Games, game)
 	if err := m.saveLocked(); err != nil {
@@ -39,12 +44,15 @@ func (m *Manager) AddGame(name, path string) (models.Game, error) {
 	return game, nil
 }
 
-func (m *Manager) UpdateGame(id string, name string, path string) (models.Game, error) {
-	if id == "" || name == "" || path == "" {
-		return models.Game{}, errors.New("id, name, and path are required")
+func (m *Manager) UpdateGame(id string, name string, path string, executablePath string, coverImageData string) (models.Game, error) {
+	if id == "" || name == "" || path == "" || executablePath == "" {
+		return models.Game{}, errors.New("id, name, path, and executablePath are required")
 	}
 	if _, err := os.Stat(path); err != nil {
 		return models.Game{}, fmt.Errorf("invalid path: %w", err)
+	}
+	if _, err := os.Stat(executablePath); err != nil {
+		return models.Game{}, fmt.Errorf("invalid executablePath: %w", err)
 	}
 
 	m.mu.Lock()
@@ -66,6 +74,8 @@ func (m *Manager) UpdateGame(id string, name string, path string) (models.Game, 
 
 	m.settings.Games[idx].Name = name
 	m.settings.Games[idx].Path = path
+	m.settings.Games[idx].ExecutablePath = executablePath
+	m.settings.Games[idx].CoverImageData = coverImageData
 	if err := m.saveLocked(); err != nil {
 		return models.Game{}, err
 	}

@@ -10,9 +10,16 @@ const (
 )
 
 type Game struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Path string `json:"path"`
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Path           string `json:"path"`
+	ExecutablePath string `json:"executablePath"`
+	CoverImageData string `json:"coverImageData,omitempty"`
+}
+
+type GameStats struct {
+	PlaytimeSeconds int64
+	LastPlayedAt    time.Time
 }
 
 type Settings struct {

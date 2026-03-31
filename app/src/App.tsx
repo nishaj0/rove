@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { api } from "./api";
 import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
-import { BackupView } from "./views/BackupView";
+import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
 import { HomeView } from "./views/HomeView";
 import { SettingsView } from "./views/SettingsView";
 
-type View = "home" | "games" | "backup" | "activity" | "settings";
+type View = "home" | "games" | "game" | "activity" | "settings";
 
 type SyncState = {
   label: string;
@@ -17,7 +17,6 @@ type SyncState = {
 const navItems: Array<{ id: View; label: string }> = [
   { id: "home", label: "Home" },
   { id: "games", label: "Games" },
-  { id: "backup", label: "Backup" },
   { id: "activity", label: "Logs" },
   { id: "settings", label: "Settings" },
 ];
@@ -25,7 +24,7 @@ const navItems: Array<{ id: View; label: string }> = [
 const titleByView: Record<View, string> = {
   home: "Control Center",
   games: "Game Library",
-  backup: "Backup Tools",
+  game: "Game Profile",
   activity: "Recent Activity",
   settings: "Settings",
 };
@@ -49,23 +48,13 @@ function NavIcon({ view }: { view: View }) {
     );
   }
 
-  if (view === "games") {
+  if (view === "games" || view === "game") {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <rect x="4" y="7.5" width="16" height="9" rx="3" stroke="currentColor" strokeWidth="1.8" />
         <path d="M9 10.5v3M7.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         <circle cx="15.7" cy="11.2" r="1" fill="currentColor" />
         <circle cx="17.8" cy="13.3" r="1" fill="currentColor" />
-      </svg>
-    );
-  }
-
-  if (view === "backup") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M4 8h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M12 11v5M10.2 14.2L12 16l1.8-1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
@@ -94,6 +83,8 @@ function NavIcon({ view }: { view: View }) {
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>("home");
+  const [selectedGameId, setSelectedGameId] = useState("");
+
   const [status, setStatus] = useState<Status | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -104,10 +95,10 @@ export default function App() {
 
   const [newName, setNewName] = useState("");
   const [newPath, setNewPath] = useState("");
+  const [newExecutablePath, setNewExecutablePath] = useState("");
+  const [newCoverImageData, setNewCoverImageData] = useState("");
 
-  const [exportGameId, setExportGameId] = useState("");
   const [exportPath, setExportPath] = useState("");
-  const [importGameId, setImportGameId] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
 
@@ -156,6 +147,19 @@ export default function App() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    if (!selectedGameId) {
+      return;
+    }
+    const stillExists = games.some((game) => game.id === selectedGameId);
+    if (!stillExists) {
+      setSelectedGameId("");
+      if (activeView === "game") {
+        setActiveView("games");
+      }
+    }
+  }, [activeView, games, selectedGameId]);
+
   const syncState = useMemo<SyncState>(() => {
     if (error) {
       return { label: "Error", className: "error" };
@@ -171,6 +175,20 @@ export default function App() {
     }
     return { label: "Synced", className: "success" };
   }, [error, status]);
+
+  const selectedGame = useMemo(() => {
+    if (!selectedGameId) {
+      return null;
+    }
+    return games.find((game) => game.id === selectedGameId) ?? null;
+  }, [games, selectedGameId]);
+
+  const pageTitle = useMemo(() => {
+    if (activeView === "game" && selectedGame) {
+      return selectedGame.name;
+    }
+    return titleByView[activeView];
+  }, [activeView, selectedGame]);
 
   const lastSyncLabel = useMemo(() => {
     if (!status?.lastSyncTime || status.lastSyncTime.startsWith("0001-")) {
@@ -190,13 +208,20 @@ export default function App() {
     return `${h}h ${m}m ${s}s`;
   }, [debugInfo]);
 
-  async function onAddGame(e: React.FormEvent) {
+  async function onAddGame(e: FormEvent) {
     e.preventDefault();
     try {
-      await api.addGame({ name: newName.trim(), path: newPath.trim() });
+      await api.addGame({
+        name: newName.trim(),
+        path: newPath.trim(),
+        executablePath: newExecutablePath.trim(),
+        coverImageData: newCoverImageData,
+      });
       setNewName("");
       setNewPath("");
-      setToast("Game folder added");
+      setNewExecutablePath("");
+      setNewCoverImageData("");
+      setToast("Game added");
       await refreshAll();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -206,6 +231,10 @@ export default function App() {
   async function onDeleteGame(id: string) {
     try {
       await api.deleteGame(id);
+      if (selectedGameId === id) {
+        setSelectedGameId("");
+        setActiveView("games");
+      }
       setToast("Game removed");
       await refreshAll();
     } catch (err) {
@@ -226,7 +255,33 @@ export default function App() {
   async function onTriggerSync() {
     try {
       await api.triggerSync();
-      setToast("Sync queued");
+      setToast("Global sync queued");
+      await refreshAll();
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onSyncSelectedGame() {
+    if (!selectedGame) {
+      return;
+    }
+    try {
+      await api.syncGame({ gameId: selectedGame.id });
+      setToast("Game sync queued");
+      await refreshAll();
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onPlaySelectedGame() {
+    if (!selectedGame) {
+      return;
+    }
+    try {
+      const result = await api.playGame({ gameId: selectedGame.id });
+      setToast(result.status === "already_running" ? "Game is already running" : "Game launched");
       await refreshAll();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -234,39 +289,61 @@ export default function App() {
   }
 
   async function onExportBackup() {
+    if (!selectedGame) {
+      return;
+    }
     try {
-      await api.exportBackup({ gameId: exportGameId, destinationPath: exportPath });
-      setToast("Backup exported");
+      const result = await api.exportBackup({ gameId: selectedGame.id, destinationPath: exportPath.trim() });
+      setToast(`Backup exported to ${result.path}`);
       await refreshAll();
     } catch (err) {
       setError(toFriendlyError(err));
     }
   }
 
-  function onQuickExport(gameId: string) {
-    setExportGameId(gameId);
-    setActiveView("backup");
-    setToast("Selected game for export");
-  }
-
-  function onQuickImport(gameId: string) {
-    setImportGameId(gameId);
-    setActiveView("backup");
-    setToast("Selected game for import");
-  }
-
-  async function onQuickEnableSync() {
-    await onTriggerSync();
+  async function onDeleteSelectedGame() {
+    if (!selectedGame) {
+      return;
+    }
+    const confirmed = window.confirm(`Remove ${selectedGame.name} from tracked games?`);
+    if (!confirmed) {
+      return;
+    }
+    await onDeleteGame(selectedGame.id);
   }
 
   async function onImportBackup() {
+    if (!selectedGame) {
+      return;
+    }
     try {
-      await api.importBackup({ gameId: importGameId, sourcePath: importPath, merge: mergeOnImport });
+      await api.importBackup({ gameId: selectedGame.id, sourcePath: importPath.trim(), merge: mergeOnImport });
       setToast("Backup imported");
       await refreshAll();
     } catch (err) {
       setError(toFriendlyError(err));
     }
+  }
+
+  async function onUpdateCover(coverImageData: string) {
+    if (!selectedGame) {
+      return;
+    }
+    try {
+      await api.updateGameCover({ gameId: selectedGame.id, coverImageData });
+      setToast("Cover updated");
+      await refreshAll();
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  function openGame(gameId: string) {
+    setSelectedGameId(gameId);
+    setExportPath("");
+    setImportPath("");
+    setMergeOnImport(true);
+    setActiveView("game");
   }
 
   function initials(name: string): string {
@@ -296,14 +373,26 @@ export default function App() {
     return parsed.toLocaleTimeString();
   }
 
+  function formatPlaytime(seconds: number): string {
+    const total = Math.max(0, Math.floor(seconds));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    if (h === 0) {
+      return `${m}m`;
+    }
+    return `${h}h ${m}m`;
+  }
+
   return (
     <div className="app-layout">
       <aside className="sidebar">
         <nav className="side-nav">
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const isActive = activeView === item.id || (item.id === "games" && activeView === "game");
+            return (
             <button
               key={item.id}
-              className={`side-link ${activeView === item.id ? "active" : ""}`}
+              className={`side-link ${isActive ? "active" : ""}`}
               onClick={() => setActiveView(item.id)}
               type="button"
             >
@@ -312,7 +401,8 @@ export default function App() {
               </span>
               <span className="side-label">{item.label}</span>
             </button>
-          ))}
+            );
+          })}
         </nav>
 
         <div className="sidebar-status">
@@ -325,11 +415,13 @@ export default function App() {
         <header className="topbar">
           <div>
             <p className="kicker">Cloud Saver Desktop</p>
-            <h1>{titleByView[activeView]}</h1>
+            <h1>{pageTitle}</h1>
           </div>
           <div className="topbar-actions">
             <button className="btn" onClick={() => void refreshAll()} type="button">Refresh</button>
-            <button className="btn primary" onClick={() => void onTriggerSync()} type="button">Sync Now</button>
+            {activeView !== "game" ? (
+              <button className="btn primary" onClick={() => void onTriggerSync()} type="button">Sync All</button>
+            ) : null}
           </div>
         </header>
 
@@ -354,34 +446,37 @@ export default function App() {
             games={games}
             newName={newName}
             newPath={newPath}
-            syncLabel={syncState.label}
-            syncClass={syncState.className}
+            newExecutablePath={newExecutablePath}
+            newCoverImageData={newCoverImageData}
             onNewNameChange={setNewName}
             onNewPathChange={setNewPath}
+            onNewExecutablePathChange={setNewExecutablePath}
+            onNewCoverImageChange={setNewCoverImageData}
             onAddGame={onAddGame}
-            onQuickExport={onQuickExport}
-            onQuickImport={onQuickImport}
-            onQuickEnableSync={() => void onQuickEnableSync()}
-            onDeleteGame={(id) => void onDeleteGame(id)}
+            onOpenGame={openGame}
             initials={initials}
+            formatPlaytime={formatPlaytime}
           />
         ) : null}
 
-        {activeView === "backup" ? (
-          <BackupView
-            games={games}
-            exportGameId={exportGameId}
+        {activeView === "game" ? (
+          <GameDetailView
+            game={selectedGame}
             exportPath={exportPath}
-            importGameId={importGameId}
             importPath={importPath}
             mergeOnImport={mergeOnImport}
-            onExportGameChange={setExportGameId}
+            onBack={() => setActiveView("games")}
+            onPlay={() => void onPlaySelectedGame()}
+            onSyncGame={() => void onSyncSelectedGame()}
+            onDelete={() => void onDeleteSelectedGame()}
             onExportPathChange={setExportPath}
-            onImportGameChange={setImportGameId}
             onImportPathChange={setImportPath}
             onMergeChange={setMergeOnImport}
             onExportBackup={() => void onExportBackup()}
             onImportBackup={() => void onImportBackup()}
+            onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
+            formatPlaytime={formatPlaytime}
+            safeDateTime={safeDateTime}
           />
         ) : null}
 
