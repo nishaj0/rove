@@ -437,6 +437,7 @@ export default function App() {
             syncLabel={syncState.label}
             syncClass={syncState.className}
             onManageGames={() => setActiveView("games")}
+            onOpenGame={openGame}
             initials={initials}
           />
         ) : null}

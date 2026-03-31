@@ -8,11 +8,12 @@ type HomeViewProps = {
   syncLabel: string;
   syncClass: "success" | "warning" | "error" | "syncing";
   onManageGames: () => void;
+  onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
 };
 
 export function HomeView(props: HomeViewProps) {
-  const { pending, games, autostart, lastSyncLabel, syncLabel, syncClass, onManageGames, initials } = props;
+  const { pending, games, autostart, lastSyncLabel, syncLabel, syncClass, onManageGames, onOpenGame, initials } = props;
 
   return (
     <>
@@ -49,15 +50,19 @@ export function HomeView(props: HomeViewProps) {
         ) : (
           <div className="game-grid">
             {games.slice(0, 6).map((g) => (
-              <article className="game-card" key={g.id}>
+              <button className="game-card game-card-button" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
                 <div className="game-cover">
-                  <span>{initials(g.name)}</span>
+                  {g.coverImageData ? <img className="game-cover-image" src={g.coverImageData} alt={`${g.name} cover`} /> : <span>{initials(g.name)}</span>}
+                  <span className={`game-state ${g.running ? "success" : "warning"}`}>{g.running ? "Running" : "Idle"}</span>
                 </div>
                 <div className="game-meta">
-                  <strong>{g.name}</strong>
-                  <p title={g.path}>{g.path}</p>
+                  <div className="game-meta-main">
+                    <strong>{g.name}</strong>
+                    <p className="game-playtime">Open game profile</p>
+                  </div>
+                  <span className="open-chip">Open</span>
                 </div>
-              </article>
+              </button>
             ))}
           </div>
         )}
