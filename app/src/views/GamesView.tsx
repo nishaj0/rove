@@ -11,7 +11,7 @@ type GamesViewProps = {
   onBrowseSaveFolder: () => void;
   onBrowseExecutable: () => void;
   onNewCoverImageChange: (value: string) => void;
-  onAddGame: (e: FormEvent) => void;
+  onAddGame: (e: FormEvent) => Promise<boolean>;
   onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
 };
@@ -42,6 +42,13 @@ export function GamesView(props: GamesViewProps) {
     }
     return games.filter((game) => game.name.toLowerCase().includes(query));
   }, [games, searchTerm]);
+
+  async function onSubmitAddGame(e: FormEvent) {
+    const added = await onAddGame(e);
+    if (added) {
+      setShowAddModal(false);
+    }
+  }
 
   return (
     <>
@@ -85,7 +92,7 @@ export function GamesView(props: GamesViewProps) {
               <h2>Add a game</h2>
               <button className="modal-close" onClick={() => setShowAddModal(false)} type="button" aria-label="Close">&#10005;</button>
             </div>
-            <form className="add-game-form" onSubmit={onAddGame}>
+            <form className="add-game-form" onSubmit={onSubmitAddGame}>
               <input placeholder="Game name" value={newName} onChange={(e) => onNewNameChange(e.target.value)} required />
               <input
                 className="picker-input"

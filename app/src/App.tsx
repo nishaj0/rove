@@ -346,7 +346,7 @@ export default function App() {
     return `${h}h ${m}m ${s}s`;
   }, [debugInfo]);
 
-  async function onAddGame(e: FormEvent) {
+  async function onAddGame(e: FormEvent): Promise<boolean> {
     e.preventDefault();
     try {
       await api.addGame({
@@ -361,8 +361,10 @@ export default function App() {
       setNewCoverImageData("");
       setToast("Game added");
       await refreshGamesData();
+      return true;
     } catch (err) {
       setError(toFriendlyError(err));
+      return false;
     }
   }
 
