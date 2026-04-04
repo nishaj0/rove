@@ -5,6 +5,10 @@ type GameDetailViewProps = {
   exportPath: string;
   importPath: string;
   mergeOnImport: boolean;
+  exportOperationState: "idle" | "working" | "success" | "failed";
+  exportOperationMessage: string;
+  importOperationState: "idle" | "working" | "success" | "failed";
+  importOperationMessage: string;
   onBack: () => void;
   onPlay: () => void;
   onSyncGame: () => void;
@@ -25,6 +29,10 @@ export function GameDetailView(props: GameDetailViewProps) {
     exportPath,
     importPath,
     mergeOnImport,
+    exportOperationState,
+    exportOperationMessage,
+    importOperationState,
+    importOperationMessage,
     onBack,
     onPlay,
     onSyncGame,
@@ -38,6 +46,18 @@ export function GameDetailView(props: GameDetailViewProps) {
     formatPlaytime,
     safeDateTime,
   } = props;
+
+  const exportStateClass = exportOperationState === "working"
+    ? "syncing"
+    : exportOperationState === "success"
+      ? "success"
+      : "error";
+
+  const importStateClass = importOperationState === "working"
+    ? "syncing"
+    : importOperationState === "success"
+      ? "success"
+      : "error";
 
   if (!game) {
     return (
@@ -85,6 +105,7 @@ export function GameDetailView(props: GameDetailViewProps) {
               placeholder="D:\\Backups"
               value={exportPath}
               readOnly
+              disabled={exportOperationState === "working"}
               onClick={onBrowseExportPath}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -94,7 +115,10 @@ export function GameDetailView(props: GameDetailViewProps) {
               }}
             />
           </label>
-          <button className="btn primary backup-action" onClick={onExportBackup} type="button">Export Backup</button>
+          <button className="btn primary backup-action" onClick={onExportBackup} type="button" disabled={exportOperationState === "working"}>
+            {exportOperationState === "working" ? "Exporting..." : "Export Backup"}
+          </button>
+          {exportOperationState !== "idle" ? <p className={`backup-status state-text ${exportStateClass}`}>{exportOperationMessage}</p> : null}
         </div>
 
         <div className="backup-pane">
@@ -106,6 +130,7 @@ export function GameDetailView(props: GameDetailViewProps) {
               placeholder="D:\\Backups\\my-game.zip"
               value={importPath}
               readOnly
+              disabled={importOperationState === "working"}
               onClick={onBrowseImportPath}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -116,10 +141,13 @@ export function GameDetailView(props: GameDetailViewProps) {
             />
           </label>
           <label className="inline-check">
-            <input type="checkbox" checked={mergeOnImport} onChange={(e) => onMergeChange(e.target.checked)} />
+            <input type="checkbox" checked={mergeOnImport} disabled={importOperationState === "working"} onChange={(e) => onMergeChange(e.target.checked)} />
             Merge into existing folder
           </label>
-          <button className="btn primary backup-action" onClick={onImportBackup} type="button">Import Backup</button>
+          <button className="btn primary backup-action" onClick={onImportBackup} type="button" disabled={importOperationState === "working"}>
+            {importOperationState === "working" ? "Importing..." : "Import Backup"}
+          </button>
+          {importOperationState !== "idle" ? <p className={`backup-status state-text ${importStateClass}`}>{importOperationMessage}</p> : null}
         </div>
       </section>
 

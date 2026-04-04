@@ -16,6 +16,8 @@ type NavSnapshot = {
   selectedGameId: string;
 };
 
+type BackupOperationState = "idle" | "working" | "success" | "failed";
+
 const navItems: Array<{ id: View; label: string }> = [
   { id: "home", label: "Home" },
   { id: "games", label: "Games" },
@@ -116,6 +118,10 @@ export default function App() {
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
+  const [exportOperationState, setExportOperationState] = useState<BackupOperationState>("idle");
+  const [exportOperationMessage, setExportOperationMessage] = useState("");
+  const [importOperationState, setImportOperationState] = useState<BackupOperationState>("idle");
+  const [importOperationMessage, setImportOperationMessage] = useState("");
 
   function syncNavButtonState() {
     setCanGoBack(navCursorRef.current > 0);
@@ -449,11 +455,17 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
+    setExportOperationState("working");
+    setExportOperationMessage("Export in progress...");
     try {
       const result = await api.exportBackup({ gameId: selectedGame.id, destinationPath: exportPath.trim() });
+      setExportOperationState("success");
+      setExportOperationMessage("Export completed successfully.");
       setToast(`Backup exported to ${result.path}`);
       await refreshGamesData();
     } catch (err) {
+      setExportOperationState("failed");
+      setExportOperationMessage("Export failed. Please check destination folder and try again.");
       setError(toFriendlyError(err));
     }
   }
@@ -473,11 +485,17 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
+    setImportOperationState("working");
+    setImportOperationMessage("Import in progress...");
     try {
       await api.importBackup({ gameId: selectedGame.id, sourcePath: importPath.trim(), merge: mergeOnImport });
+      setImportOperationState("success");
+      setImportOperationMessage("Import completed successfully.");
       setToast("Backup imported");
       await refreshGamesData();
     } catch (err) {
+      setImportOperationState("failed");
+      setImportOperationMessage("Import failed. Please verify the ZIP and try again.");
       setError(toFriendlyError(err));
     }
   }
@@ -499,6 +517,10 @@ export default function App() {
     setExportPath("");
     setImportPath("");
     setMergeOnImport(true);
+    setExportOperationState("idle");
+    setExportOperationMessage("");
+    setImportOperationState("idle");
+    setImportOperationMessage("");
     pushNavigation("game", gameId);
   }
 
@@ -616,6 +638,10 @@ export default function App() {
             onMergeChange={setMergeOnImport}
             onExportBackup={() => void onExportBackup()}
             onImportBackup={() => void onImportBackup()}
+            exportOperationState={exportOperationState}
+            exportOperationMessage={exportOperationMessage}
+            importOperationState={importOperationState}
+            importOperationMessage={importOperationMessage}
             onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
             formatPlaytime={formatPlaytime}
             safeDateTime={safeDateTime}
