@@ -596,6 +596,38 @@ h3 {
   font-size: 0.88rem;
 }
 
+.backup-policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.backup-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.backup-history-row {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--surface-1);
+  padding: 0.55rem 0.7rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.backup-history-row p {
+  margin: 0;
+}
+
+.backup-history-path {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
 .game-detail-head {
   gap: 0.9rem;
 }
@@ -875,6 +907,7 @@ label {
 @media (max-width: 1200px) {
   .activity-summary,
   .settings-grid,
+  .backup-policy-grid,
   .split,
   .add-game-form {
     grid-template-columns: 1fr;

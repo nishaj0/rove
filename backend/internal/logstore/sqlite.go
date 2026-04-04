@@ -88,6 +88,16 @@ CREATE TABLE IF NOT EXISTS game_stats (
 	total_play_seconds INTEGER NOT NULL DEFAULT 0,
 	last_played_at TEXT NOT NULL DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS backup_history (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	game_id TEXT NOT NULL,
+	path TEXT NOT NULL,
+	created_at TEXT NOT NULL,
+	reason TEXT NOT NULL,
+	signature TEXT NOT NULL,
+	status TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_backup_history_game_created ON backup_history(game_id, created_at DESC, id DESC);
 `
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("migrate schema: %w", err)
@@ -253,6 +263,174 @@ func (s *Store) DeleteGameStats(gameID string) error {
 		time.Sleep(busyRetryDelay)
 	}
 	return nil
+}
+
+// stores one auto-backup record for later history and signature checks.
+func (s *Store) InsertBackupHistory(entry models.BackupHistoryEntry) error {
+	if entry.GameID == "" || entry.Path == "" {
+		return fmt.Errorf("backup history requires game id and path")
+	}
+	createdAt := entry.CreatedAt
+	if createdAt.IsZero() {
+		createdAt = time.Now().UTC()
+	}
+	reason := entry.Reason
+	if reason == "" {
+		reason = "periodic"
+	}
+	status := entry.Status
+	if status == "" {
+		status = "ok"
+	}
+
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		_, err := s.db.Exec(
+			`INSERT INTO backup_history(game_id, path, created_at, reason, signature, status) VALUES (?, ?, ?, ?, ?, ?)`,
+			entry.GameID,
+			entry.Path,
+			createdAt.UTC().Format(time.RFC3339),
+			reason,
+			entry.Signature,
+			status,
+		)
+		if err == nil {
+			return nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return fmt.Errorf("insert backup_history: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	return nil
+}
+
+// returns recent local backup records for one game ordered newest first.
+func (s *Store) BackupHistory(gameID string, limit int) ([]models.BackupHistoryEntry, error) {
+	if gameID == "" {
+		return []models.BackupHistoryEntry{}, nil
+	}
+	if limit <= 0 || limit > 100 {
+		limit = 20
+	}
+
+	var rows *sql.Rows
+	var err error
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		rows, err = s.db.Query(
+			`SELECT id, game_id, path, created_at, reason, signature, status FROM backup_history WHERE game_id = ? ORDER BY created_at DESC, id DESC LIMIT ?`,
+			gameID,
+			limit,
+		)
+		if err == nil {
+			break
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return nil, fmt.Errorf("query backup_history: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	defer rows.Close()
+
+	result := make([]models.BackupHistoryEntry, 0, limit)
+	for rows.Next() {
+		var row models.BackupHistoryEntry
+		var createdRaw string
+		if err := rows.Scan(&row.ID, &row.GameID, &row.Path, &createdRaw, &row.Reason, &row.Signature, &row.Status); err != nil {
+			return nil, fmt.Errorf("scan backup_history: %w", err)
+		}
+		parsed, _ := time.Parse(time.RFC3339, createdRaw)
+		row.CreatedAt = parsed
+		result = append(result, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate backup_history: %w", err)
+	}
+	return result, nil
+}
+
+// returns latest successful backup signature for change detection decisions.
+func (s *Store) LatestBackupSignature(gameID string) (string, error) {
+	if gameID == "" {
+		return "", nil
+	}
+
+	var signature string
+	var err error
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		err = s.db.QueryRow(
+			`SELECT signature FROM backup_history WHERE game_id = ? AND status = 'ok' ORDER BY created_at DESC, id DESC LIMIT 1`,
+			gameID,
+		).Scan(&signature)
+		if err == nil {
+			return signature, nil
+		}
+		if err == sql.ErrNoRows {
+			return "", nil
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return "", fmt.Errorf("query latest backup signature: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	return "", nil
+}
+
+// trims backup history to keep only the newest records and returns removed paths.
+func (s *Store) PruneBackupHistory(gameID string, keep int) ([]string, error) {
+	if gameID == "" || keep < 1 {
+		return []string{}, nil
+	}
+
+	var rows *sql.Rows
+	var err error
+	for attempt := 0; attempt <= busyRetryCount; attempt++ {
+		rows, err = s.db.Query(
+			`SELECT id, path FROM backup_history WHERE game_id = ? ORDER BY created_at DESC, id DESC LIMIT -1 OFFSET ?`,
+			gameID,
+			keep,
+		)
+		if err == nil {
+			break
+		}
+		if !isBusyError(err) || attempt == busyRetryCount {
+			return nil, fmt.Errorf("query prune backup_history: %w", err)
+		}
+		time.Sleep(busyRetryDelay)
+	}
+	defer rows.Close()
+
+	type pruneRow struct {
+		id   int64
+		path string
+	}
+	toRemove := make([]pruneRow, 0)
+	for rows.Next() {
+		var row pruneRow
+		if err := rows.Scan(&row.id, &row.path); err != nil {
+			return nil, fmt.Errorf("scan prune backup_history: %w", err)
+		}
+		toRemove = append(toRemove, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate prune backup_history: %w", err)
+	}
+
+	removedPaths := make([]string, 0, len(toRemove))
+	for _, row := range toRemove {
+		for attempt := 0; attempt <= busyRetryCount; attempt++ {
+			_, err := s.db.Exec(`DELETE FROM backup_history WHERE id = ?`, row.id)
+			if err == nil {
+				removedPaths = append(removedPaths, row.path)
+				break
+			}
+			if !isBusyError(err) || attempt == busyRetryCount {
+				return nil, fmt.Errorf("delete backup_history row: %w", err)
+			}
+			time.Sleep(busyRetryDelay)
+		}
+	}
+
+	return removedPaths, nil
 }
 
 func isBusyError(err error) bool {

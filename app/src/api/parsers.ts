@@ -1,4 +1,11 @@
-import type { ConflictPolicy, Game, LogEntry, Settings, Status, ThemeMode } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, Status, ThemeMode } from "../types";
+
+const defaultBackupPolicy: BackupPolicy = {
+  enabled: true,
+  intervalMinutes: 10,
+  exitDelaySeconds: 10,
+  retentionCount: 5,
+};
 
 const defaultSettings: Settings = {
   port: 7331,
@@ -34,6 +41,18 @@ function asThemeMode(input: unknown, fallback: ThemeMode): ThemeMode {
   return input === "dark" || input === "light" || input === "system" ? input : fallback;
 }
 
+function normalizeBackupPolicy(input: unknown): BackupPolicy {
+  if (!isRecord(input)) {
+    return { ...defaultBackupPolicy };
+  }
+  return {
+    enabled: asBoolean(input.enabled, defaultBackupPolicy.enabled),
+    intervalMinutes: asNumber(input.intervalMinutes, defaultBackupPolicy.intervalMinutes),
+    exitDelaySeconds: asNumber(input.exitDelaySeconds, defaultBackupPolicy.exitDelaySeconds),
+    retentionCount: asNumber(input.retentionCount, defaultBackupPolicy.retentionCount),
+  };
+}
+
 export function normalizeGames(input: unknown): Game[] {
   if (!Array.isArray(input)) {
     return [];
@@ -49,12 +68,35 @@ export function normalizeGames(input: unknown): Game[] {
         path: asString(value.path),
         executablePath: asString(value.executablePath),
         coverImageData: asString(value.coverImageData),
+        backupPolicy: normalizeBackupPolicy(value.backupPolicy),
         playtimeSeconds: asNumber(value.playtimeSeconds, 0),
         lastPlayedAt: asString(value.lastPlayedAt),
         running: asBoolean(value.running, false),
       };
     })
     .filter((value): value is Game => value !== null);
+}
+
+export function normalizeBackupHistory(input: unknown): BackupHistoryEntry[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  return input
+    .map((value): BackupHistoryEntry | null => {
+      if (!isRecord(value)) {
+        return null;
+      }
+      return {
+        id: asNumber(value.id, 0),
+        gameId: asString(value.gameId),
+        path: asString(value.path),
+        createdAt: asString(value.createdAt),
+        reason: asString(value.reason),
+        signature: asString(value.signature),
+        status: asString(value.status, "ok"),
+      };
+    })
+    .filter((value): value is BackupHistoryEntry => value !== null);
 }
 
 export function normalizeLogs(input: unknown): LogEntry[] {

@@ -1,7 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "./api";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
-import type { ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
+import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -118,6 +118,7 @@ export default function App() {
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
+  const [backupHistory, setBackupHistory] = useState<BackupHistoryEntry[]>([]);
   const [exportOperationState, setExportOperationState] = useState<BackupOperationState>("idle");
   const [exportOperationMessage, setExportOperationMessage] = useState("");
   const [importOperationState, setImportOperationState] = useState<BackupOperationState>("idle");
@@ -243,6 +244,19 @@ export default function App() {
     }
   }
 
+  async function refreshBackupHistory(gameID: string) {
+    if (!gameID) {
+      setBackupHistory([]);
+      return;
+    }
+    try {
+      const entries = await api.getBackupHistory(gameID, 20);
+      setBackupHistory(entries);
+    } catch (e) {
+      setError(toFriendlyError(e));
+    }
+  }
+
   async function loadInitialData() {
     try {
       setError("");
@@ -282,6 +296,22 @@ export default function App() {
       }
     };
   }, [activeView]);
+
+  useEffect(() => {
+    if (activeView !== "game" || !selectedGameId) {
+      setBackupHistory([]);
+      return;
+    }
+
+    void refreshBackupHistory(selectedGameId);
+    const timer = window.setInterval(() => {
+      void refreshBackupHistory(selectedGameId);
+    }, 15000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [activeView, selectedGameId]);
 
   useEffect(() => {
     if (!toast) {
@@ -513,6 +543,22 @@ export default function App() {
     }
   }
 
+  async function onSaveSelectedGameBackupPolicy(policy: BackupPolicy): Promise<boolean> {
+    if (!selectedGame) {
+      return false;
+    }
+    try {
+      const updated = await api.updateGameBackupPolicy({ gameId: selectedGame.id, backupPolicy: policy });
+      setGames((existing) => existing.map((game) => (game.id === updated.id ? updated : game)));
+      setToast("Backup policy saved");
+      await refreshBackupHistory(updated.id);
+      return true;
+    } catch (err) {
+      setError(toFriendlyError(err));
+      return false;
+    }
+  }
+
   function openGame(gameId: string) {
     setExportPath("");
     setImportPath("");
@@ -521,6 +567,7 @@ export default function App() {
     setExportOperationMessage("");
     setImportOperationState("idle");
     setImportOperationMessage("");
+    setBackupHistory([]);
     pushNavigation("game", gameId);
   }
 
@@ -642,6 +689,8 @@ export default function App() {
             exportOperationMessage={exportOperationMessage}
             importOperationState={importOperationState}
             importOperationMessage={importOperationMessage}
+            backupHistory={backupHistory}
+            onSaveBackupPolicy={onSaveSelectedGameBackupPolicy}
             onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
             formatPlaytime={formatPlaytime}
             safeDateTime={safeDateTime}

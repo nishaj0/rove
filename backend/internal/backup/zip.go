@@ -27,52 +27,26 @@ func (s *Service) ExportGame(game models.Game, destinationPath string) (string, 
 	if err != nil {
 		return "", err
 	}
-	if err := os.MkdirAll(filepath.Dir(resolvedZipPath), 0o755); err != nil {
-		return "", fmt.Errorf("create destination dir: %w", err)
-	}
-
-	f, err := os.Create(resolvedZipPath)
-	if err != nil {
-		return "", fmt.Errorf("create zip file: %w", err)
-	}
-	defer f.Close()
-
-	zw := zip.NewWriter(f)
-	defer zw.Close()
-
-	err = filepath.WalkDir(game.Path, func(path string, d os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if d.IsDir() {
-			return nil
-		}
-
-		rel, err := filepath.Rel(game.Path, path)
-		if err != nil {
-			return err
-		}
-		rel = filepath.ToSlash(rel)
-
-		wf, err := zw.Create(rel)
-		if err != nil {
-			return err
-		}
-		sf, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer sf.Close()
-
-		if _, err := io.Copy(wf, sf); err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
+	if err := writeZipAtomic(game, resolvedZipPath); err != nil {
 		return "", err
 	}
+	return resolvedZipPath, nil
+}
 
+// creates an automatic backup zip under game-specific app-data folder naming.
+func (s *Service) ExportAutoGame(game models.Game, backupsRoot, reason string) (string, error) {
+	if strings.TrimSpace(backupsRoot) == "" {
+		return "", errors.New("backups root is required")
+	}
+	gameFolder := filepath.Join(backupsRoot, autoBackupFolderName(game))
+	if err := os.MkdirAll(gameFolder, 0o755); err != nil {
+		return "", fmt.Errorf("create backup folder: %w", err)
+	}
+	filename := generatedAutoBackupFilename(game.Name, reason)
+	resolvedZipPath := filepath.Join(gameFolder, filename)
+	if err := writeZipAtomic(game, resolvedZipPath); err != nil {
+		return "", err
+	}
 	return resolvedZipPath, nil
 }
 
@@ -118,6 +92,91 @@ func sanitizeFilename(input string) string {
 		return "game"
 	}
 	return compact
+}
+
+func autoBackupFolderName(game models.Game) string {
+	base := sanitizeFilename(game.Name)
+	id := strings.TrimSpace(game.ID)
+	if id == "" {
+		return base
+	}
+	return base + "__" + id
+}
+
+func generatedAutoBackupFilename(gameName, reason string) string {
+	safeGameName := sanitizeFilename(gameName)
+	timestamp := time.Now().UTC().Format("20060102_150405")
+	reasonTag := strings.TrimSpace(reason)
+	if reasonTag == "" {
+		reasonTag = "periodic"
+	}
+	return fmt.Sprintf("%s_%s_%s.zip", safeGameName, timestamp, sanitizeFilename(reasonTag))
+}
+
+func writeZipAtomic(game models.Game, finalPath string) error {
+	if err := os.MkdirAll(filepath.Dir(finalPath), 0o755); err != nil {
+		return fmt.Errorf("create destination dir: %w", err)
+	}
+	tmpPath := finalPath + ".tmp-" + fmt.Sprintf("%d", time.Now().UnixNano())
+
+	f, err := os.Create(tmpPath)
+	if err != nil {
+		return fmt.Errorf("create temp zip file: %w", err)
+	}
+	zw := zip.NewWriter(f)
+
+	writeErr := filepath.WalkDir(game.Path, func(path string, d os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			return nil
+		}
+
+		rel, err := filepath.Rel(game.Path, path)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+
+		wf, err := zw.Create(rel)
+		if err != nil {
+			return err
+		}
+		sf, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		_, copyErr := io.Copy(wf, sf)
+		closeErr := sf.Close()
+		if copyErr != nil {
+			return copyErr
+		}
+		if closeErr != nil {
+			return closeErr
+		}
+		return nil
+	})
+	closeZipErr := zw.Close()
+	closeFileErr := f.Close()
+
+	if writeErr != nil || closeZipErr != nil || closeFileErr != nil {
+		_ = os.Remove(tmpPath)
+		if writeErr != nil {
+			return writeErr
+		}
+		if closeZipErr != nil {
+			return closeZipErr
+		}
+		return closeFileErr
+	}
+
+	_ = os.Remove(finalPath)
+	if err := os.Rename(tmpPath, finalPath); err != nil {
+		_ = os.Remove(tmpPath)
+		return fmt.Errorf("finalize zip file: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) ImportGame(game models.Game, sourceZip string, merge bool) error {

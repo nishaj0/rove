@@ -1,4 +1,6 @@
 import type {
+  BackupHistoryEntry,
+  BackupPolicy,
   BackupExportRequest,
   BackupExportResponse,
   BackupImportRequest,
@@ -11,6 +13,7 @@ import type {
   Status,
 } from "./types";
 import {
+  normalizeBackupHistory,
   normalizeGames,
   normalizeLogs,
   normalizeSettings,
@@ -104,6 +107,12 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  updateGameBackupPolicy(payload: { gameId: string; backupPolicy: BackupPolicy }) {
+    return request<Game>("/games/backup-policy", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
   async getStatus() {
     const payload = await request<unknown>("/status");
     return normalizeStatus(payload);
@@ -136,5 +145,9 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     });
+  },
+  async getBackupHistory(gameId: string, limit = 20): Promise<BackupHistoryEntry[]> {
+    const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
+    return normalizeBackupHistory(payload);
   },
 };

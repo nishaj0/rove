@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"cloud-saver/backend/internal/models"
@@ -59,4 +60,27 @@ func (s *Server) handleBackupImport(w http.ResponseWriter, r *http.Request) {
 	s.engine.Trigger("backup-import")
 	_ = s.logs.Write("info", "backup", fmt.Sprintf("imported backup for %s", game.Name))
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+func (s *Server) handleBackupHistory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	gameID := strings.TrimSpace(r.URL.Query().Get("gameId"))
+	if gameID == "" {
+		writeErr(w, http.StatusBadRequest, errors.New("gameId is required"))
+		return
+	}
+	if _, ok := s.cfg.FindGame(gameID); !ok {
+		writeErr(w, http.StatusNotFound, errors.New("game not found"))
+		return
+	}
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	entries, err := s.logs.BackupHistory(gameID, limit)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, entries)
 }

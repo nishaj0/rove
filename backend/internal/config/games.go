@@ -12,6 +12,11 @@ import (
 )
 
 func (m *Manager) AddGame(name, path, executablePath, coverImageData string) (models.Game, error) {
+	return m.AddGameWithPolicy(name, path, executablePath, coverImageData, nil)
+}
+
+// adds a tracked game and optionally overrides default backup policy values.
+func (m *Manager) AddGameWithPolicy(name, path, executablePath, coverImageData string, policy *models.BackupPolicy) (models.Game, error) {
 	if name == "" || path == "" || executablePath == "" {
 		return models.Game{}, errors.New("name, path, and executablePath are required")
 	}
@@ -30,12 +35,21 @@ func (m *Manager) AddGame(name, path, executablePath, coverImageData string) (mo
 		}
 	}
 
+	backupPolicy := defaultBackupPolicy()
+	if policy != nil {
+		backupPolicy = *policy
+		if err := validateBackupPolicy(backupPolicy); err != nil {
+			return models.Game{}, err
+		}
+	}
+
 	game := models.Game{
 		ID:             uuid.NewString(),
 		Name:           name,
 		Path:           path,
 		ExecutablePath: executablePath,
 		CoverImageData: coverImageData,
+		BackupPolicy:   backupPolicy,
 	}
 	m.settings.Games = append(m.settings.Games, game)
 	if err := m.saveLocked(); err != nil {
@@ -45,6 +59,11 @@ func (m *Manager) AddGame(name, path, executablePath, coverImageData string) (mo
 }
 
 func (m *Manager) UpdateGame(id string, name string, path string, executablePath string, coverImageData string) (models.Game, error) {
+	return m.UpdateGameWithPolicy(id, name, path, executablePath, coverImageData, nil)
+}
+
+// updates game identity/path fields and can replace backup policy when provided.
+func (m *Manager) UpdateGameWithPolicy(id string, name string, path string, executablePath string, coverImageData string, policy *models.BackupPolicy) (models.Game, error) {
 	if id == "" || name == "" || path == "" || executablePath == "" {
 		return models.Game{}, errors.New("id, name, path, and executablePath are required")
 	}
@@ -76,6 +95,42 @@ func (m *Manager) UpdateGame(id string, name string, path string, executablePath
 	m.settings.Games[idx].Path = path
 	m.settings.Games[idx].ExecutablePath = executablePath
 	m.settings.Games[idx].CoverImageData = coverImageData
+	if policy != nil {
+		if err := validateBackupPolicy(*policy); err != nil {
+			return models.Game{}, err
+		}
+		m.settings.Games[idx].BackupPolicy = *policy
+	}
+	if err := m.saveLocked(); err != nil {
+		return models.Game{}, err
+	}
+	return m.settings.Games[idx], nil
+}
+
+// updates only per-game backup policy while preserving other game fields.
+func (m *Manager) UpdateGameBackupPolicy(id string, policy models.BackupPolicy) (models.Game, error) {
+	if id == "" {
+		return models.Game{}, errors.New("id is required")
+	}
+	if err := validateBackupPolicy(policy); err != nil {
+		return models.Game{}, err
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	idx := -1
+	for i, g := range m.settings.Games {
+		if g.ID == id {
+			idx = i
+			break
+		}
+	}
+	if idx < 0 {
+		return models.Game{}, errors.New("game not found")
+	}
+
+	m.settings.Games[idx].BackupPolicy = policy
 	if err := m.saveLocked(); err != nil {
 		return models.Game{}, err
 	}

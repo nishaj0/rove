@@ -12,6 +12,63 @@ import (
 	"cloud-saver/backend/internal/models"
 )
 
+const (
+	defaultBackupIntervalMinutes  = 10
+	defaultBackupExitDelaySeconds = 10
+	defaultBackupRetentionCount   = 5
+	minBackupIntervalMinutes      = 3
+	maxBackupIntervalMinutes      = 120
+	minBackupExitDelaySeconds     = 3
+	maxBackupExitDelaySeconds     = 120
+	minBackupRetentionCount       = 1
+	maxBackupRetentionCount       = 30
+)
+
+func defaultBackupPolicy() models.BackupPolicy {
+	return models.BackupPolicy{
+		Enabled:          true,
+		IntervalMinutes:  defaultBackupIntervalMinutes,
+		ExitDelaySeconds: defaultBackupExitDelaySeconds,
+		RetentionCount:   defaultBackupRetentionCount,
+	}
+}
+
+func normalizeBackupPolicy(policy *models.BackupPolicy) bool {
+	if policy == nil {
+		return false
+	}
+	changed := false
+	defaults := defaultBackupPolicy()
+
+	if policy.IntervalMinutes < minBackupIntervalMinutes || policy.IntervalMinutes > maxBackupIntervalMinutes {
+		policy.IntervalMinutes = defaults.IntervalMinutes
+		changed = true
+	}
+	if policy.ExitDelaySeconds < minBackupExitDelaySeconds || policy.ExitDelaySeconds > maxBackupExitDelaySeconds {
+		policy.ExitDelaySeconds = defaults.ExitDelaySeconds
+		changed = true
+	}
+	if policy.RetentionCount < minBackupRetentionCount || policy.RetentionCount > maxBackupRetentionCount {
+		policy.RetentionCount = defaults.RetentionCount
+		changed = true
+	}
+
+	return changed
+}
+
+func validateBackupPolicy(policy models.BackupPolicy) error {
+	if policy.IntervalMinutes < minBackupIntervalMinutes || policy.IntervalMinutes > maxBackupIntervalMinutes {
+		return fmt.Errorf("backup interval must be between %d and %d minutes", minBackupIntervalMinutes, maxBackupIntervalMinutes)
+	}
+	if policy.ExitDelaySeconds < minBackupExitDelaySeconds || policy.ExitDelaySeconds > maxBackupExitDelaySeconds {
+		return fmt.Errorf("backup exit delay must be between %d and %d seconds", minBackupExitDelaySeconds, maxBackupExitDelaySeconds)
+	}
+	if policy.RetentionCount < minBackupRetentionCount || policy.RetentionCount > maxBackupRetentionCount {
+		return fmt.Errorf("backup retention count must be between %d and %d", minBackupRetentionCount, maxBackupRetentionCount)
+	}
+	return nil
+}
+
 // coordinates in-memory settings state with on-disk persistence.
 type Manager struct {
 	mu       sync.RWMutex
@@ -170,6 +227,11 @@ func normalizeSettings(settings *models.Settings) bool {
 	if settings.Games == nil {
 		settings.Games = []models.Game{}
 		changed = true
+	}
+	for i := range settings.Games {
+		if normalizeBackupPolicy(&settings.Games[i].BackupPolicy) {
+			changed = true
+		}
 	}
 
 	return changed

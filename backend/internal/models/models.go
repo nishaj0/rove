@@ -16,13 +16,22 @@ const (
 	ThemeSystem        ThemeMode      = "system"
 )
 
+// stores per-game rules for automatic local backups.
+type BackupPolicy struct {
+	Enabled          bool `json:"enabled"`
+	IntervalMinutes  int  `json:"intervalMinutes"`
+	ExitDelaySeconds int  `json:"exitDelaySeconds"`
+	RetentionCount   int  `json:"retentionCount"`
+}
+
 // stores tracked title metadata and local filesystem paths.
 type Game struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	Path           string `json:"path"`
-	ExecutablePath string `json:"executablePath"`
-	CoverImageData string `json:"coverImageData,omitempty"`
+	ID             string       `json:"id"`
+	Name           string       `json:"name"`
+	Path           string       `json:"path"`
+	ExecutablePath string       `json:"executablePath"`
+	CoverImageData string       `json:"coverImageData,omitempty"`
+	BackupPolicy   BackupPolicy `json:"backupPolicy"`
 }
 
 // stores persisted runtime totals used by status views.
@@ -70,4 +79,15 @@ type BackupImportRequest struct {
 	GameID     string `json:"gameId"`
 	SourcePath string `json:"sourcePath"`
 	Merge      bool   `json:"merge"`
+}
+
+// stores one local auto-backup record used by history endpoints.
+type BackupHistoryEntry struct {
+	ID        int64     `json:"id"`
+	GameID    string    `json:"gameId"`
+	Path      string    `json:"path"`
+	CreatedAt time.Time `json:"createdAt"`
+	Reason    string    `json:"reason"`
+	Signature string    `json:"signature"`
+	Status    string    `json:"status"`
 }

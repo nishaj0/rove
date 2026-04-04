@@ -15,14 +15,15 @@ import (
 const maxCoverImagePayload = 2_500_000
 
 type gameResponse struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	Path            string `json:"path"`
-	ExecutablePath  string `json:"executablePath"`
-	CoverImageData  string `json:"coverImageData,omitempty"`
-	PlaytimeSeconds int64  `json:"playtimeSeconds"`
-	LastPlayedAt    string `json:"lastPlayedAt,omitempty"`
-	Running         bool   `json:"running"`
+	ID              string              `json:"id"`
+	Name            string              `json:"name"`
+	Path            string              `json:"path"`
+	ExecutablePath  string              `json:"executablePath"`
+	CoverImageData  string              `json:"coverImageData,omitempty"`
+	BackupPolicy    models.BackupPolicy `json:"backupPolicy"`
+	PlaytimeSeconds int64               `json:"playtimeSeconds"`
+	LastPlayedAt    string              `json:"lastPlayedAt,omitempty"`
+	Running         bool                `json:"running"`
 }
 
 func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
@@ -31,10 +32,11 @@ func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.toGameResponses(s.cfg.Get().Games))
 	case http.MethodPost:
 		var req struct {
-			Name           string `json:"name"`
-			Path           string `json:"path"`
-			ExecutablePath string `json:"executablePath"`
-			CoverImageData string `json:"coverImageData"`
+			Name           string               `json:"name"`
+			Path           string               `json:"path"`
+			ExecutablePath string               `json:"executablePath"`
+			CoverImageData string               `json:"coverImageData"`
+			BackupPolicy   *models.BackupPolicy `json:"backupPolicy"`
 		}
 		if err := decodeJSON(r, &req); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
@@ -45,7 +47,7 @@ func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		game, err := s.cfg.AddGame(req.Name, req.Path, req.ExecutablePath, coverImageData)
+		game, err := s.cfg.AddGameWithPolicy(req.Name, req.Path, req.ExecutablePath, coverImageData, req.BackupPolicy)
 		if err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
@@ -89,10 +91,11 @@ func (s *Server) handleGameByID(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, s.toGameResponse(game, stat.PlaytimeSeconds+pending, stat.LastPlayedAt, running))
 	case http.MethodPut:
 		var req struct {
-			Name           string `json:"name"`
-			Path           string `json:"path"`
-			ExecutablePath string `json:"executablePath"`
-			CoverImageData string `json:"coverImageData"`
+			Name           string               `json:"name"`
+			Path           string               `json:"path"`
+			ExecutablePath string               `json:"executablePath"`
+			CoverImageData string               `json:"coverImageData"`
+			BackupPolicy   *models.BackupPolicy `json:"backupPolicy"`
 		}
 		if err := decodeJSON(r, &req); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
@@ -103,7 +106,7 @@ func (s *Server) handleGameByID(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		game, err := s.cfg.UpdateGame(id, req.Name, req.Path, req.ExecutablePath, coverImageData)
+		game, err := s.cfg.UpdateGameWithPolicy(id, req.Name, req.Path, req.ExecutablePath, coverImageData, req.BackupPolicy)
 		if err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
@@ -232,13 +235,54 @@ func (s *Server) handleGameCover(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
-	updated, err := s.cfg.UpdateGame(game.ID, game.Name, game.Path, game.ExecutablePath, coverImageData)
+	updated, err := s.cfg.UpdateGameWithPolicy(game.ID, game.Name, game.Path, game.ExecutablePath, coverImageData, nil)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
 	s.onGamesChanged(s.cfg.Get().Games)
 	writeJSON(w, http.StatusOK, s.toGameResponse(updated, 0, time.Time{}, false))
+}
+
+func (s *Server) handleGameBackupPolicy(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		GameID       string              `json:"gameId"`
+		BackupPolicy models.BackupPolicy `json:"backupPolicy"`
+	}
+	if err := decodeJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	if req.GameID == "" {
+		writeErr(w, http.StatusBadRequest, errors.New("gameId is required"))
+		return
+	}
+	updated, err := s.cfg.UpdateGameBackupPolicy(req.GameID, req.BackupPolicy)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	s.onGamesChanged(s.cfg.Get().Games)
+	if s.monitor != nil {
+		s.monitor.ForcePoll()
+	}
+	_ = s.logs.Write("info", "games", "updated backup policy for: "+updated.Name)
+	stats, statsErr := s.logs.GameStats([]string{updated.ID})
+	if statsErr != nil {
+		writeJSON(w, http.StatusOK, s.toGameResponse(updated, 0, time.Time{}, false))
+		return
+	}
+	stat := stats[updated.ID]
+	running := s.monitor != nil && s.monitor.IsRunning(updated.ID)
+	pending := int64(0)
+	if s.monitor != nil {
+		pending = s.monitor.PendingSeconds(updated.ID)
+	}
+	writeJSON(w, http.StatusOK, s.toGameResponse(updated, stat.PlaytimeSeconds+pending, stat.LastPlayedAt, running))
 }
 
 func (s *Server) toGameResponses(games []models.Game) []gameResponse {
@@ -276,6 +320,7 @@ func (s *Server) toGameResponse(game models.Game, playtimeSeconds int64, lastPla
 		Path:            game.Path,
 		ExecutablePath:  game.ExecutablePath,
 		CoverImageData:  game.CoverImageData,
+		BackupPolicy:    game.BackupPolicy,
 		PlaytimeSeconds: playtimeSeconds,
 		Running:         running,
 	}

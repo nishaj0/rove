@@ -1,12 +1,30 @@
 export type ConflictPolicy = "latest_wins" | "keep_both";
 export type ThemeMode = "dark" | "light" | "system";
 
+export interface BackupPolicy {
+  enabled: boolean;
+  intervalMinutes: number;
+  exitDelaySeconds: number;
+  retentionCount: number;
+}
+
+export interface BackupHistoryEntry {
+  id: number;
+  gameId: string;
+  path: string;
+  createdAt: string;
+  reason: string;
+  signature: string;
+  status: string;
+}
+
 export interface Game {
   id: string;
   name: string;
   path: string;
   executablePath: string;
   coverImageData?: string;
+  backupPolicy: BackupPolicy;
   playtimeSeconds?: number;
   lastPlayedAt?: string;
   running?: boolean;

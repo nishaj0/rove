@@ -51,6 +51,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/sync/game", s.handleGameSync)
 	mux.HandleFunc("/games/play", s.handleGamePlay)
 	mux.HandleFunc("/games/cover", s.handleGameCover)
+	mux.HandleFunc("/games/backup-policy", s.handleGameBackupPolicy)
 	mux.HandleFunc("/games/", s.handleGameByID)
 	mux.HandleFunc("/sync", s.handleSync)
 	mux.HandleFunc("/status", s.handleStatus)
@@ -59,6 +60,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/debug/info", s.handleDebugInfo)
 	mux.HandleFunc("/backup/export", s.handleBackupExport)
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
+	mux.HandleFunc("/backup/history", s.handleBackupHistory)
 
 	handler := localhostOnly(mux)
 	handler = withLoopbackCORS(handler)

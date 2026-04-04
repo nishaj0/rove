@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"cloud-saver/backend/internal/api"
+	"cloud-saver/backend/internal/autobackup"
 	"cloud-saver/backend/internal/backup"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/gamemon"
@@ -23,17 +24,18 @@ import (
 
 // coordinates daemon services and runtime lifecycle.
 type Application struct {
-	cfg     *config.Manager
-	logs    *logstore.Store
-	engine  *syncer.Engine
-	watcher *watcher.Manager
-	monitor *gamemon.Monitor
-	tray    *tray.Manager
-	backup  *backup.Service
-	debug   bool
-	httpSrv *http.Server
-	cancel  context.CancelFunc
-	wg      sync.WaitGroup
+	cfg        *config.Manager
+	logs       *logstore.Store
+	engine     *syncer.Engine
+	watcher    *watcher.Manager
+	monitor    *gamemon.Monitor
+	tray       *tray.Manager
+	backup     *backup.Service
+	autoBackup *autobackup.Service
+	debug      bool
+	httpSrv    *http.Server
+	cancel     context.CancelFunc
+	wg         sync.WaitGroup
 }
 
 // captures startup configuration for daemon runtime.
@@ -75,18 +77,21 @@ func New(opts Options) (*Application, error) {
 	})
 	trayMgr := tray.New()
 	backupSvc := backup.New()
+	autoBackupSvc := autobackup.New(cfg, logs, backupSvc, opts.Debug)
 
 	a := &Application{
-		cfg:     cfg,
-		logs:    logs,
-		engine:  engine,
-		watcher: watchMgr,
-		monitor: monitor,
-		tray:    trayMgr,
-		backup:  backupSvc,
-		debug:   opts.Debug,
+		cfg:        cfg,
+		logs:       logs,
+		engine:     engine,
+		watcher:    watchMgr,
+		monitor:    monitor,
+		tray:       trayMgr,
+		backup:     backupSvc,
+		autoBackup: autoBackupSvc,
+		debug:      opts.Debug,
 	}
 	a.monitor.SetOnRunningChanged(func(runningIDs []string) {
+		a.autoBackup.UpdateRunning(runningIDs)
 		if err := a.reloadWatcherForRunningGames(runningIDs); err != nil {
 			a.logEvent("error", "watcher", err.Error())
 		}
@@ -102,9 +107,12 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 
 	a.engine.Start(ctx)
 	a.monitor.Start(ctx)
+	a.autoBackup.Start(ctx)
 	a.logEvent("info", "app", fmt.Sprintf("application starting (noTray=%t)", noTray))
 
-	if err := a.reloadWatcherForRunningGames(a.monitor.RunningIDs()); err != nil {
+	runningIDs := a.monitor.RunningIDs()
+	a.autoBackup.UpdateRunning(runningIDs)
+	if err := a.reloadWatcherForRunningGames(runningIDs); err != nil {
 		a.logEvent("error", "watcher", err.Error())
 	}
 
@@ -120,7 +128,9 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.debug,
 		func(_ []models.Game) {
 			a.monitor.ForcePoll()
-			if err := a.reloadWatcherForRunningGames(a.monitor.RunningIDs()); err != nil {
+			running := a.monitor.RunningIDs()
+			a.autoBackup.UpdateRunning(running)
+			if err := a.reloadWatcherForRunningGames(running); err != nil {
 				a.logEvent("error", "watcher", err.Error())
 			}
 		},
@@ -171,6 +181,9 @@ func (a *Application) Stop() error {
 	a.logEvent("info", "app", "application stopping")
 	if a.watcher != nil {
 		_ = a.watcher.Close()
+	}
+	if a.autoBackup != nil {
+		a.autoBackup.Stop()
 	}
 	if a.httpSrv != nil {
 		// stop accepting api traffic before waiting on goroutines.

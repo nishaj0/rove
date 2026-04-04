@@ -1,4 +1,12 @@
-import type { Game } from "../types";
+import { useEffect, useState } from "react";
+import type { BackupHistoryEntry, BackupPolicy, Game } from "../types";
+
+const defaultBackupPolicy: BackupPolicy = {
+  enabled: true,
+  intervalMinutes: 10,
+  exitDelaySeconds: 10,
+  retentionCount: 5,
+};
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -9,6 +17,7 @@ type GameDetailViewProps = {
   exportOperationMessage: string;
   importOperationState: "idle" | "working" | "success" | "failed";
   importOperationMessage: string;
+  backupHistory: BackupHistoryEntry[];
   onBack: () => void;
   onPlay: () => void;
   onSyncGame: () => void;
@@ -18,6 +27,7 @@ type GameDetailViewProps = {
   onMergeChange: (value: boolean) => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
+  onSaveBackupPolicy: (value: BackupPolicy) => Promise<boolean>;
   onUpdateCover: (coverImageData: string) => void;
   formatPlaytime: (seconds: number) => string;
   safeDateTime: (value: string) => string;
@@ -33,6 +43,7 @@ export function GameDetailView(props: GameDetailViewProps) {
     exportOperationMessage,
     importOperationState,
     importOperationMessage,
+    backupHistory,
     onBack,
     onPlay,
     onSyncGame,
@@ -42,10 +53,34 @@ export function GameDetailView(props: GameDetailViewProps) {
     onMergeChange,
     onExportBackup,
     onImportBackup,
+    onSaveBackupPolicy,
     onUpdateCover,
     formatPlaytime,
     safeDateTime,
   } = props;
+
+  const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? defaultBackupPolicy);
+  const [backupPolicyState, setBackupPolicyState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
+
+  useEffect(() => {
+    if (!game) {
+      return;
+    }
+    setBackupPolicyDraft(game.backupPolicy);
+    setBackupPolicyState("idle");
+  }, [
+    game?.id,
+    game?.backupPolicy.enabled,
+    game?.backupPolicy.intervalMinutes,
+    game?.backupPolicy.exitDelaySeconds,
+    game?.backupPolicy.retentionCount,
+  ]);
+
+  async function onSavePolicy() {
+    setBackupPolicyState("saving");
+    const saved = await onSaveBackupPolicy(backupPolicyDraft);
+    setBackupPolicyState(saved ? "saved" : "failed");
+  }
 
   const exportStateClass = exportOperationState === "working"
     ? "syncing"
@@ -56,6 +91,12 @@ export function GameDetailView(props: GameDetailViewProps) {
   const importStateClass = importOperationState === "working"
     ? "syncing"
     : importOperationState === "success"
+      ? "success"
+      : "error";
+
+  const policyStateClass = backupPolicyState === "saving"
+    ? "syncing"
+    : backupPolicyState === "saved"
       ? "success"
       : "error";
 
@@ -149,6 +190,104 @@ export function GameDetailView(props: GameDetailViewProps) {
           </button>
           {importOperationState !== "idle" ? <p className={`backup-status state-text ${importStateClass}`}>{importOperationMessage}</p> : null}
         </div>
+      </section>
+
+      <section className="panel">
+        <h2>Auto Backup Policy</h2>
+        <div className="backup-policy-grid">
+          <label className="inline-check">
+            <input
+              type="checkbox"
+              checked={backupPolicyDraft.enabled}
+              onChange={(e) => {
+                setBackupPolicyState("idle");
+                setBackupPolicyDraft((current) => ({ ...current, enabled: e.target.checked }));
+              }}
+            />
+            Enable automatic local backups
+          </label>
+          <label>
+            Interval minutes
+            <input
+              type="number"
+              min={3}
+              max={120}
+              value={backupPolicyDraft.intervalMinutes}
+              onChange={(e) => {
+                setBackupPolicyState("idle");
+                const value = Number.parseInt(e.target.value, 10);
+                setBackupPolicyDraft((current) => ({
+                  ...current,
+                  intervalMinutes: Number.isFinite(value) ? value : current.intervalMinutes,
+                }));
+              }}
+            />
+          </label>
+          <label>
+            Exit delay seconds
+            <input
+              type="number"
+              min={3}
+              max={120}
+              value={backupPolicyDraft.exitDelaySeconds}
+              onChange={(e) => {
+                setBackupPolicyState("idle");
+                const value = Number.parseInt(e.target.value, 10);
+                setBackupPolicyDraft((current) => ({
+                  ...current,
+                  exitDelaySeconds: Number.isFinite(value) ? value : current.exitDelaySeconds,
+                }));
+              }}
+            />
+          </label>
+          <label>
+            Keep latest backups
+            <input
+              type="number"
+              min={1}
+              max={30}
+              value={backupPolicyDraft.retentionCount}
+              onChange={(e) => {
+                setBackupPolicyState("idle");
+                const value = Number.parseInt(e.target.value, 10);
+                setBackupPolicyDraft((current) => ({
+                  ...current,
+                  retentionCount: Number.isFinite(value) ? value : current.retentionCount,
+                }));
+              }}
+            />
+          </label>
+        </div>
+        <div className="detail-actions">
+          <button className="btn primary" onClick={() => void onSavePolicy()} type="button" disabled={backupPolicyState === "saving"}>
+            {backupPolicyState === "saving" ? "Saving..." : "Save Backup Policy"}
+          </button>
+        </div>
+        {backupPolicyState !== "idle" ? (
+          <p className={`backup-status state-text ${policyStateClass}`}>
+            {backupPolicyState === "saving" ? "Saving backup policy..." : backupPolicyState === "saved" ? "Backup policy saved." : "Backup policy save failed."}
+          </p>
+        ) : null}
+      </section>
+
+      <section className="panel">
+        <h2>Local Backup History</h2>
+        {backupHistory.length === 0 ? (
+          <p className="empty-state">No automatic backups yet.</p>
+        ) : (
+          <ul className="backup-history-list">
+            {backupHistory.map((entry) => (
+              <li className="backup-history-row" key={entry.id}>
+                <p>
+                  <strong>{entry.reason === "final" ? "Final" : "Periodic"}</strong>
+                  {" backup at "}
+                  {safeDateTime(entry.createdAt)}
+                </p>
+                <p className="backup-history-path" title={entry.path}>{entry.path}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="panel">
