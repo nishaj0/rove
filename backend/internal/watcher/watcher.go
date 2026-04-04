@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -44,9 +45,9 @@ func (m *Manager) Reload(games []models.Game, onEvent func(path string)) error {
 
 	for _, game := range games {
 		if err := addRecursive(w, game.Path); err != nil {
-			_ = w.Close()
-			m.watcher = nil
-			return err
+			if m.onError != nil {
+				m.onError(fmt.Errorf("watch setup warning for %s: %w", game.Path, err))
+			}
 		}
 	}
 
@@ -63,7 +64,13 @@ func (m *Manager) Reload(games []models.Game, onEvent func(path string)) error {
 					return
 				}
 				if event.Has(fsnotify.Create) {
-					_ = addRecursive(w, event.Name)
+					if info, statErr := os.Stat(event.Name); statErr == nil && info.IsDir() {
+						if err := addRecursive(w, event.Name); err != nil && m.onError != nil {
+							m.onError(fmt.Errorf("watch recursive add failed for %s: %w", event.Name, err))
+						}
+					} else if statErr != nil && !os.IsNotExist(statErr) && m.onError != nil {
+						m.onError(fmt.Errorf("watch stat failed for %s: %w", event.Name, statErr))
+					}
 				}
 				onEvent(event.Name)
 			case err, ok := <-w.Errors:
@@ -93,15 +100,26 @@ func (m *Manager) Close() error {
 }
 
 func addRecursive(w *fsnotify.Watcher, root string) error {
-	return filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+	var firstErr error
+	walkErr := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
+			if firstErr == nil {
+				firstErr = fmt.Errorf("walk dir %s: %w", path, err)
+			}
 			return nil
 		}
 		if d.IsDir() {
 			if err := w.Add(path); err != nil {
+				if firstErr == nil {
+					firstErr = fmt.Errorf("add watch %s: %w", path, err)
+				}
 				return nil
 			}
 		}
 		return nil
 	})
+	if walkErr != nil {
+		return walkErr
+	}
+	return firstErr
 }

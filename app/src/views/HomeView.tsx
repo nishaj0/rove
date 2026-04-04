@@ -2,8 +2,6 @@ import type { Game } from "../types";
 
 type HomeViewProps = {
   games: Game[];
-  syncLabel: string;
-  syncClass: "success" | "warning" | "error" | "syncing";
   onOpenLibrary: () => void;
   onOpenActivity: () => void;
   onOpenGame: (gameId: string) => void;
@@ -11,7 +9,7 @@ type HomeViewProps = {
 };
 
 export function HomeView(props: HomeViewProps) {
-  const { games, syncLabel, syncClass, onOpenLibrary, onOpenActivity, onOpenGame, initials } = props;
+  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials } = props;
 
   return (
     <>
@@ -23,7 +21,6 @@ export function HomeView(props: HomeViewProps) {
           <button className="btn primary" onClick={onOpenLibrary} type="button">Open Library</button>
           <button className="btn" onClick={onOpenActivity} type="button">View Activity</button>
         </div>
-        <p className={`home-service-state ${syncClass}`}>Service state: {syncLabel}</p>
       </section>
 
       <section className="panel">

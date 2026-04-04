@@ -11,11 +11,6 @@ import { SettingsView } from "./views/SettingsView";
 type View = "home" | "games" | "game" | "activity" | "settings";
 type EffectiveTheme = "dark" | "light";
 
-type SyncState = {
-  label: string;
-  className: "success" | "warning" | "error" | "syncing";
-};
-
 type NavSnapshot = {
   view: View;
   selectedGameId: string;
@@ -215,19 +210,25 @@ export default function App() {
     return raw;
   }
 
-  async function refreshAll() {
+  async function refreshGamesData() {
     try {
       setError("");
-      const [nextStatus, nextGames, nextSettings, nextLogs] = await Promise.all([
+      const nextGames = await api.getGames();
+      setGames(nextGames);
+    } catch (e) {
+      setError(toFriendlyError(e));
+    }
+  }
+
+  async function refreshActivityData() {
+    try {
+      setError("");
+      const [nextStatus, nextLogs] = await Promise.all([
         api.getStatus(),
-        api.getGames(),
-        api.getSettings(),
         api.getRecentLogs(25),
       ]);
       const nextDebugInfo = await api.getDebugInfo().catch(() => null);
       setStatus(nextStatus);
-      setGames(nextGames);
-      setSettings(nextSettings);
       setLogs(nextLogs);
       setDebugInfo(nextDebugInfo);
     } catch (e) {
@@ -236,13 +237,45 @@ export default function App() {
     }
   }
 
+  async function loadInitialData() {
+    try {
+      setError("");
+      const [nextGames, nextSettings] = await Promise.all([
+        api.getGames(),
+        api.getSettings(),
+      ]);
+      setGames(nextGames);
+      setSettings(nextSettings);
+    } catch (e) {
+      setError(toFriendlyError(e));
+    }
+  }
+
   useEffect(() => {
-    void refreshAll();
-    const timer = window.setInterval(() => {
-      void refreshAll();
-    }, 5000);
-    return () => window.clearInterval(timer);
+    void loadInitialData();
   }, []);
+
+  useEffect(() => {
+    let timer: number | undefined;
+
+    if (activeView === "activity") {
+      void refreshActivityData();
+      timer = window.setInterval(() => {
+        void refreshActivityData();
+      }, 5000);
+    } else if (activeView === "home" || activeView === "games" || activeView === "game") {
+      void refreshGamesData();
+      timer = window.setInterval(() => {
+        void refreshGamesData();
+      }, 5000);
+    }
+
+    return () => {
+      if (timer !== undefined) {
+        window.clearInterval(timer);
+      }
+    };
+  }, [activeView]);
 
   useEffect(() => {
     if (!toast) {
@@ -288,22 +321,6 @@ export default function App() {
     return () => mediaQuery.removeListener(handleChange);
   }, [settings.themeMode]);
 
-  const syncState = useMemo<SyncState>(() => {
-    if (error) {
-      return { label: "Error", className: "error" };
-    }
-    if (!status) {
-      return { label: "Connecting", className: "warning" };
-    }
-    if (status.pending > 0) {
-      return { label: "Syncing", className: "syncing" };
-    }
-    if (!status.running) {
-      return { label: "Paused", className: "warning" };
-    }
-    return { label: "Synced", className: "success" };
-  }, [error, status]);
-
   const selectedGame = useMemo(() => {
     if (!selectedGameId) {
       return null;
@@ -317,13 +334,6 @@ export default function App() {
     }
     return viewTitle[activeView];
   }, [activeView, selectedGame]);
-
-  const lastSyncLabel = useMemo(() => {
-    if (!status?.lastSyncTime || status.lastSyncTime.startsWith("0001-")) {
-      return "Never";
-    }
-    return safeDateTime(status.lastSyncTime);
-  }, [status]);
 
   const uptimeLabel = useMemo(() => {
     if (!debugInfo) {
@@ -350,7 +360,7 @@ export default function App() {
       setNewExecutablePath("");
       setNewCoverImageData("");
       setToast("Game added");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -364,7 +374,7 @@ export default function App() {
         pushNavigation("games");
       }
       setToast("Game removed");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -372,9 +382,9 @@ export default function App() {
 
   async function onSaveSettings() {
     try {
-      await api.saveSettings({ ...settings, games });
+      const saved = await api.saveSettings({ ...settings, games });
+      setSettings(saved);
       setToast("Settings saved");
-      await refreshAll();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -389,8 +399,8 @@ export default function App() {
     setSettings((s) => ({ ...s, themeMode: value }));
 
     try {
-      const persisted = await api.getSettings();
-      await api.saveSettings({ ...persisted, games, themeMode: value });
+      const saved = await api.saveSettings({ ...settings, games, themeMode: value });
+      setSettings(saved);
     } catch (err) {
       setSettings((s) => ({ ...s, themeMode: previous }));
       setError(toFriendlyError(err));
@@ -401,7 +411,7 @@ export default function App() {
     try {
       await api.triggerSync();
       setToast("Global sync queued");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -414,7 +424,7 @@ export default function App() {
     try {
       await api.syncGame({ gameId: selectedGame.id });
       setToast("Game sync queued");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -427,7 +437,7 @@ export default function App() {
     try {
       const result = await api.playGame({ gameId: selectedGame.id });
       setToast(result.status === "already_running" ? "Game is already running" : "Game launched");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -440,7 +450,7 @@ export default function App() {
     try {
       const result = await api.exportBackup({ gameId: selectedGame.id, destinationPath: exportPath.trim() });
       setToast(`Backup exported to ${result.path}`);
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -464,7 +474,7 @@ export default function App() {
     try {
       await api.importBackup({ gameId: selectedGame.id, sourcePath: importPath.trim(), merge: mergeOnImport });
       setToast("Backup imported");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -477,7 +487,7 @@ export default function App() {
     try {
       await api.updateGameCover({ gameId: selectedGame.id, coverImageData });
       setToast("Cover updated");
-      await refreshAll();
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -548,11 +558,6 @@ export default function App() {
             );
           })}
         </nav>
-
-        <div className="sidebar-status">
-          <span className={`dot ${syncState.className}`} />
-          <span>{syncState.label}</span>
-        </div>
       </aside>
 
       <main className="main-panel">
@@ -570,8 +575,6 @@ export default function App() {
         {activeView === "home" ? (
           <HomeView
             games={games}
-            syncLabel={syncState.label}
-            syncClass={syncState.className}
             onOpenLibrary={() => pushNavigation("games")}
             onOpenActivity={() => pushNavigation("activity")}
             onOpenGame={openGame}
@@ -623,7 +626,7 @@ export default function App() {
             uptimeLabel={uptimeLabel}
             lastError={status?.lastError ?? ""}
             logs={logs}
-            onRefresh={() => void refreshAll()}
+            onRefresh={() => void refreshActivityData()}
             safeTime={safeTime}
           />
         ) : null}
