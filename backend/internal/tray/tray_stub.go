@@ -10,6 +10,6 @@ func New() *Manager { return &Manager{} }
 
 func (m *Manager) SetRunning(_ bool) {}
 
-func (m *Manager) Run(_ func(), _ func(), _ func()) {
+func (m *Manager) Run(_ <-chan Status, _ func(), _ func(), _ func(), _ func()) {
 	<-context.Background().Done()
 }

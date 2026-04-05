@@ -8,7 +8,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
+	"time"
 
 	"cloud-saver/backend/internal/api"
 	"cloud-saver/backend/internal/autobackup"
@@ -21,6 +23,8 @@ import (
 	"cloud-saver/backend/internal/syncer"
 	"cloud-saver/backend/internal/tray"
 	"cloud-saver/backend/internal/watcher"
+
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 // coordinates daemon services and runtime lifecycle.
@@ -156,8 +160,39 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		return a.Stop()
 	}
 
+	statusUpdates := make(chan tray.Status, 1)
+	a.wg.Add(1)
+	go func() {
+		defer a.wg.Done()
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				runningIDs := a.monitor.RunningIDs()
+				snapshot := a.engine.Status()
+				update := tray.Status{
+					SyncEnabled:  a.engine.Status().Running,
+					Pending:      snapshot.Pending,
+					PlayingGames: a.runningGameNames(runningIDs),
+				}
+				select {
+				case statusUpdates <- update:
+				default:
+				}
+			}
+		}
+	}()
+
 	a.tray.Run(
-		func() { _ = openUI(a.cfg.Get().Port) },
+		statusUpdates,
+		func() {
+			if err := openUI(a.cfg.Get().Port); err != nil {
+				a.logEvent("error", "tray", fmt.Sprintf("open app failed: %v", err))
+			}
+		},
 		func() {
 			if a.engine.Status().Running {
 				a.engine.Stop()
@@ -166,6 +201,9 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 				a.engine.Resume()
 				a.tray.SetRunning(true)
 			}
+		},
+		func() {
+			a.engine.Trigger(syncer.TriggerReasonManual)
 		},
 		func() {
 			_ = a.Stop()
@@ -239,8 +277,111 @@ func (a *Application) logEvent(level, event, message string) {
 	}
 }
 
-// asks windows shell to open the local status page in the default browser.
+func (a *Application) runningGameNames(runningIDs []string) []string {
+	if len(runningIDs) == 0 {
+		return nil
+	}
+	runningSet := make(map[string]struct{}, len(runningIDs))
+	for _, id := range runningIDs {
+		runningSet[id] = struct{}{}
+	}
+
+	settings := a.cfg.Get()
+	names := make([]string, 0, len(runningIDs))
+	for _, game := range settings.Games {
+		if _, ok := runningSet[game.ID]; ok {
+			names = append(names, game.Name)
+		}
+	}
+	return names
+}
+
+// opens desktop app when available and falls back to local status page.
 func openUI(port int) error {
+	if uiPath, ok := desktopAppExecutable(); ok {
+		if desktopAppRunning(filepath.Base(uiPath), uiPath) {
+			return nil
+		}
+		cmd := exec.Command(uiPath)
+		return cmd.Start()
+	}
+
+	if desktopAppRunning("cloud-saver-app.exe", "") || desktopAppRunning("Cloud Saver.exe", "") {
+		return nil
+	}
+
 	cmd := exec.Command("rundll32", "url.dll,FileProtocolHandler", runtimecfg.StatusURL(port))
 	return cmd.Start()
+}
+
+func desktopAppExecutable() (string, bool) {
+	candidates := []string{
+		filepath.Join("..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+		filepath.Join("..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
+		filepath.Join("..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+		filepath.Join("..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
+		filepath.Join("app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+		filepath.Join("app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
+		filepath.Join("app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+		filepath.Join("app", "src-tauri", "target", "release", "Cloud Saver.exe"),
+	}
+
+	if exePath, err := os.Executable(); err == nil {
+		exeDir := filepath.Dir(exePath)
+		candidates = append(candidates,
+			filepath.Join(exeDir, "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
+		)
+	}
+
+	seen := make(map[string]struct{}, len(candidates))
+	for _, path := range candidates {
+		normalized := filepath.Clean(path)
+		if _, ok := seen[normalized]; ok {
+			continue
+		}
+		seen[normalized] = struct{}{}
+		if info, err := os.Stat(normalized); err == nil && !info.IsDir() {
+			return normalized, true
+		}
+	}
+	return "", false
+}
+
+func desktopAppRunning(exeName, exePath string) bool {
+	procs, err := process.Processes()
+	if err != nil {
+		return false
+	}
+
+	normalizedPath := ""
+	if strings.TrimSpace(exePath) != "" {
+		normalizedPath = strings.ToLower(filepath.Clean(exePath))
+	}
+	normalizedName := strings.ToLower(strings.TrimSpace(exeName))
+
+	for _, p := range procs {
+		if exe, exeErr := p.Exe(); exeErr == nil && exe != "" {
+			if normalizedPath != "" && strings.EqualFold(filepath.Clean(exe), normalizedPath) {
+				return true
+			}
+			if normalizedName != "" && strings.EqualFold(filepath.Base(exe), normalizedName) {
+				return true
+			}
+			continue
+		}
+		if name, nameErr := p.Name(); nameErr == nil && normalizedName != "" && strings.EqualFold(name, normalizedName) {
+			return true
+		}
+	}
+
+	return false
 }
