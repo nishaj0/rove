@@ -19,13 +19,12 @@ import {
   normalizeSettings,
   normalizeStatus,
 } from "./api/parsers";
-
-const BASE_URL = "http://127.0.0.1:7331";
+import { BACKEND_BASE_URL } from "./constants/network";
 
 type ErrorPayload = { error?: string };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),

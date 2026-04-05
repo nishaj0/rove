@@ -17,6 +17,7 @@ import (
 	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
+	runtimecfg "cloud-saver/backend/internal/runtime"
 	"cloud-saver/backend/internal/syncer"
 	"cloud-saver/backend/internal/tray"
 	"cloud-saver/backend/internal/watcher"
@@ -137,7 +138,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	)
 	a.logEvent("info", "http", fmt.Sprintf("api listening on %s", a.httpSrvAddr()))
 	a.httpSrv = &http.Server{
-		Addr:    fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port),
+		Addr:    runtimecfg.LoopbackAddr(a.cfg.Get().Port),
 		Handler: apiSvc.Handler(),
 	}
 
@@ -156,7 +157,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	}
 
 	a.tray.Run(
-		func() { _ = openUI() },
+		func() { _ = openUI(a.cfg.Get().Port) },
 		func() {
 			if a.engine.Status().Running {
 				a.engine.Stop()
@@ -198,7 +199,7 @@ func (a *Application) Stop() error {
 
 // builds the loopback bind address from current config port.
 func (a *Application) httpSrvAddr() string {
-	return fmt.Sprintf("127.0.0.1:%d", a.cfg.Get().Port)
+	return runtimecfg.LoopbackAddr(a.cfg.Get().Port)
 }
 
 // limits watcher roots to currently running tracked games.
@@ -239,7 +240,7 @@ func (a *Application) logEvent(level, event, message string) {
 }
 
 // asks windows shell to open the local status page in the default browser.
-func openUI() error {
-	cmd := exec.Command("rundll32", "url.dll,FileProtocolHandler", "http://127.0.0.1:7331/status")
+func openUI(port int) error {
+	cmd := exec.Command("rundll32", "url.dll,FileProtocolHandler", runtimecfg.StatusURL(port))
 	return cmd.Start()
 }

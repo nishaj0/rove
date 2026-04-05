@@ -1,21 +1,5 @@
 import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, Status, ThemeMode } from "../types";
-
-const defaultBackupPolicy: BackupPolicy = {
-  enabled: true,
-  intervalMinutes: 10,
-  exitDelaySeconds: 10,
-  retentionCount: 5,
-};
-
-const defaultSettings: Settings = {
-  port: 7331,
-  syncIntervalSeconds: 30,
-  conflictPolicy: "latest_wins",
-  themeMode: "dark",
-  autostart: false,
-  ignorePatterns: ["*.tmp", "*.log", "cache"],
-  games: [],
-};
+import { newDefaultBackupPolicy, newDefaultSettings } from "../constants/defaults";
 
 function isRecord(input: unknown): input is Record<string, unknown> {
   return typeof input === "object" && input !== null;
@@ -42,14 +26,15 @@ function asThemeMode(input: unknown, fallback: ThemeMode): ThemeMode {
 }
 
 function normalizeBackupPolicy(input: unknown): BackupPolicy {
+  const defaults = newDefaultBackupPolicy();
   if (!isRecord(input)) {
-    return { ...defaultBackupPolicy };
+    return defaults;
   }
   return {
-    enabled: asBoolean(input.enabled, defaultBackupPolicy.enabled),
-    intervalMinutes: asNumber(input.intervalMinutes, defaultBackupPolicy.intervalMinutes),
-    exitDelaySeconds: asNumber(input.exitDelaySeconds, defaultBackupPolicy.exitDelaySeconds),
-    retentionCount: asNumber(input.retentionCount, defaultBackupPolicy.retentionCount),
+    enabled: asBoolean(input.enabled, defaults.enabled),
+    intervalMinutes: asNumber(input.intervalMinutes, defaults.intervalMinutes),
+    exitDelaySeconds: asNumber(input.exitDelaySeconds, defaults.exitDelaySeconds),
+    retentionCount: asNumber(input.retentionCount, defaults.retentionCount),
   };
 }
 
@@ -120,18 +105,19 @@ export function normalizeLogs(input: unknown): LogEntry[] {
 }
 
 export function normalizeSettings(input: unknown): Settings {
+  const defaults = newDefaultSettings();
   if (!isRecord(input)) {
-    return { ...defaultSettings };
+    return defaults;
   }
 
   const ignorePatternsRaw = Array.isArray(input.ignorePatterns) ? input.ignorePatterns : [];
   const ignorePatterns = ignorePatternsRaw.filter((value): value is string => typeof value === "string");
 
   return {
-    port: asNumber(input.port, defaultSettings.port),
-    syncIntervalSeconds: asNumber(input.syncIntervalSeconds, defaultSettings.syncIntervalSeconds),
-    conflictPolicy: asConflictPolicy(input.conflictPolicy, defaultSettings.conflictPolicy),
-    themeMode: asThemeMode(input.themeMode, defaultSettings.themeMode),
+    port: asNumber(input.port, defaults.port),
+    syncIntervalSeconds: asNumber(input.syncIntervalSeconds, defaults.syncIntervalSeconds),
+    conflictPolicy: asConflictPolicy(input.conflictPolicy, defaults.conflictPolicy),
+    themeMode: asThemeMode(input.themeMode, defaults.themeMode),
     autostart: Boolean(input.autostart),
     ignorePatterns,
     games: normalizeGames(input.games),

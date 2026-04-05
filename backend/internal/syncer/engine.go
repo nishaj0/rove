@@ -80,14 +80,14 @@ func (e *Engine) Resume() {
 	e.paused.Store(false)
 	e.running.Store(true)
 	e.setRunning(true)
-	e.Trigger("resume")
+	e.Trigger(TriggerReasonResume)
 	_ = e.logs.Write("info", "sync", "sync engine resumed")
 }
 
 // requests a full sync cycle and coalesces duplicate queue entries.
 func (e *Engine) Trigger(reason string) {
 	if reason == "" {
-		reason = "manual"
+		reason = TriggerReasonManual
 	}
 	// keep trigger queue bounded; a single queued run is enough.
 	select {
@@ -102,7 +102,7 @@ func (e *Engine) TriggerGame(gameID, reason string) {
 		return
 	}
 	if reason == "" {
-		reason = "manual-game"
+		reason = TriggerReasonManualGame
 	}
 	select {
 	case e.trigger <- syncTrigger{reason: reason, gameID: gameID}:
@@ -113,7 +113,7 @@ func (e *Engine) TriggerGame(gameID, reason string) {
 // increments pending count and nudges the engine via watcher reason.
 func (e *Engine) NotifyFileEvent(_ string) {
 	e.pending.Add(1)
-	e.Trigger("watcher")
+	e.Trigger(TriggerReasonWatcher)
 }
 
 // returns an immutable snapshot for /status responses.
@@ -142,7 +142,7 @@ func (e *Engine) loop(ctx context.Context) {
 			timer.Stop()
 			e.runOnce(req.reason, req.gameID)
 		case <-timer.C:
-			e.runOnce("interval", "")
+			e.runOnce(TriggerReasonInterval, "")
 		}
 	}
 }

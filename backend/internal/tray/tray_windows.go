@@ -3,7 +3,10 @@
 package tray
 
 import (
+	"fmt"
 	"sync/atomic"
+
+	"cloud-saver/backend/internal/branding"
 
 	"github.com/getlantern/systray"
 )
@@ -24,13 +27,13 @@ func (m *Manager) SetRunning(v bool) {
 
 func (m *Manager) Run(onOpenUI, onToggleSync, onExit func()) {
 	systray.Run(func() {
-		systray.SetTitle("Cloud Saver")
-		systray.SetTooltip("Cloud Saver")
+		systray.SetTitle(branding.DisplayName)
+		systray.SetTooltip(branding.DisplayName)
 
 		openItem := systray.AddMenuItem("Open UI", "Open settings UI")
 		toggleItem := systray.AddMenuItem("Stop Sync", "Start or stop syncing")
 		systray.AddSeparator()
-		exitItem := systray.AddMenuItem("Exit", "Exit Cloud Saver")
+		exitItem := systray.AddMenuItem("Exit", fmt.Sprintf("Exit %s", branding.DisplayName))
 
 		go func() {
 			for {

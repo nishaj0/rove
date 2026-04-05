@@ -276,11 +276,11 @@ func (s *Store) InsertBackupHistory(entry models.BackupHistoryEntry) error {
 	}
 	reason := entry.Reason
 	if reason == "" {
-		reason = "periodic"
+		reason = models.BackupReasonPeriodic
 	}
 	status := entry.Status
 	if status == "" {
-		status = "ok"
+		status = models.BackupStatusOK
 	}
 
 	for attempt := 0; attempt <= busyRetryCount; attempt++ {
@@ -358,8 +358,9 @@ func (s *Store) LatestBackupSignature(gameID string) (string, error) {
 	var err error
 	for attempt := 0; attempt <= busyRetryCount; attempt++ {
 		err = s.db.QueryRow(
-			`SELECT signature FROM backup_history WHERE game_id = ? AND status = 'ok' ORDER BY created_at DESC, id DESC LIMIT 1`,
+			`SELECT signature FROM backup_history WHERE game_id = ? AND status = ? ORDER BY created_at DESC, id DESC LIMIT 1`,
 			gameID,
+			models.BackupStatusOK,
 		).Scan(&signature)
 		if err == nil {
 			return signature, nil

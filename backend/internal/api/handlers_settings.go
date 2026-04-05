@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"cloud-saver/backend/internal/autostart"
+	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/models"
 )
 
@@ -21,7 +22,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		if err := autostart.SetEnabled("CloudSaver", s.exePath, req.Autostart); err != nil {
+		if err := autostart.SetEnabled(branding.AutostartKeyName, s.exePath, req.Autostart); err != nil {
 			_ = s.logs.Write("error", "autostart", err.Error())
 		}
 		writeJSON(w, http.StatusOK, s.cfg.Get())

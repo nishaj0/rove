@@ -9,7 +9,9 @@ import (
 	"path/filepath"
 	"sync"
 
+	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/models"
+	runtimecfg "cloud-saver/backend/internal/runtime"
 )
 
 const (
@@ -93,19 +95,19 @@ func New(path string) (*Manager, error) {
 	return m, nil
 }
 
-// resolves the per-user settings.json location under CloudSaver.
+// resolves the per-user settings.json location under the app data directory.
 func defaultPath() (string, error) {
 	base, err := os.UserConfigDir()
 	if err != nil {
 		return "", fmt.Errorf("resolve user config dir: %w", err)
 	}
-	return filepath.Join(base, "CloudSaver", "settings.json"), nil
+	return filepath.Join(base, branding.InternalName, "settings.json"), nil
 }
 
 // returns baseline values used for first run and normalization fallback.
 func DefaultSettings() models.Settings {
 	return models.Settings{
-		Port:                7331,
+		Port:                runtimecfg.DefaultAPIPort,
 		SyncIntervalSeconds: 30,
 		ConflictPolicy:      models.ConflictLatestWins,
 		ThemeMode:           models.ThemeDark,

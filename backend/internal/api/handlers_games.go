@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cloud-saver/backend/internal/models"
+	"cloud-saver/backend/internal/syncer"
 )
 
 const maxCoverImagePayload = 2_500_000
@@ -203,7 +204,7 @@ func (s *Server) handleGameSync(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
-	s.engine.TriggerGame(req.GameID, "api-game")
+	s.engine.TriggerGame(req.GameID, syncer.TriggerReasonAPIGame)
 	_ = s.logs.Write("info", "sync", "queued game sync for: "+game.Name)
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "queued"})
 }

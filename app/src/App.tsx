@@ -1,5 +1,8 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "./api";
+import { newDefaultSettings } from "./constants/defaults";
+import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
+import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
@@ -31,16 +34,6 @@ const viewTitle: Record<View, string> = {
   game: "Game",
   activity: "Activity",
   settings: "Settings",
-};
-
-const defaultSettings: Settings = {
-  port: 7331,
-  syncIntervalSeconds: 30,
-  conflictPolicy: "latest_wins",
-  themeMode: "dark",
-  autostart: false,
-  ignorePatterns: ["*.tmp", "*.log", "cache"],
-  games: [],
 };
 
 function resolveTheme(mode: Settings["themeMode"]): EffectiveTheme {
@@ -104,7 +97,7 @@ export default function App() {
 
   const [status, setStatus] = useState<Status | null>(null);
   const [games, setGames] = useState<Game[]>([]);
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [settings, setSettings] = useState<Settings>(() => newDefaultSettings());
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [error, setError] = useState<string>("");
@@ -212,7 +205,7 @@ export default function App() {
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
-      return "Cannot reach backend service. Start backend with 'go run ./cmd/daemon --no-tray --debug', then open http://127.0.0.1:7331/debug/info to confirm it is alive.";
+      return `Cannot reach backend service. Start backend with 'go run ./cmd/daemon --no-tray --debug', then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
     }
     return raw;
   }
@@ -282,12 +275,12 @@ export default function App() {
       void refreshActivityData();
       timer = window.setInterval(() => {
         void refreshActivityData();
-      }, 5000);
+      }, VIEW_REFRESH_INTERVAL_MS);
     } else if (activeView === "home" || activeView === "games" || activeView === "game") {
       void refreshGamesData();
       timer = window.setInterval(() => {
         void refreshGamesData();
-      }, 5000);
+      }, VIEW_REFRESH_INTERVAL_MS);
     }
 
     return () => {
@@ -306,7 +299,7 @@ export default function App() {
     void refreshBackupHistory(selectedGameId);
     const timer = window.setInterval(() => {
       void refreshBackupHistory(selectedGameId);
-    }, 15000);
+    }, BACKUP_HISTORY_REFRESH_INTERVAL_MS);
 
     return () => {
       window.clearInterval(timer);
@@ -317,7 +310,7 @@ export default function App() {
     if (!toast) {
       return;
     }
-    const t = window.setTimeout(() => setToast(""), 2200);
+    const t = window.setTimeout(() => setToast(""), TOAST_DISMISS_DELAY_MS);
     return () => window.clearTimeout(t);
   }, [toast]);
 

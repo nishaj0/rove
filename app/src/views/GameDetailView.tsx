@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
+import { newDefaultBackupPolicy } from "../constants/defaults";
 import type { BackupHistoryEntry, BackupPolicy, Game } from "../types";
-
-const defaultBackupPolicy: BackupPolicy = {
-  enabled: true,
-  intervalMinutes: 10,
-  exitDelaySeconds: 10,
-  retentionCount: 5,
-};
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -59,7 +53,7 @@ export function GameDetailView(props: GameDetailViewProps) {
     safeDateTime,
   } = props;
 
-  const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? defaultBackupPolicy);
+  const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? newDefaultBackupPolicy());
   const [backupPolicyState, setBackupPolicyState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
 
   useEffect(() => {

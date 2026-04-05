@@ -1,13 +1,17 @@
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"cloud-saver/backend/internal/syncer"
+)
 
 func (s *Server) handleSync(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	s.engine.Trigger("api")
+	s.engine.Trigger(syncer.TriggerReasonAPI)
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "queued"})
 }
 

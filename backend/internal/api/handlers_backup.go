@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"cloud-saver/backend/internal/models"
+	"cloud-saver/backend/internal/syncer"
 )
 
 func (s *Server) handleBackupExport(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func (s *Server) handleBackupImport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	s.engine.Trigger("backup-import")
+	s.engine.Trigger(syncer.TriggerReasonImport)
 	_ = s.logs.Write("info", "backup", fmt.Sprintf("imported backup for %s", game.Name))
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

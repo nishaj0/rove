@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"cloud-saver/backend/internal/backup"
+	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
@@ -158,7 +159,7 @@ func (s *Service) onExitDelayElapsed(gameID string) {
 	if stillRunning {
 		return
 	}
-	s.enqueueBackup(gameID, "final")
+	s.enqueueBackup(gameID, models.BackupReasonFinal)
 }
 
 func (s *Service) runPeriodicChecks() {
@@ -184,7 +185,7 @@ func (s *Service) runPeriodicChecks() {
 		if !s.periodicDue(gameID, now, game.BackupPolicy.IntervalMinutes) {
 			continue
 		}
-		s.enqueueBackup(gameID, "periodic")
+		s.enqueueBackup(gameID, models.BackupReasonPeriodic)
 	}
 }
 
@@ -280,7 +281,7 @@ func (s *Service) runBackup(gameID, reason string) {
 		return
 	}
 
-	backupsRoot := filepath.Join(filepath.Dir(s.cfg.Path()), "backups")
+	backupsRoot := filepath.Join(filepath.Dir(s.cfg.Path()), branding.BackupsDirName)
 	outputPath, err := s.zipper.ExportAutoGame(game, backupsRoot, reason)
 	if err != nil {
 		_ = s.logs.Write("error", "backup", fmt.Sprintf("create %s backup failed for %s: %v", reason, game.Name, err))
@@ -294,7 +295,7 @@ func (s *Service) runBackup(gameID, reason string) {
 		CreatedAt: now,
 		Reason:    reason,
 		Signature: signature,
-		Status:    "ok",
+		Status:    models.BackupStatusOK,
 	})
 	if err != nil {
 		_ = s.logs.Write("error", "backup", fmt.Sprintf("record backup history failed for %s: %v", game.Name, err))

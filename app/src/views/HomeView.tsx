@@ -1,4 +1,5 @@
 import type { Game } from "../types";
+import { HOME_KICKER_LABEL } from "../constants/branding";
 
 type HomeViewProps = {
   games: Game[];
@@ -14,7 +15,7 @@ export function HomeView(props: HomeViewProps) {
   return (
     <>
       <section className="panel home-hero">
-        <p className="home-kicker">Cloud Saver Desktop</p>
+        <p className="home-kicker">{HOME_KICKER_LABEL}</p>
         <h1 className="home-title">Manage your save library</h1>
         <p className="home-subtitle">Track saves, launch a game profile, and handle backup import or export from one place.</p>
         <div className="home-actions">
