@@ -1,0 +1,82 @@
+name: release-windows
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/package-lock.json
+
+      - name: setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install app dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: sync version from tag
+        run: node scripts/sync-version.mjs "${{ github.ref_name }}"
+
+      - name: validate version sync
+        run: node scripts/sync-version.mjs "${{ github.ref_name }}" --check
+
+      - name: type-check frontend
+        working-directory: app
+        run: npm run type-check
+
+      - name: verify backend build
+        working-directory: backend
+        run: go build ./...
+
+      - name: build tauri release bundle
+        working-directory: app
+        run: npm run tauri:build
+
+      - name: generate checksums
+        shell: powershell
+        run: |
+          $bundleRoot = "app/src-tauri/target/release/bundle"
+          $files = Get-ChildItem -Path $bundleRoot -File -Recurse |
+            Where-Object { $_.Extension -in ".exe", ".msi", ".zip" }
+          if (-not $files) {
+            Write-Error "no bundle artifacts found under $bundleRoot"
+            exit 1
+          }
+          $lines = @()
+          foreach ($file in $files) {
+            $hash = (Get-FileHash -Algorithm SHA256 -Path $file.FullName).Hash.ToLower()
+            $relativePath = Resolve-Path -Relative -Path $file.FullName
+            $normalized = $relativePath -replace "^\.\\", "" -replace "\\", "/"
+            $lines += "$hash  $normalized"
+          }
+          Set-Content -Path release-checksums.txt -Value $lines -Encoding ascii
+
+      - name: publish github release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            app/src-tauri/target/release/bundle/nsis/**/*
+            release-checksums.txt

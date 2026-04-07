@@ -9,6 +9,20 @@
     "devUrl": "http://localhost:5173",
     "frontendDist": "../dist"
   },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "both"
+      }
+    },
+    "resources": [
+      "resources/backend"
+    ]
+  },
   "app": {
     "windows": [
       {

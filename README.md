@@ -177,19 +177,64 @@ This writes a per-user Run registry entry used by Startup Apps.
 
 ## Build for Release
 
-Desktop package:
+Local package build (Windows):
 
 ```powershell
 cd app
 npm run tauri:build
 ```
 
-Optional daemon build:
+This build now stages the backend daemon into the Tauri bundle resources before packaging.
+
+If you only want to build the daemon manually:
 
 ```powershell
 cd backend
 go build -o cloud-saver-daemon.exe ./cmd/daemon
 ```
+
+## Windows Installer Behavior
+
+The generated package is an NSIS Windows setup executable, so users get a standard installer wizard with Next/Back flow.
+
+1. The installer presents normal setup steps and lets users choose installation scope.
+2. Installation scope is configured as `both`, so users can choose:
+	- current user install (user profile location)
+	- all users install (system-wide)
+3. Because scope selection is enabled, Windows may show a UAC permission prompt during setup.
+4. The wizard includes install location handling as part of the normal Windows installer experience.
+
+## Automated GitHub Release Flow
+
+Production releases are tag-driven.
+
+1. Ensure your branch is ready and tests/type checks pass.
+2. Push a semver tag in the form `vX.Y.Z`.
+
+```powershell
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+When the tag is pushed, the `release-windows` workflow will:
+
+1. Sync version fields from the tag to:
+	- `app/package.json`
+	- `app/src-tauri/tauri.conf.json`
+	- `app/src-tauri/Cargo.toml`
+	- `app/src/constants/updates.ts`
+2. Validate synced versions.
+3. Run frontend type-check (`npm run type-check`).
+4. Run backend compile verification (`go build ./...`).
+5. Build backend daemon and stage it under Tauri resources.
+6. Build the Windows Tauri bundle.
+7. Publish bundle artifacts and `release-checksums.txt` to the matching GitHub Release.
+
+Post-release quick verification:
+
+1. Install the generated Windows package.
+2. Confirm the desktop app opens and can reach local backend API.
+3. Confirm the update banner points users to the new GitHub release page when a newer version exists.
 
 ## Troubleshooting
 

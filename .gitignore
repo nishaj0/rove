@@ -5,6 +5,9 @@ app/dist/
 # Tauri/Rust
 app/src-tauri/target/
 app/src-tauri/gen/
+app/src-tauri/resources/backend/*.exe
+app/src-tauri/resources/backend/cloud-saver-daemon
+!app/src-tauri/resources/backend/.gitkeep
 
 # Go
 backend/*.exe

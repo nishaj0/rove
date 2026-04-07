@@ -7,9 +7,11 @@
     "dev": "tauri dev",
     "ui:dev": "vite",
     "build": "vite build",
-    "tauri:build": "tauri build",
+    "tauri:build": "node ../scripts/stage-backend-daemon.mjs && tauri build --bundles nsis",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "release:sync-version": "node ../scripts/sync-version.mjs",
+    "release:check-version": "node ../scripts/sync-version.mjs --check"
   },
   "dependencies": {
     "react": "^18.3.1",

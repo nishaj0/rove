@@ -4,6 +4,7 @@ import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
 import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
+import { type AppUpdateInfo, checkForAppUpdate } from "./update";
 import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
@@ -102,6 +103,8 @@ export default function App() {
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
+  const [availableUpdate, setAvailableUpdate] = useState<AppUpdateInfo | null>(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
 
   const [newName, setNewName] = useState("");
   const [newPath, setNewPath] = useState("");
@@ -266,6 +269,24 @@ export default function App() {
 
   useEffect(() => {
     void loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadUpdateInfo() {
+      const update = await checkForAppUpdate();
+      if (!cancelled && update) {
+        setAvailableUpdate(update);
+        setUpdateDismissed(false);
+        setToast(`New version ${update.latestVersion} is available`);
+      }
+    }
+
+    void loadUpdateInfo();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -601,6 +622,16 @@ export default function App() {
     return `${h}h ${m}m`;
   }
 
+  function onDownloadUpdate() {
+    if (!availableUpdate) {
+      return;
+    }
+    const opened = window.open(availableUpdate.releaseUrl, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      window.location.href = availableUpdate.releaseUrl;
+    }
+  }
+
   return (
     <div className="app-layout">
       <aside className="sidebar">
@@ -631,9 +662,27 @@ export default function App() {
             <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward">&#8250;</button>
           </div>
           <p className="app-utility-title">{currentViewTitle}</p>
+          <div className="app-utility-actions">
+            {availableUpdate ? (
+              <button className="update-indicator" type="button" onClick={onDownloadUpdate}>
+                Update {availableUpdate.latestVersion}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {error ? <div className="banner error">{error}</div> : null}
+        {availableUpdate && !updateDismissed ? (
+          <div className="banner toast update-banner">
+            <p>
+              New version {availableUpdate.latestVersion} is available. You are on {availableUpdate.currentVersion}.
+            </p>
+            <div className="update-banner-actions">
+              <button className="btn primary" type="button" onClick={onDownloadUpdate}>Download</button>
+              <button className="btn" type="button" onClick={() => setUpdateDismissed(true)}>Dismiss</button>
+            </div>
+          </div>
+        ) : null}
         {toast ? <div className="banner toast">{toast}</div> : null}
 
         {activeView === "home" ? (
