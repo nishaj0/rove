@@ -208,7 +208,7 @@ export default function App() {
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
-      return `Cannot reach backend service. Start backend with 'go run ./cmd/daemon --no-tray --debug', then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
+      return `Cannot reach backend service. If running from source, start backend with 'go run ./cmd/daemon --no-tray --debug'. If using the installed app, restart Cloud Saver and allow security prompts for cloud-saver-daemon.exe. Then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
     }
     return raw;
   }
