@@ -40,24 +40,13 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 		toggleItem := systray.AddMenuItem("Stop Sync", "Start or stop syncing")
 		syncNowItem := systray.AddMenuItem("Sync Now", "Trigger manual sync")
 		systray.AddSeparator()
-		statusItem := systray.AddMenuItem("Sync: idle", "Current sync status")
-		statusItem.Disable()
-		pendingItem := systray.AddMenuItem("Pending: 0", "Files waiting for sync")
-		pendingItem.Disable()
 		playingItem := systray.AddMenuItem("Playing: none", "Tracked games currently running")
 		playingItem.Disable()
 		systray.AddSeparator()
 		exitItem := systray.AddMenuItem("Exit", fmt.Sprintf("Exit %s", branding.DisplayName))
 
-		currentStatus := Status{SyncEnabled: m.running.Load(), Pending: 0, PlayingGames: nil}
+		currentStatus := Status{PlayingGames: nil}
 		renderStatus := func(s Status) {
-			state := "idle"
-			if !s.SyncEnabled {
-				state = "paused"
-			} else if s.Pending > 0 {
-				state = "syncing"
-			}
-
 			playingSummary := "none"
 			if len(s.PlayingGames) > 0 {
 				if len(s.PlayingGames) <= 2 {
@@ -67,10 +56,8 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 				}
 			}
 
-			statusItem.SetTitle(fmt.Sprintf("Sync: %s", state))
-			pendingItem.SetTitle(fmt.Sprintf("Pending: %d", s.Pending))
 			playingItem.SetTitle(fmt.Sprintf("Playing: %s", playingSummary))
-			systray.SetTooltip(fmt.Sprintf("%s | sync: %s | pending: %d | playing: %s", branding.DisplayName, state, s.Pending, playingSummary))
+			systray.SetTooltip(fmt.Sprintf("%s | playing: %s", branding.DisplayName, playingSummary))
 		}
 		renderStatus(currentStatus)
 
@@ -79,6 +66,8 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 				select {
 				case <-openItem.ClickedCh:
 					onOpenUI()
+				case <-systray.TrayDoubleClickedCh:
+					onOpenUI()
 				case <-toggleItem.ClickedCh:
 					onToggleSync()
 					if m.running.Load() {
@@ -86,7 +75,6 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 					} else {
 						toggleItem.SetTitle("Start Sync")
 					}
-					currentStatus.SyncEnabled = m.running.Load()
 					renderStatus(currentStatus)
 				case <-syncNowItem.ClickedCh:
 					onSyncNow()

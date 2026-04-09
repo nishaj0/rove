@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
@@ -23,8 +22,6 @@ import (
 	"cloud-saver/backend/internal/syncer"
 	"cloud-saver/backend/internal/tray"
 	"cloud-saver/backend/internal/watcher"
-
-	"github.com/shirou/gopsutil/v3/process"
 )
 
 // coordinates daemon services and runtime lifecycle.
@@ -172,10 +169,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 				return
 			case <-ticker.C:
 				runningIDs := a.monitor.RunningIDs()
-				snapshot := a.engine.Status()
 				update := tray.Status{
-					SyncEnabled:  a.engine.Status().Running,
-					Pending:      snapshot.Pending,
 					PlayingGames: a.runningGameNames(runningIDs),
 				}
 				select {
@@ -189,7 +183,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	a.tray.Run(
 		statusUpdates,
 		func() {
-			if err := openUI(a.cfg.Get().Port); err != nil {
+			if err := openUI(); err != nil {
 				a.logEvent("error", "tray", fmt.Sprintf("open app failed: %v", err))
 			}
 		},
@@ -296,26 +290,20 @@ func (a *Application) runningGameNames(runningIDs []string) []string {
 	return names
 }
 
-// opens desktop app when available and falls back to local status page.
-func openUI(port int) error {
+// opens desktop app executable path without falling back to browser endpoints.
+func openUI() error {
 	if uiPath, ok := desktopAppExecutable(); ok {
-		if desktopAppRunning(filepath.Base(uiPath), uiPath) {
-			return nil
-		}
 		cmd := exec.Command(uiPath)
 		return cmd.Start()
 	}
 
-	if desktopAppRunning("cloud-saver-app.exe", "") || desktopAppRunning("Cloud Saver.exe", "") {
-		return nil
-	}
-
-	cmd := exec.Command("rundll32", "url.dll,FileProtocolHandler", runtimecfg.StatusURL(port))
-	return cmd.Start()
+	return fmt.Errorf("desktop app executable not found")
 }
 
 func desktopAppExecutable() (string, bool) {
 	candidates := []string{
+		"cloud-saver-app.exe",
+		"Cloud Saver.exe",
 		filepath.Join("..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
 		filepath.Join("..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 		filepath.Join("..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
@@ -331,6 +319,10 @@ func desktopAppExecutable() (string, bool) {
 		candidates = append(candidates,
 			filepath.Join(exeDir, "cloud-saver-app.exe"),
 			filepath.Join(exeDir, "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "Cloud Saver.exe"),
+			filepath.Join(exeDir, "..", "..", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
@@ -354,34 +346,4 @@ func desktopAppExecutable() (string, bool) {
 		}
 	}
 	return "", false
-}
-
-func desktopAppRunning(exeName, exePath string) bool {
-	procs, err := process.Processes()
-	if err != nil {
-		return false
-	}
-
-	normalizedPath := ""
-	if strings.TrimSpace(exePath) != "" {
-		normalizedPath = strings.ToLower(filepath.Clean(exePath))
-	}
-	normalizedName := strings.ToLower(strings.TrimSpace(exeName))
-
-	for _, p := range procs {
-		if exe, exeErr := p.Exe(); exeErr == nil && exe != "" {
-			if normalizedPath != "" && strings.EqualFold(filepath.Clean(exe), normalizedPath) {
-				return true
-			}
-			if normalizedName != "" && strings.EqualFold(filepath.Base(exe), normalizedName) {
-				return true
-			}
-			continue
-		}
-		if name, nameErr := p.Name(); nameErr == nil && normalizedName != "" && strings.EqualFold(name, normalizedName) {
-			return true
-		}
-	}
-
-	return false
 }

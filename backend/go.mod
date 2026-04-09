@@ -2,6 +2,8 @@ module cloud-saver/backend
 
 go 1.23.0
 
+replace github.com/getlantern/systray => ./third_party/systray
+
 require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/getlantern/systray v1.2.2
