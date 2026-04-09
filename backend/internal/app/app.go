@@ -13,7 +13,9 @@ import (
 
 	"cloud-saver/backend/internal/api"
 	"cloud-saver/backend/internal/autobackup"
+	"cloud-saver/backend/internal/autostart"
 	"cloud-saver/backend/internal/backup"
+	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
@@ -118,7 +120,11 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.logEvent("error", "watcher", err.Error())
 	}
 
-	exePath, _ := os.Executable()
+	daemonExePath, _ := os.Executable()
+	startupCommand := startupCommandTarget(daemonExePath)
+	if err := autostart.SetEnabled(branding.AutostartKeyName, startupCommand, a.cfg.Get().Autostart); err != nil {
+		a.logEvent("error", "autostart", err.Error())
+	}
 	// keep watcher roots in sync when game list changes via api.
 	apiSvc := api.New(
 		a.cfg,
@@ -126,7 +132,8 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.logs,
 		a.backup,
 		a.monitor,
-		exePath,
+		daemonExePath,
+		startupCommand,
 		a.debug,
 		func(_ []models.Game) {
 			a.monitor.ForcePoll()
@@ -346,4 +353,12 @@ func desktopAppExecutable() (string, bool) {
 		}
 	}
 	return "", false
+}
+
+// prefers desktop app startup target and falls back to daemon executable path.
+func startupCommandTarget(daemonExePath string) string {
+	if uiPath, ok := desktopAppExecutable(); ok {
+		return uiPath
+	}
+	return daemonExePath
 }

@@ -26,9 +26,10 @@ type Server struct {
 	sqlitePath     string
 	onGamesChanged func([]models.Game)
 	exePath        string
+	startupCommand string
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, exePath string, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, exePath string, startupCommand string, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
@@ -41,6 +42,7 @@ func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backu
 		sqlitePath:     logs.Path(),
 		onGamesChanged: onGamesChanged,
 		exePath:        exePath,
+		startupCommand: startupCommand,
 	}
 }
 

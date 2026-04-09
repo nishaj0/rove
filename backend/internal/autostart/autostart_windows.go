@@ -4,6 +4,8 @@ package autostart
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"golang.org/x/sys/windows/registry"
 )
@@ -22,7 +24,14 @@ func SetEnabled(appName, exePath string, enabled bool) error {
 	defer k.Close()
 
 	if enabled {
-		return k.SetStringValue(appName, exePath)
+		command := strings.TrimSpace(exePath)
+		if command == "" {
+			return errors.New("exePath is required")
+		}
+		if !strings.HasPrefix(command, "\"") {
+			command = fmt.Sprintf("\"%s\"", command)
+		}
+		return k.SetStringValue(appName, command)
 	}
 	if err := k.DeleteValue(appName); err != nil && !errors.Is(err, registry.ErrNotExist) {
 		return err

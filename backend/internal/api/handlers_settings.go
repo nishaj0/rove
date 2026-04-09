@@ -22,7 +22,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		if err := autostart.SetEnabled(branding.AutostartKeyName, s.exePath, req.Autostart); err != nil {
+		if err := autostart.SetEnabled(branding.AutostartKeyName, s.startupCommand, req.Autostart); err != nil {
 			_ = s.logs.Write("error", "autostart", err.Error())
 		}
 		writeJSON(w, http.StatusOK, s.cfg.Get())
