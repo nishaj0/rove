@@ -12,6 +12,7 @@ import (
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/syncer"
+	"cloud-saver/backend/internal/updater"
 )
 
 type Server struct {
@@ -27,9 +28,10 @@ type Server struct {
 	onGamesChanged func([]models.Game)
 	exePath        string
 	startupCommand string
+	updater        *updater.Client
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, exePath string, startupCommand string, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
@@ -43,6 +45,7 @@ func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backu
 		onGamesChanged: onGamesChanged,
 		exePath:        exePath,
 		startupCommand: startupCommand,
+		updater:        updaterClient,
 	}
 }
 
@@ -63,6 +66,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/backup/export", s.handleBackupExport)
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
 	mux.HandleFunc("/backup/history", s.handleBackupHistory)
+	mux.HandleFunc("/updates/latest", s.handleUpdatesLatest)
 
 	handler := localhostOnly(mux)
 	handler = withLoopbackCORS(handler)

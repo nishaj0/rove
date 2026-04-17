@@ -1,15 +1,11 @@
 import { getVersion } from "@tauri-apps/api/app";
-import { FALLBACK_APP_VERSION, RELEASES_API_URL } from "./constants/updates";
+import { api } from "./api";
+import { FALLBACK_APP_VERSION } from "./constants/updates";
 
 export type AppUpdateInfo = {
   currentVersion: string;
   latestVersion: string;
   releaseUrl: string;
-};
-
-type LatestReleasePayload = {
-  tag_name?: string;
-  html_url?: string;
 };
 
 function normalizeVersion(input: string): string {
@@ -53,19 +49,9 @@ export async function checkForAppUpdate(): Promise<AppUpdateInfo | null> {
   const currentVersion = await resolveCurrentVersion();
 
   try {
-    const response = await fetch(RELEASES_API_URL, {
-      method: "GET",
-      headers: {
-        Accept: "application/vnd.github+json",
-      },
-    });
-    if (!response.ok) {
-      return null;
-    }
-
-    const payload = (await response.json()) as LatestReleasePayload;
-    const latestVersion = (payload.tag_name ?? "").trim();
-    const releaseUrl = (payload.html_url ?? "").trim();
+    const payload = await api.getLatestRelease();
+    const latestVersion = (payload.tagName ?? "").trim();
+    const releaseUrl = (payload.htmlUrl ?? "").trim();
     if (latestVersion === "" || releaseUrl === "") {
       return null;
     }

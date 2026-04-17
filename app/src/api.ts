@@ -6,6 +6,7 @@ import type {
   BackupImportRequest,
   DebugInfo,
   Game,
+  LatestReleaseInfo,
   LogEntry,
   PlayGameRequest,
   Settings,
@@ -132,6 +133,9 @@ export const api = {
   },
   getDebugInfo() {
     return request<DebugInfo>("/debug/info");
+  },
+  getLatestRelease() {
+    return request<LatestReleaseInfo>("/updates/latest");
   },
   exportBackup(payload: BackupExportRequest) {
     return request<BackupExportResponse>("/backup/export", {

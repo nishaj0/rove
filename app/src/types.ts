@@ -66,6 +66,11 @@ export interface DebugInfo {
   exePath: string;
 }
 
+export interface LatestReleaseInfo {
+  tagName: string;
+  htmlUrl: string;
+}
+
 export interface BackupExportRequest {
   gameId: string;
   destinationPath: string;

@@ -23,6 +23,7 @@ import (
 	runtimecfg "cloud-saver/backend/internal/runtime"
 	"cloud-saver/backend/internal/syncer"
 	"cloud-saver/backend/internal/tray"
+	"cloud-saver/backend/internal/updater"
 	"cloud-saver/backend/internal/watcher"
 )
 
@@ -125,6 +126,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	if err := autostart.SetEnabled(branding.AutostartKeyName, startupCommand, a.cfg.Get().Autostart); err != nil {
 		a.logEvent("error", "autostart", err.Error())
 	}
+	updaterClient := updater.New()
 	// keep watcher roots in sync when game list changes via api.
 	apiSvc := api.New(
 		a.cfg,
@@ -134,6 +136,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.monitor,
 		daemonExePath,
 		startupCommand,
+		updaterClient,
 		a.debug,
 		func(_ []models.Game) {
 			a.monitor.ForcePoll()

@@ -14,13 +14,14 @@ func (s *Server) handleDebugInfo(w http.ResponseWriter, r *http.Request) {
 
 	uptime := int64(time.Since(s.startedAt).Seconds())
 	writeJSON(w, http.StatusOK, map[string]any{
-		"debug":      s.debug,
-		"pid":        os.Getpid(),
-		"startedAt":  s.startedAt,
-		"uptimeSec":  uptime,
-		"port":       s.cfg.Get().Port,
-		"configPath": s.configPath,
-		"sqlitePath": s.sqlitePath,
-		"exePath":    s.exePath,
+		"debug":          s.debug,
+		"pid":            os.Getpid(),
+		"startedAt":      s.startedAt,
+		"uptimeSec":      uptime,
+		"port":           s.cfg.Get().Port,
+		"configPath":     s.configPath,
+		"sqlitePath":     s.sqlitePath,
+		"exePath":        s.exePath,
+		"startupCommand": s.startupCommand,
 	})
 }
