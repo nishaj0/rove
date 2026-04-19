@@ -64,6 +64,8 @@ export interface DebugInfo {
   configPath: string;
   sqlitePath: string;
   exePath: string;
+  startupCommand?: string;
+  startupCommandExists?: boolean;
 }
 
 export interface LatestReleaseInfo {

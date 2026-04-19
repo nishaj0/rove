@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -123,7 +124,9 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 
 	daemonExePath, _ := os.Executable()
 	startupCommand := startupCommandTarget(daemonExePath)
-	if err := autostart.SetEnabled(branding.AutostartKeyName, startupCommand, a.cfg.Get().Autostart); err != nil {
+	if a.cfg.Get().Autostart && startupCommand == "" {
+		a.logEvent("error", "autostart", "startup target not found; autostart cannot be enabled")
+	} else if err := autostart.SetEnabled(branding.AutostartKeyName, startupCommand, a.cfg.Get().Autostart); err != nil {
 		a.logEvent("error", "autostart", err.Error())
 	}
 	updaterClient := updater.New()
@@ -351,8 +354,8 @@ func desktopAppExecutable() (string, bool) {
 			continue
 		}
 		seen[normalized] = struct{}{}
-		if info, err := os.Stat(normalized); err == nil && !info.IsDir() {
-			return normalized, true
+		if resolved, ok := resolveExecutableCandidate(normalized); ok {
+			return resolved, true
 		}
 	}
 	return "", false
@@ -363,5 +366,24 @@ func startupCommandTarget(daemonExePath string) string {
 	if uiPath, ok := desktopAppExecutable(); ok {
 		return uiPath
 	}
-	return daemonExePath
+	if resolved, ok := resolveExecutableCandidate(daemonExePath); ok {
+		return resolved
+	}
+	return ""
+}
+
+// returns an absolute executable path when the candidate exists on disk.
+func resolveExecutableCandidate(candidate string) (string, bool) {
+	if strings.TrimSpace(candidate) == "" {
+		return "", false
+	}
+	absolute, err := filepath.Abs(candidate)
+	if err != nil {
+		return "", false
+	}
+	info, err := os.Stat(absolute)
+	if err != nil || info.IsDir() {
+		return "", false
+	}
+	return absolute, true
 }

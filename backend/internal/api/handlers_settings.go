@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"cloud-saver/backend/internal/autostart"
@@ -34,6 +35,12 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 			previousAutostart = enabled
 		}
 
+		if req.Autostart && s.startupCommand == "" {
+			err := errors.New("startup target not found")
+			_ = s.logs.Write("error", "autostart", err.Error())
+			writeErr(w, http.StatusInternalServerError, err)
+			return
+		}
 		if err := autostart.SetEnabled(branding.AutostartKeyName, s.startupCommand, req.Autostart); err != nil {
 			_ = s.logs.Write("error", "autostart", err.Error())
 			writeErr(w, http.StatusInternalServerError, err)

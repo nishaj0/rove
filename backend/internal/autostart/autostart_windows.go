@@ -5,6 +5,7 @@ package autostart
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/sys/windows/registry"
@@ -27,6 +28,13 @@ func SetEnabled(appName, exePath string, enabled bool) error {
 		command := strings.TrimSpace(exePath)
 		if command == "" {
 			return errors.New("exePath is required")
+		}
+		if !filepath.IsAbs(command) {
+			absolute, err := filepath.Abs(command)
+			if err != nil {
+				return err
+			}
+			command = absolute
 		}
 		if !strings.HasPrefix(command, "\"") {
 			command = fmt.Sprintf("\"%s\"", command)
