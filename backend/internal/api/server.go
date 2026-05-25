@@ -11,6 +11,7 @@ import (
 	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
+	"cloud-saver/backend/internal/snapshots"
 	"cloud-saver/backend/internal/syncer"
 	"cloud-saver/backend/internal/updater"
 )
@@ -21,6 +22,7 @@ type Server struct {
 	logs           *logstore.Store
 	backup         *backup.Service
 	monitor        *gamemon.Monitor
+	snapshots      *snapshots.Service
 	debug          bool
 	startedAt      time.Time
 	configPath     string
@@ -31,13 +33,14 @@ type Server struct {
 	updater        *updater.Client
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
 		logs:           logs,
 		backup:         backupSvc,
 		monitor:        monitor,
+		snapshots:      snapshotSvc,
 		debug:          debug,
 		startedAt:      time.Now().UTC(),
 		configPath:     cfg.Path(),
@@ -66,6 +69,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/backup/export", s.handleBackupExport)
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
 	mux.HandleFunc("/backup/history", s.handleBackupHistory)
+	mux.HandleFunc("/snapshots", s.handleSnapshots)
+	mux.HandleFunc("/snapshots/restore", s.handleSnapshotRestore)
+	mux.HandleFunc("/snapshots/", s.handleSnapshotByID)
 	mux.HandleFunc("/updates/latest", s.handleUpdatesLatest)
 
 	handler := localhostOnly(mux)

@@ -18,12 +18,18 @@ const (
 	defaultBackupIntervalMinutes  = 10
 	defaultBackupExitDelaySeconds = 10
 	defaultBackupRetentionCount   = 5
+	defaultSnapshotMaxPerGame     = 5
+	defaultSnapshotIntervalMins   = 15
 	minBackupIntervalMinutes      = 3
 	maxBackupIntervalMinutes      = 120
 	minBackupExitDelaySeconds     = 3
 	maxBackupExitDelaySeconds     = 120
 	minBackupRetentionCount       = 1
 	maxBackupRetentionCount       = 30
+	minSnapshotMaxPerGame         = 1
+	maxSnapshotMaxPerGame         = 50
+	minSnapshotIntervalMins       = 1
+	maxSnapshotIntervalMins       = 1440
 )
 
 func defaultBackupPolicy() models.BackupPolicy {
@@ -107,13 +113,18 @@ func defaultPath() (string, error) {
 // returns baseline values used for first run and normalization fallback.
 func DefaultSettings() models.Settings {
 	return models.Settings{
-		Port:                runtimecfg.DefaultAPIPort,
-		SyncIntervalSeconds: 30,
-		ConflictPolicy:      models.ConflictLatestWins,
-		ThemeMode:           models.ThemeDark,
-		Autostart:           false,
-		IgnorePatterns:      []string{"*.tmp", "*.log", "cache"},
-		Games:               []models.Game{},
+		Port:                    runtimecfg.DefaultAPIPort,
+		SyncIntervalSeconds:     30,
+		ConflictPolicy:          models.ConflictLatestWins,
+		ThemeMode:               models.ThemeDark,
+		Autostart:               false,
+		IgnorePatterns:          []string{"*.tmp", "*.log", "cache"},
+		SnapshotVaultPath:       "",
+		SnapshotMaxPerGame:      defaultSnapshotMaxPerGame,
+		SnapshotOnExit:          true,
+		SnapshotPeriodic:        false,
+		SnapshotIntervalMinutes: defaultSnapshotIntervalMins,
+		Games:                   []models.Game{},
 	}
 }
 
@@ -148,6 +159,12 @@ func (m *Manager) Update(next models.Settings) error {
 	if next.ThemeMode != models.ThemeDark && next.ThemeMode != models.ThemeLight && next.ThemeMode != models.ThemeSystem {
 		return errors.New("invalid theme mode")
 	}
+	if next.SnapshotMaxPerGame < minSnapshotMaxPerGame || next.SnapshotMaxPerGame > maxSnapshotMaxPerGame {
+		return fmt.Errorf("snapshot max per game must be between %d and %d", minSnapshotMaxPerGame, maxSnapshotMaxPerGame)
+	}
+	if next.SnapshotIntervalMinutes < minSnapshotIntervalMins || next.SnapshotIntervalMinutes > maxSnapshotIntervalMins {
+		return fmt.Errorf("snapshot interval must be between %d and %d minutes", minSnapshotIntervalMins, maxSnapshotIntervalMins)
+	}
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -157,6 +174,11 @@ func (m *Manager) Update(next models.Settings) error {
 	m.settings.ThemeMode = next.ThemeMode
 	m.settings.Autostart = next.Autostart
 	m.settings.IgnorePatterns = append([]string{}, next.IgnorePatterns...)
+	m.settings.SnapshotVaultPath = next.SnapshotVaultPath
+	m.settings.SnapshotMaxPerGame = next.SnapshotMaxPerGame
+	m.settings.SnapshotOnExit = next.SnapshotOnExit
+	m.settings.SnapshotPeriodic = next.SnapshotPeriodic
+	m.settings.SnapshotIntervalMinutes = next.SnapshotIntervalMinutes
 	return m.saveLocked()
 }
 
@@ -228,6 +250,14 @@ func normalizeSettings(settings *models.Settings) bool {
 	}
 	if settings.Games == nil {
 		settings.Games = []models.Game{}
+		changed = true
+	}
+	if settings.SnapshotMaxPerGame < minSnapshotMaxPerGame || settings.SnapshotMaxPerGame > maxSnapshotMaxPerGame {
+		settings.SnapshotMaxPerGame = defaults.SnapshotMaxPerGame
+		changed = true
+	}
+	if settings.SnapshotIntervalMinutes < minSnapshotIntervalMins || settings.SnapshotIntervalMinutes > maxSnapshotIntervalMins {
+		settings.SnapshotIntervalMinutes = defaults.SnapshotIntervalMinutes
 		changed = true
 	}
 	for i := range settings.Games {

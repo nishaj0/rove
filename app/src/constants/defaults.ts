@@ -14,6 +14,11 @@ export const DEFAULT_SETTINGS: Settings = {
   themeMode: "dark",
   autostart: false,
   ignorePatterns: ["*.tmp", "*.log", "cache"],
+  snapshotVaultPath: "",
+  snapshotMaxPerGame: 5,
+  snapshotOnExit: true,
+  snapshotPeriodic: false,
+  snapshotIntervalMinutes: 15,
   games: [],
 };
 

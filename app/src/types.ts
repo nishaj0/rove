@@ -18,6 +18,15 @@ export interface BackupHistoryEntry {
   status: string;
 }
 
+export interface SnapshotSummary {
+  id: string;
+  seq: number;
+  createdAt: string;
+  trigger: string;
+  changedFiles: number;
+  totalSize: number;
+}
+
 export interface Game {
   id: string;
   name: string;
@@ -37,6 +46,11 @@ export interface Settings {
   themeMode: ThemeMode;
   autostart: boolean;
   ignorePatterns: string[];
+  snapshotVaultPath: string;
+  snapshotMaxPerGame: number;
+  snapshotOnExit: boolean;
+  snapshotPeriodic: boolean;
+  snapshotIntervalMinutes: number;
   games: Game[];
 }
 
@@ -95,4 +109,9 @@ export interface PlayGameRequest {
 
 export interface SyncGameRequest {
   gameId: string;
+}
+
+export interface SnapshotCreateResponse {
+  status: string;
+  snapshot?: SnapshotSummary | null;
 }

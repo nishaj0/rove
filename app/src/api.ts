@@ -10,6 +10,8 @@ import type {
   LogEntry,
   PlayGameRequest,
   Settings,
+  SnapshotCreateResponse,
+  SnapshotSummary,
   SyncGameRequest,
   Status,
 } from "./types";
@@ -18,6 +20,7 @@ import {
   normalizeGames,
   normalizeLogs,
   normalizeSettings,
+  normalizeSnapshots,
   normalizeStatus,
 } from "./api/parsers";
 import { BACKEND_BASE_URL } from "./constants/network";
@@ -152,5 +155,26 @@ export const api = {
   async getBackupHistory(gameId: string, limit = 20): Promise<BackupHistoryEntry[]> {
     const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
     return normalizeBackupHistory(payload);
+  },
+  async getSnapshots(gameId: string): Promise<SnapshotSummary[]> {
+    const payload = await request<unknown>(`/snapshots?gameId=${encodeURIComponent(gameId)}`);
+    return normalizeSnapshots(payload);
+  },
+  createSnapshot(gameId: string) {
+    return request<SnapshotCreateResponse>("/snapshots", {
+      method: "POST",
+      body: JSON.stringify({ gameId }),
+    });
+  },
+  restoreSnapshot(gameId: string, snapshotId: string) {
+    return request<{ status: string }>("/snapshots/restore", {
+      method: "POST",
+      body: JSON.stringify({ gameId, snapshotId }),
+    });
+  },
+  deleteSnapshot(gameId: string, snapshotId: string) {
+    return request<void>(`/snapshots/${encodeURIComponent(snapshotId)}?gameId=${encodeURIComponent(gameId)}`, {
+      method: "DELETE",
+    });
   },
 };

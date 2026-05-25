@@ -1,4 +1,4 @@
-import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, Status, ThemeMode } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, SnapshotSummary, Status, ThemeMode } from "../types";
 import { newDefaultBackupPolicy, newDefaultSettings } from "../constants/defaults";
 
 function isRecord(input: unknown): input is Record<string, unknown> {
@@ -84,6 +84,27 @@ export function normalizeBackupHistory(input: unknown): BackupHistoryEntry[] {
     .filter((value): value is BackupHistoryEntry => value !== null);
 }
 
+export function normalizeSnapshots(input: unknown): SnapshotSummary[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  return input
+    .map((value): SnapshotSummary | null => {
+      if (!isRecord(value)) {
+        return null;
+      }
+      return {
+        id: asString(value.id),
+        seq: asNumber(value.seq, 0),
+        createdAt: asString(value.createdAt),
+        trigger: asString(value.trigger),
+        changedFiles: asNumber(value.changedFiles, 0),
+        totalSize: asNumber(value.totalSize, 0),
+      };
+    })
+    .filter((value): value is SnapshotSummary => value !== null);
+}
+
 export function normalizeLogs(input: unknown): LogEntry[] {
   if (!Array.isArray(input)) {
     return [];
@@ -120,6 +141,11 @@ export function normalizeSettings(input: unknown): Settings {
     themeMode: asThemeMode(input.themeMode, defaults.themeMode),
     autostart: Boolean(input.autostart),
     ignorePatterns,
+    snapshotVaultPath: asString(input.snapshotVaultPath),
+    snapshotMaxPerGame: asNumber(input.snapshotMaxPerGame, defaults.snapshotMaxPerGame),
+    snapshotOnExit: asBoolean(input.snapshotOnExit, defaults.snapshotOnExit),
+    snapshotPeriodic: asBoolean(input.snapshotPeriodic, defaults.snapshotPeriodic),
+    snapshotIntervalMinutes: asNumber(input.snapshotIntervalMinutes, defaults.snapshotIntervalMinutes),
     games: normalizeGames(input.games),
   };
 }

@@ -42,13 +42,18 @@ type GameStats struct {
 
 // stores persisted daemon configuration from settings.json.
 type Settings struct {
-	Port                int            `json:"port"`
-	SyncIntervalSeconds int            `json:"syncIntervalSeconds"`
-	ConflictPolicy      ConflictPolicy `json:"conflictPolicy"`
-	ThemeMode           ThemeMode      `json:"themeMode"`
-	Autostart           bool           `json:"autostart"`
-	IgnorePatterns      []string       `json:"ignorePatterns"`
-	Games               []Game         `json:"games"`
+	Port                    int            `json:"port"`
+	SyncIntervalSeconds     int            `json:"syncIntervalSeconds"`
+	ConflictPolicy          ConflictPolicy `json:"conflictPolicy"`
+	ThemeMode               ThemeMode      `json:"themeMode"`
+	Autostart               bool           `json:"autostart"`
+	IgnorePatterns          []string       `json:"ignorePatterns"`
+	SnapshotVaultPath       string         `json:"snapshotVaultPath"`
+	SnapshotMaxPerGame      int            `json:"snapshotMaxPerGame"`
+	SnapshotOnExit          bool           `json:"snapshotOnExit"`
+	SnapshotPeriodic        bool           `json:"snapshotPeriodic"`
+	SnapshotIntervalMinutes int            `json:"snapshotIntervalMinutes"`
+	Games                   []Game         `json:"games"`
 }
 
 // reports current engine state for api status responses.
@@ -90,4 +95,25 @@ type BackupHistoryEntry struct {
 	Reason    string    `json:"reason"`
 	Signature string    `json:"signature"`
 	Status    string    `json:"status"`
+}
+
+// summarizes one versioned save snapshot stored in the local vault.
+type SnapshotSummary struct {
+	ID           string    `json:"id"`
+	Seq          int       `json:"seq"`
+	CreatedAt    time.Time `json:"createdAt"`
+	Trigger      string    `json:"trigger"`
+	ChangedFiles int       `json:"changedFiles"`
+	TotalSize    int64     `json:"totalSize"`
+}
+
+// requests an immediate snapshot for a single tracked game.
+type SnapshotCreateRequest struct {
+	GameID string `json:"gameId"`
+}
+
+// requests restoring one previously stored snapshot for a game.
+type SnapshotRestoreRequest struct {
+	GameID     string `json:"gameId"`
+	SnapshotID string `json:"snapshotId"`
 }

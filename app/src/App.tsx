@@ -2,10 +2,10 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
-import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
+import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import { type AppUpdateInfo, checkForAppUpdate } from "./update";
-import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, Status } from "./types";
+import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, SnapshotSummary, Status } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -115,6 +115,7 @@ export default function App() {
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
   const [backupHistory, setBackupHistory] = useState<BackupHistoryEntry[]>([]);
+  const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
   const [exportOperationState, setExportOperationState] = useState<BackupOperationState>("idle");
   const [exportOperationMessage, setExportOperationMessage] = useState("");
   const [importOperationState, setImportOperationState] = useState<BackupOperationState>("idle");
@@ -205,6 +206,17 @@ export default function App() {
     }
   }
 
+  async function onBrowseSnapshotVault() {
+    try {
+      const selected = await pickFolder(settings.snapshotVaultPath || undefined);
+      if (selected) {
+        setSettings((current) => ({ ...current, snapshotVaultPath: selected }));
+      }
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
@@ -248,6 +260,19 @@ export default function App() {
     try {
       const entries = await api.getBackupHistory(gameID, 20);
       setBackupHistory(entries);
+    } catch (e) {
+      setError(toFriendlyError(e));
+    }
+  }
+
+  async function refreshSnapshots(gameID: string) {
+    if (!gameID) {
+      setSnapshots([]);
+      return;
+    }
+    try {
+      const entries = await api.getSnapshots(gameID);
+      setSnapshots(entries);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -314,16 +339,22 @@ export default function App() {
   useEffect(() => {
     if (activeView !== "game" || !selectedGameId) {
       setBackupHistory([]);
+      setSnapshots([]);
       return;
     }
 
     void refreshBackupHistory(selectedGameId);
-    const timer = window.setInterval(() => {
+    void refreshSnapshots(selectedGameId);
+    const backupTimer = window.setInterval(() => {
       void refreshBackupHistory(selectedGameId);
     }, BACKUP_HISTORY_REFRESH_INTERVAL_MS);
+    const snapshotTimer = window.setInterval(() => {
+      void refreshSnapshots(selectedGameId);
+    }, SNAPSHOT_REFRESH_INTERVAL_MS);
 
     return () => {
-      window.clearInterval(timer);
+      window.clearInterval(backupTimer);
+      window.clearInterval(snapshotTimer);
     };
   }, [activeView, selectedGameId]);
 
@@ -573,6 +604,57 @@ export default function App() {
     }
   }
 
+  async function onSaveSnapshotNow() {
+    if (!selectedGame) {
+      return;
+    }
+    try {
+      const result = await api.createSnapshot(selectedGame.id);
+      if (result.status === "created") {
+        setToast("Snapshot saved");
+      } else {
+        setToast("Snapshot skipped");
+      }
+      await refreshSnapshots(selectedGame.id);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onRestoreSnapshot(snapshotId: string) {
+    if (!selectedGame) {
+      return;
+    }
+    const confirmed = window.confirm("Restore this snapshot? Cloud Saver will save a pre-restore snapshot first.");
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await api.restoreSnapshot(selectedGame.id, snapshotId);
+      setToast("Snapshot restored");
+      await Promise.all([refreshGamesData(), refreshSnapshots(selectedGame.id)]);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onDeleteSnapshot(snapshotId: string) {
+    if (!selectedGame) {
+      return;
+    }
+    const confirmed = window.confirm("Delete this snapshot?");
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await api.deleteSnapshot(selectedGame.id, snapshotId);
+      setToast("Snapshot deleted");
+      await refreshSnapshots(selectedGame.id);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
   function openGame(gameId: string) {
     setExportPath("");
     setImportPath("");
@@ -582,6 +664,7 @@ export default function App() {
     setImportOperationState("idle");
     setImportOperationMessage("");
     setBackupHistory([]);
+    setSnapshots([]);
     pushNavigation("game", gameId);
   }
 
@@ -620,6 +703,27 @@ export default function App() {
       return `${m}m`;
     }
     return `${h}h ${m}m`;
+  }
+
+  function formatBytes(bytes: number): string {
+    const value = Math.max(0, bytes);
+    if (value < 1024) {
+      return `${value} B`;
+    }
+    if (value < 1024 * 1024) {
+      return `${(value / 1024).toFixed(1)} KB`;
+    }
+    if (value < 1024 * 1024 * 1024) {
+      return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    return `${(value / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  }
+
+  function formatSnapshotTrigger(trigger: string): string {
+    if (trigger === "pre-restore") {
+      return "pre-restore";
+    }
+    return trigger || "manual";
   }
 
   function onDownloadUpdate() {
@@ -732,10 +836,17 @@ export default function App() {
             importOperationState={importOperationState}
             importOperationMessage={importOperationMessage}
             backupHistory={backupHistory}
+            snapshots={snapshots}
+            snapshotVaultConfigured={settings.snapshotVaultPath.trim() !== ""}
+            onSaveSnapshotNow={() => void onSaveSnapshotNow()}
+            onRestoreSnapshot={(snapshotId) => void onRestoreSnapshot(snapshotId)}
+            onDeleteSnapshot={(snapshotId) => void onDeleteSnapshot(snapshotId)}
             onSaveBackupPolicy={onSaveSelectedGameBackupPolicy}
             onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
             formatPlaytime={formatPlaytime}
             safeDateTime={safeDateTime}
+            formatBytes={formatBytes}
+            formatSnapshotTrigger={formatSnapshotTrigger}
           />
         ) : null}
 
@@ -758,6 +869,11 @@ export default function App() {
             onThemeModeChange={(value) => void onThemeModeChange(value)}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
+            onBrowseSnapshotVault={() => void onBrowseSnapshotVault()}
+            onSnapshotMaxPerGameChange={(value) => setSettings((s) => ({ ...s, snapshotMaxPerGame: value }))}
+            onSnapshotOnExitChange={(value) => setSettings((s) => ({ ...s, snapshotOnExit: value }))}
+            onSnapshotPeriodicChange={(value) => setSettings((s) => ({ ...s, snapshotPeriodic: value }))}
+            onSnapshotIntervalChange={(value) => setSettings((s) => ({ ...s, snapshotIntervalMinutes: value }))}
             onSaveSettings={() => void onSaveSettings()}
           />
         ) : null}

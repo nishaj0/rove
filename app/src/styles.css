@@ -651,6 +651,46 @@ h3 {
   gap: 0.5rem;
 }
 
+.snapshot-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.snapshot-row {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--surface-1);
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.snapshot-main {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.snapshot-main p {
+  margin: 0;
+}
+
+.snapshot-meta {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.snapshot-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .backup-history-row {
   border: 1px solid var(--line-soft);
   border-radius: 10px;

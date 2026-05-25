@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { newDefaultBackupPolicy } from "../constants/defaults";
-import type { BackupHistoryEntry, BackupPolicy, Game } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, Game, SnapshotSummary } from "../types";
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -12,6 +12,8 @@ type GameDetailViewProps = {
   importOperationState: "idle" | "working" | "success" | "failed";
   importOperationMessage: string;
   backupHistory: BackupHistoryEntry[];
+  snapshots: SnapshotSummary[];
+  snapshotVaultConfigured: boolean;
   onBack: () => void;
   onPlay: () => void;
   onSyncGame: () => void;
@@ -21,10 +23,15 @@ type GameDetailViewProps = {
   onMergeChange: (value: boolean) => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
+  onSaveSnapshotNow: () => void;
+  onRestoreSnapshot: (snapshotId: string) => void;
+  onDeleteSnapshot: (snapshotId: string) => void;
   onSaveBackupPolicy: (value: BackupPolicy) => Promise<boolean>;
   onUpdateCover: (coverImageData: string) => void;
   formatPlaytime: (seconds: number) => string;
   safeDateTime: (value: string) => string;
+  formatBytes: (bytes: number) => string;
+  formatSnapshotTrigger: (trigger: string) => string;
 };
 
 export function GameDetailView(props: GameDetailViewProps) {
@@ -38,6 +45,8 @@ export function GameDetailView(props: GameDetailViewProps) {
     importOperationState,
     importOperationMessage,
     backupHistory,
+    snapshots,
+    snapshotVaultConfigured,
     onBack,
     onPlay,
     onSyncGame,
@@ -47,10 +56,15 @@ export function GameDetailView(props: GameDetailViewProps) {
     onMergeChange,
     onExportBackup,
     onImportBackup,
+    onSaveSnapshotNow,
+    onRestoreSnapshot,
+    onDeleteSnapshot,
     onSaveBackupPolicy,
     onUpdateCover,
     formatPlaytime,
     safeDateTime,
+    formatBytes,
+    formatSnapshotTrigger,
   } = props;
 
   const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? newDefaultBackupPolicy());
@@ -262,6 +276,41 @@ export function GameDetailView(props: GameDetailViewProps) {
             {backupPolicyState === "saving" ? "Saving backup policy..." : backupPolicyState === "saved" ? "Backup policy saved." : "Backup policy save failed."}
           </p>
         ) : null}
+      </section>
+
+      <section className="panel">
+        <div className="panel-head">
+          <h2>Snapshots</h2>
+          <button className="btn primary" onClick={onSaveSnapshotNow} type="button" disabled={!snapshotVaultConfigured}>Save Now</button>
+        </div>
+        {!snapshotVaultConfigured ? (
+          <p className="empty-state">Choose a snapshot vault folder in Settings to enable versioned snapshots.</p>
+        ) : snapshots.length === 0 ? (
+          <p className="empty-state">No snapshots yet.</p>
+        ) : (
+          <ul className="snapshot-list">
+            {snapshots.map((snapshot) => (
+              <li className="snapshot-row" key={snapshot.id}>
+                <div className="snapshot-main">
+                  <p>
+                    <strong>#{snapshot.seq}</strong>
+                    {" · "}
+                    {safeDateTime(snapshot.createdAt)}
+                    {" · "}
+                    {formatSnapshotTrigger(snapshot.trigger)}
+                  </p>
+                  <p className="snapshot-meta">
+                    {snapshot.changedFiles} changed file{snapshot.changedFiles === 1 ? "" : "s"} · {formatBytes(snapshot.totalSize)}
+                  </p>
+                </div>
+                <div className="snapshot-actions">
+                  <button className="btn" onClick={() => onRestoreSnapshot(snapshot.id)} type="button">Restore</button>
+                  <button className="btn danger" onClick={() => onDeleteSnapshot(snapshot.id)} type="button">Delete</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="panel">
