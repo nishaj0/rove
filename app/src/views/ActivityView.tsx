@@ -13,7 +13,7 @@ export function ActivityView(props: ActivityViewProps) {
   const { debugInfo, uptimeLabel, lastError, logs, onRefresh, safeTime } = props;
 
   return (
-    <section className="panel activity-shell">
+    <section className="panel activity-shell" data-window-title="ACTIVITY.LOG">
       <div className="activity-header">
         <div>
           <h1>Activity</h1>

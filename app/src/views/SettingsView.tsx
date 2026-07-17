@@ -1,7 +1,8 @@
-import type { Settings } from "../types";
+import type { Settings, ThemeMode } from "../types";
 
 type SettingsViewProps = {
   settings: Settings;
+  onThemeModeChange: (value: ThemeMode) => void;
   onSyncIntervalChange: (value: number) => void;
   onAutostartChange: (value: boolean) => void;
   onIgnorePatternsChange: (value: string[]) => void;
@@ -19,6 +20,7 @@ type SettingsViewProps = {
 export function SettingsView(props: SettingsViewProps) {
   const {
     settings,
+    onThemeModeChange,
     onSyncIntervalChange,
     onAutostartChange,
     onIgnorePatternsChange,
@@ -34,10 +36,18 @@ export function SettingsView(props: SettingsViewProps) {
   } = props;
 
   return (
-    <section className="panel">
+    <section className="panel" data-window-title="SYSTEM.SETTINGS">
       <h2>Global Settings</h2>
       <p className="empty-state">Cloud changes are never applied automatically when both copies changed; conflicts require review.</p>
       <div className="settings-grid">
+        <label>
+          Desktop appearance
+          <select value={settings.themeMode === "dark" ? "dark" : "light"} onChange={(e) => onThemeModeChange(e.target.value as ThemeMode)}>
+            <option value="light">Light desktop (default)</option>
+            <option value="dark">CRT desktop</option>
+          </select>
+          <span className="settings-help">Light uses toasted-cream windows. CRT uses deep brown-black windows with warm orange accents.</span>
+        </label>
         <label>
           Sync interval (seconds)
           <input

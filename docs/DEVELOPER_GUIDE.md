@@ -161,7 +161,7 @@ Snapshots are independent from cloud revisions. `snapshots.Service` supports man
 
 `app/src/App.tsx` is the stateful coordinator. It owns navigation, refresh timers, toast/error handling, dialogs, and calls to `api.ts`. Views are mostly presentational and receive callbacks/typed state.
 
-The UI uses the fixed Cypherpunk visual system: Lime `#D7FF4E` page background, Beige `#ECE6D6` raised surfaces, Ink `#131310` 2px borders, sharp 2px corners, and JetBrains Mono-style display text. Do not add gradients, shadows, rounded pills, tinted neutral backgrounds, or a conventional light/dark switch; the single visual mode is deliberate.
+The UI uses the Nostalgia visual system. Light mode is the default: toasted-cream desktop `#FFEEDD`, warm window bodies `#F6E6D6`, espresso headings `#381C00`, taupe `#C7AE8E` hairlines, and orange `#D94A00` primary actions. Every major content block is a bordered desktop-style window with a labeled title bar, decorative control dots, a 3px radius, and a directional warm shadow. Use serif faces only for page headings and mono for system data. The Settings view persists the explicit Light desktop or opt-in CRT desktop palette (`#1E140C` / `#2A1C12`) through `Settings.ThemeMode`; the selected palette previews immediately and is stored when the settings form is saved. Do not add pills, glass, blur-heavy shadows, or gradients outside chart area fills.
 
 Key UI flows:
 

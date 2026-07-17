@@ -34,7 +34,7 @@ export function BackupView(props: BackupViewProps) {
   } = props;
 
   return (
-    <section className="panel split">
+    <section className="panel split" data-window-title="ZIP.TRANSFER">
       <div className="backup-pane">
         <h2>Export ZIP</h2>
         <label>

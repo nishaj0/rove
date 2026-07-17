@@ -15,7 +15,7 @@ export function HomeView(props: HomeViewProps) {
 
   return (
     <>
-      <section className="panel home-hero">
+      <section className="panel home-hero" data-window-title="WELCOME.TXT">
         <p className="home-kicker">{HOME_KICKER_LABEL}</p>
         <h1 className="home-title">Manage your save library</h1>
         <p className="home-subtitle">Track saves, launch a game profile, and handle backup import or export from one place.</p>
@@ -25,12 +25,12 @@ export function HomeView(props: HomeViewProps) {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel" data-window-title="SYNC.STATUS">
         <div className="panel-head"><h2>Cloud Sync</h2><span className={`state-text ${status?.syncConfigured ? "success" : "warning"}`}>{status?.syncConfigured ? "Ready" : "Setup needed"}</span></div>
         <p className="empty-state">{status?.syncConfigured ? `Last completed: ${status.lastSyncTime ? new Date(status.lastSyncTime).toLocaleString() : "Not yet"}. ${status.pending} request${status.pending === 1 ? "" : "s"} pending.` : "Choose a synced folder in Settings. Your existing local backups remain unchanged."}</p>
       </section>
 
-      <section className="panel">
+      <section className="panel" data-window-title="RECENT.GAMES">
         <div className="panel-head">
           <h2>Recent Games</h2>
           <button className="btn" onClick={onOpenLibrary} type="button">See all</button>

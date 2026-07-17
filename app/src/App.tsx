@@ -398,6 +398,8 @@ export default function App() {
     return games.find((game) => game.id === selectedGameId) ?? null;
   }, [games, selectedGameId]);
 
+  const nostalgiaDarkMode = settings.themeMode === "dark";
+
   const currentViewTitle = useMemo(() => {
     if (activeView === "game" && selectedGame) {
       return selectedGame.name;
@@ -723,7 +725,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" data-theme={nostalgiaDarkMode ? "dark" : "light"}>
       <aside className="sidebar">
         <div className="sidebar-brand">
           <strong>Cloud//Saver</strong>
@@ -867,6 +869,7 @@ export default function App() {
         {activeView === "settings" ? (
           <SettingsView
             settings={settings}
+            onThemeModeChange={(value) => setSettings((s) => ({ ...s, themeMode: value }))}
             onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}

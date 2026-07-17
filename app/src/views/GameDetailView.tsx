@@ -120,7 +120,7 @@ export function GameDetailView(props: GameDetailViewProps) {
 
   if (!game) {
     return (
-      <section className="panel">
+      <section className="panel" data-window-title="MISSING.GAME">
         <h2>Game Not Found</h2>
         <p className="empty-state">This game no longer exists. Return to Games to pick another one.</p>
         <button className="btn nav-back" onClick={onBack} type="button"><span aria-hidden="true">&#8592;</span> Back to Games</button>
@@ -130,7 +130,7 @@ export function GameDetailView(props: GameDetailViewProps) {
 
   return (
     <>
-      <section className="panel game-detail-head">
+      <section className="panel game-detail-head" data-window-title="GAME.PROFILE">
         <div className="game-detail-nav">
           <button className="btn nav-back" onClick={onBack} type="button"><span aria-hidden="true">&#8592;</span> Back to Games</button>
         </div>
@@ -154,7 +154,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         </div>
       </section>
 
-      <section className="panel split">
+      <section className="panel split" data-window-title="TRANSFER.UTILITY">
         <div className="backup-pane">
           <h2>Export Save</h2>
           <label>
@@ -210,7 +210,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel" data-window-title="BACKUP.POLICY">
         <h2>Auto Backup Policy</h2>
         <div className="backup-policy-grid">
           <label className="inline-check">
@@ -288,7 +288,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         ) : null}
       </section>
 
-      <section className="panel">
+      <section className="panel" data-window-title="SNAPSHOT.ARCHIVE">
         <div className="panel-head">
           <h2>Snapshots</h2>
           <button className="btn primary" onClick={onSaveSnapshotNow} type="button" disabled={!snapshotVaultConfigured}>Save Now</button>
@@ -328,13 +328,13 @@ export function GameDetailView(props: GameDetailViewProps) {
         )}
       </section>
 
-      {syncConflicts.length > 0 ? <section className="panel">
+      {syncConflicts.length > 0 ? <section className="panel" data-window-title="CONFLICT.REVIEW">
         <h2>Sync conflicts need review</h2>
         <p className="empty-state">No save is overwritten until you choose a resolution.</p>
         <ul className="snapshot-list">{syncConflicts.map((conflict) => <li className="snapshot-row" key={conflict.id}><div className="snapshot-main"><p><strong>{conflict.path}</strong></p><p className="snapshot-meta">Local {conflict.localHash.slice(0, 8)} · Remote {conflict.remoteHash.slice(0, 8)}</p></div><div className="snapshot-actions"><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "local")} type="button">Keep local</button><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "remote")} type="button">Use remote</button><button className="btn primary" onClick={() => onResolveSyncConflict(conflict.id, "both")} type="button">Keep both</button></div></li>)}</ul>
       </section> : null}
 
-      <section className="panel">
+      <section className="panel" data-window-title="BACKUP.HISTORY">
         <h2>Local Backup History</h2>
         {backupHistory.length === 0 ? (
           <p className="empty-state">No automatic backups yet.</p>
@@ -354,7 +354,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         )}
       </section>
 
-      <section className="panel">
+      <section className="panel" data-window-title="COVER.ART">
         <h2>Cover Image</h2>
         <label className="file-input-wrap">
           <span>Upload image</span>

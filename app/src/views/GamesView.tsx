@@ -52,7 +52,7 @@ export function GamesView(props: GamesViewProps) {
 
   return (
     <>
-      <section className="library-shell">
+      <section className="library-shell" data-window-title="GAMES.LIBRARY">
         <div className="library-toolbar">
           <label className="library-search">
             <span aria-hidden="true">&#128269;</span>
