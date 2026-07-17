@@ -2,6 +2,8 @@
 
 Cloud Saver is a Windows desktop app for tracking, backing up, and safely synchronizing game save folders. It is designed for games without dependable built-in cloud saves, including custom installs and non-store games.
 
+For step-by-step help, see the [user guide](docs/USER_GUIDE.md). Contributors should start with the [developer guide](docs/DEVELOPER_GUIDE.md).
+
 ## What it does
 
 - Tracks arbitrary game save folders and launches configured game executables.
