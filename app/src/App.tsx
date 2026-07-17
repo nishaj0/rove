@@ -13,7 +13,6 @@ import { HomeView } from "./views/HomeView";
 import { SettingsView } from "./views/SettingsView";
 
 type View = "home" | "games" | "game" | "activity" | "settings";
-type EffectiveTheme = "dark" | "light";
 
 type NavSnapshot = {
   view: View;
@@ -36,13 +35,6 @@ const viewTitle: Record<View, string> = {
   activity: "Activity",
   settings: "Settings",
 };
-
-function resolveTheme(mode: Settings["themeMode"]): EffectiveTheme {
-  if (mode === "dark" || mode === "light") {
-    return mode;
-  }
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
 
 function NavIcon({ view }: { view: View }) {
   if (view === "home") {
@@ -399,29 +391,6 @@ export default function App() {
     }
   }, [activeView, games, selectedGameId]);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", resolveTheme(settings.themeMode));
-  }, [settings.themeMode]);
-
-  useEffect(() => {
-    if (settings.themeMode !== "system") {
-      return;
-    }
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      document.documentElement.setAttribute("data-theme", mediaQuery.matches ? "dark" : "light");
-    };
-
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", handleChange);
-      return () => mediaQuery.removeEventListener("change", handleChange);
-    }
-
-    mediaQuery.addListener(handleChange);
-    return () => mediaQuery.removeListener(handleChange);
-  }, [settings.themeMode]);
-
   const selectedGame = useMemo(() => {
     if (!selectedGameId) {
       return null;
@@ -489,23 +458,6 @@ export default function App() {
       setSettings(saved);
       setToast("Settings saved");
     } catch (err) {
-      setError(toFriendlyError(err));
-    }
-  }
-
-  async function onThemeModeChange(value: Settings["themeMode"]) {
-    const previous = settings.themeMode;
-    if (previous === value) {
-      return;
-    }
-
-    setSettings((s) => ({ ...s, themeMode: value }));
-
-    try {
-      const saved = await api.saveSettings({ ...settings, games, themeMode: value });
-      setSettings(saved);
-    } catch (err) {
-      setSettings((s) => ({ ...s, themeMode: previous }));
       setError(toFriendlyError(err));
     }
   }
@@ -773,9 +725,14 @@ export default function App() {
   return (
     <div className="app-layout">
       <aside className="sidebar">
+        <div className="sidebar-brand">
+          <strong>Cloud//Saver</strong>
+          <span>save-state console</span>
+        </div>
         <nav className="side-nav">
           {navItems.map((item) => {
             const isActive = activeView === item.id || (item.id === "games" && activeView === "game");
+            const count = item.id === "games" ? games.length : item.id === "activity" ? syncConflicts.length : 0;
             return (
             <button
               key={item.id}
@@ -787,10 +744,16 @@ export default function App() {
                 <NavIcon view={item.id} />
               </span>
               <span className="side-label">{item.label}</span>
+              {count > 0 ? <span className="nav-count">{count}</span> : null}
             </button>
             );
           })}
         </nav>
+        <div className="sidebar-status">
+          <span>Cloud link</span>
+          <strong>{status?.syncConfigured ? "armed" : "unconfigured"}</strong>
+          {status?.lastError ? <span>fault recorded</span> : <span>no current fault</span>}
+        </div>
       </aside>
 
       <main className="main-panel">
@@ -905,7 +868,6 @@ export default function App() {
           <SettingsView
             settings={settings}
             onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
-            onThemeModeChange={(value) => void onThemeModeChange(value)}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
             onBrowseSnapshotVault={() => void onBrowseSnapshotVault()}

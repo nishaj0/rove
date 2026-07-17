@@ -1,9 +1,8 @@
-import type { Settings, ThemeMode } from "../types";
+import type { Settings } from "../types";
 
 type SettingsViewProps = {
   settings: Settings;
   onSyncIntervalChange: (value: number) => void;
-  onThemeModeChange: (value: ThemeMode) => void;
   onAutostartChange: (value: boolean) => void;
   onIgnorePatternsChange: (value: string[]) => void;
   onBrowseSnapshotVault: () => void;
@@ -21,7 +20,6 @@ export function SettingsView(props: SettingsViewProps) {
   const {
     settings,
     onSyncIntervalChange,
-    onThemeModeChange,
     onAutostartChange,
     onIgnorePatternsChange,
     onBrowseSnapshotVault,
@@ -48,17 +46,6 @@ export function SettingsView(props: SettingsViewProps) {
             value={settings.syncIntervalSeconds}
             onChange={(e) => onSyncIntervalChange(Number(e.target.value))}
           />
-        </label>
-        <label>
-          Theme
-          <select
-            value={settings.themeMode}
-            onChange={(e) => onThemeModeChange(e.target.value as ThemeMode)}
-          >
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-            <option value="system">Auto (System)</option>
-          </select>
         </label>
         <label className="inline-check">
           <input

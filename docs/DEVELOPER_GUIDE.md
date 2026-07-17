@@ -161,6 +161,8 @@ Snapshots are independent from cloud revisions. `snapshots.Service` supports man
 
 `app/src/App.tsx` is the stateful coordinator. It owns navigation, refresh timers, toast/error handling, dialogs, and calls to `api.ts`. Views are mostly presentational and receive callbacks/typed state.
 
+The UI uses the fixed Cypherpunk visual system: Lime `#D7FF4E` page background, Beige `#ECE6D6` raised surfaces, Ink `#131310` 2px borders, sharp 2px corners, and JetBrains Mono-style display text. Do not add gradients, shadows, rounded pills, tinted neutral backgrounds, or a conventional light/dark switch; the single visual mode is deliberate.
+
 Key UI flows:
 
 - Settings chooses `syncRoot` and saves all settings through `POST /settings`.
