@@ -22,6 +22,8 @@ import {
   normalizeSettings,
   normalizeSnapshots,
   normalizeStatus,
+  normalizeSyncJobs,
+  normalizeSyncConflicts,
 } from "./api/parsers";
 import { BACKEND_BASE_URL } from "./constants/network";
 
@@ -82,15 +84,15 @@ export const api = {
     });
   },
   triggerSync() {
-    return request<{ status: string }>("/sync", { method: "POST" });
+    return request<{ status: string; jobId: string }>("/sync", { method: "POST" });
   },
   syncGame(payload: SyncGameRequest) {
-    return request<{ status: string }>("/games/sync", {
+    return request<{ status: string; jobId: string }>("/games/sync", {
       method: "POST",
       body: JSON.stringify(payload),
     }).catch((error: unknown) => {
       if (error instanceof Error && (/^(404|405)\b/.test(error.message) || /method not allowed/i.test(error.message))) {
-        return request<{ status: string }>("/sync/game", {
+        return request<{ status: string; jobId: string }>("/sync/game", {
           method: "POST",
           body: JSON.stringify(payload),
         });
@@ -155,6 +157,20 @@ export const api = {
   async getBackupHistory(gameId: string, limit = 20): Promise<BackupHistoryEntry[]> {
     const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
     return normalizeBackupHistory(payload);
+  },
+  linkGameToCloud(payload: { gameId: string; syncId: string }) {
+    return request<Game>("/games/pair", { method: "POST", body: JSON.stringify(payload) });
+  },
+  async getSyncJobs(gameId?: string) {
+    const payload = await request<unknown>(`/sync/jobs${gameId ? `?gameId=${encodeURIComponent(gameId)}` : ""}`);
+    return normalizeSyncJobs(payload);
+  },
+  async getSyncConflicts(gameId: string) {
+    const payload = await request<unknown>(`/sync/conflicts?gameId=${encodeURIComponent(gameId)}`);
+    return normalizeSyncConflicts(payload);
+  },
+  resolveSyncConflict(id: string, action: "local" | "remote" | "both") {
+    return request<{ status: string }>("/sync/conflicts", { method: "POST", body: JSON.stringify({ id, action }) });
   },
   async getSnapshots(gameId: string): Promise<SnapshotSummary[]> {
     const payload = await request<unknown>(`/snapshots?gameId=${encodeURIComponent(gameId)}`);

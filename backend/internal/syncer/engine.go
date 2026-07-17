@@ -3,58 +3,41 @@ package syncer
 import (
 	"context"
 	"fmt"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/google/uuid"
 
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
 )
 
-// stores lightweight metadata used for change detection.
-type fileFingerprint struct {
-	ModTime int64
-	Size    int64
-}
+type syncTrigger struct{ reason, gameID, jobID string }
 
-// carries queue metadata for manual, watcher, or interval requests.
-type syncTrigger struct {
-	reason string
-	gameID string
-}
-
-// schedules sync cycles and tracks runtime status.
+// Engine serializes reconciliation work, coalesces watcher bursts, and retains
+// a bounded in-memory job history for the local UI.
 type Engine struct {
-	cfg     *config.Manager
-	logs    *logstore.Store
-	debug   bool
-	mu      sync.RWMutex
-	status  models.Status
-	trigger chan syncTrigger
-	tracked map[string]fileFingerprint
-	pending atomic.Int64
-	started atomic.Bool
-	running atomic.Bool
-	paused  atomic.Bool
+	cfg      *config.Manager
+	logs     *logstore.Store
+	debug    bool
+	mu       sync.RWMutex
+	status   models.Status
+	trigger  chan syncTrigger
+	pending  atomic.Int64
+	started  atomic.Bool
+	running  atomic.Bool
+	paused   atomic.Bool
+	jobsMu   sync.RWMutex
+	jobs     map[string]models.SyncJob
+	jobOrder []string
 }
 
-// constructs an engine bound to config and sqlite log storage.
 func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
-	return &Engine{
-		cfg:     cfg,
-		logs:    logs,
-		debug:   debug,
-		trigger: make(chan syncTrigger, 1),
-		tracked: make(map[string]fileFingerprint),
-	}
+	return &Engine{cfg: cfg, logs: logs, debug: debug, trigger: make(chan syncTrigger, 1), jobs: make(map[string]models.SyncJob)}
 }
 
-// launches the background loop and marks engine as running.
 func (e *Engine) Start(ctx context.Context) {
 	if !e.started.CompareAndSwap(false, true) {
 		e.Resume()
@@ -66,16 +49,12 @@ func (e *Engine) Start(ctx context.Context) {
 	_ = e.logs.Write("info", "sync", "sync engine started")
 	go e.loop(ctx)
 }
-
-// pauses sync execution without tearing down the loop goroutine.
 func (e *Engine) Stop() {
 	e.paused.Store(true)
 	e.running.Store(false)
 	e.setRunning(false)
 	_ = e.logs.Write("info", "sync", "sync engine paused")
 }
-
-// re-enables sync processing and enqueues a catch-up cycle.
 func (e *Engine) Resume() {
 	e.paused.Store(false)
 	e.running.Store(true)
@@ -84,197 +63,169 @@ func (e *Engine) Resume() {
 	_ = e.logs.Write("info", "sync", "sync engine resumed")
 }
 
-// requests a full sync cycle and coalesces duplicate queue entries.
-func (e *Engine) Trigger(reason string) {
+func (e *Engine) Trigger(reason string) string { return e.enqueue("", reason) }
+func (e *Engine) TriggerGame(gameID, reason string) string {
+	if gameID == "" {
+		return ""
+	}
+	return e.enqueue(gameID, reason)
+}
+func (e *Engine) enqueue(gameID, reason string) string {
 	if reason == "" {
 		reason = TriggerReasonManual
 	}
-	// keep trigger queue bounded; a single queued run is enough.
+	job := models.SyncJob{ID: uuid.NewString(), GameID: gameID, Reason: reason, State: "queued"}
+	e.storeJob(job)
 	select {
-	case e.trigger <- syncTrigger{reason: reason}:
+	case e.trigger <- syncTrigger{reason: reason, gameID: gameID, jobID: job.ID}:
 	default:
+		// A later full reconciliation makes an extra watcher job redundant.
+		e.updateJob(job.ID, func(j *models.SyncJob) { j.State = "coalesced"; j.FinishedAt = time.Now().UTC() })
 	}
+	return job.ID
 }
 
-// requests a game-scoped sync cycle when a specific game changes.
-func (e *Engine) TriggerGame(gameID, reason string) {
-	if gameID == "" {
-		return
-	}
-	if reason == "" {
-		reason = TriggerReasonManualGame
-	}
-	select {
-	case e.trigger <- syncTrigger{reason: reason, gameID: gameID}:
-	default:
-	}
-}
-
-// increments pending count and nudges the engine via watcher reason.
-func (e *Engine) NotifyFileEvent(_ string) {
-	e.pending.Add(1)
-	e.Trigger(TriggerReasonWatcher)
-}
-
-// returns an immutable snapshot for /status responses.
+func (e *Engine) NotifyFileEvent(_ string) { e.pending.Add(1); e.Trigger(TriggerReasonWatcher) }
 func (e *Engine) Status() models.Status {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
-	copy := e.status
-	copy.Pending = int(e.pending.Load())
-	return copy
+	value := e.status
+	value.Pending = int(e.pending.Load())
+	value.SyncConfigured = e.cfg.Get().SyncRoot != ""
+	return value
+}
+func (e *Engine) Jobs(gameID string) []models.SyncJob {
+	e.jobsMu.RLock()
+	defer e.jobsMu.RUnlock()
+	result := make([]models.SyncJob, 0, len(e.jobOrder))
+	for i := len(e.jobOrder) - 1; i >= 0; i-- {
+		job := e.jobs[e.jobOrder[i]]
+		if gameID == "" || job.GameID == gameID {
+			result = append(result, job)
+		}
+	}
+	return result
 }
 
-// waits for interval ticks or trigger events and runs one cycle per request.
 func (e *Engine) loop(ctx context.Context) {
 	for {
 		settings := e.cfg.Get()
 		interval := time.Duration(settings.SyncIntervalSeconds) * time.Second
 		timer := time.NewTimer(interval)
-
 		select {
 		case <-ctx.Done():
 			timer.Stop()
 			e.Stop()
 			return
 		case req := <-e.trigger:
-			// consume queued trigger immediately and skip waiting for timer tick.
 			timer.Stop()
-			e.runOnce(req.reason, req.gameID)
+			e.runOnce(req)
 		case <-timer.C:
-			e.runOnce(TriggerReasonInterval, "")
+			e.runOnce(syncTrigger{reason: TriggerReasonInterval, jobID: e.newScheduledJob()})
 		}
 	}
 }
+func (e *Engine) newScheduledJob() string { return e.enqueueNoQueue("", TriggerReasonInterval) }
+func (e *Engine) enqueueNoQueue(gameID, reason string) string {
+	job := models.SyncJob{ID: uuid.NewString(), GameID: gameID, Reason: reason, State: "queued"}
+	e.storeJob(job)
+	return job.ID
+}
 
-// performs one sync pass, optionally scoped to a single game id.
-func (e *Engine) runOnce(reason, targetGameID string) {
+func (e *Engine) runOnce(req syncTrigger) {
 	if e.paused.Load() {
 		return
 	}
-	start := time.Now()
 	settings := e.cfg.Get()
+	e.updateJob(req.jobID, func(job *models.SyncJob) { job.State = "running"; job.StartedAt = time.Now().UTC() })
+	if settings.SyncRoot == "" {
+		e.updateJob(req.jobID, func(job *models.SyncJob) {
+			job.State = "skipped"
+			job.FinishedAt = time.Now().UTC()
+			job.Error = "Choose a sync folder in Settings to enable cloud sync."
+		})
+		return
+	}
 	games := settings.Games
-	if targetGameID != "" {
+	if req.gameID != "" {
 		games = nil
 		for _, game := range settings.Games {
-			if game.ID == targetGameID {
+			if game.ID == req.gameID {
 				games = append(games, game)
 				break
 			}
 		}
 		if len(games) == 0 {
-			e.noteError("sync", fmt.Sprintf("sync target game not found: %s", targetGameID))
+			e.finishJob(req.jobID, "failed", 0, 0, nil, "sync target game not found")
 			return
 		}
 	}
 	changed := 0
-	e.setLastError("")
-	if e.debug {
-		scope := "all"
-		if targetGameID != "" {
-			scope = "game=" + targetGameID
-		}
-		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle start: reason=%s scope=%s games=%d", reason, scope, len(games)))
-	}
-
-	// detect changes by comparing mtime+size fingerprints so edits and rewrites are both captured.
+	var bytes int64
+	conflictIDs := []string{}
 	for _, game := range games {
-		root := game.Path
-		_ = filepath.WalkDir(game.Path, func(path string, d fs.DirEntry, walkErr error) error {
-			if walkErr != nil {
-				e.noteError("sync", fmt.Sprintf("scan failed for %s: %v", root, walkErr))
-				return nil
-			}
-			if d.IsDir() {
-				if shouldIgnore(path, settings.IgnorePatterns) {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if shouldIgnore(path, settings.IgnorePatterns) {
-				return nil
-			}
-
-			info, err := d.Info()
-			if err != nil {
-				e.noteError("sync", fmt.Sprintf("file info failed for %s: %v", path, err))
-				return nil
-			}
-			key := game.ID + "::" + path
-			fp := fileFingerprint{ModTime: info.ModTime().UnixNano(), Size: info.Size()}
-
-			e.mu.Lock()
-			// track fingerprints per game to avoid collisions for same filename across libraries.
-			prev, ok := e.tracked[key]
-			if !ok || prev != fp {
-				e.tracked[key] = fp
-				changed++
-			}
-			e.mu.Unlock()
-			return nil
-		})
-	}
-
-	if changed > 0 {
-		if targetGameID != "" {
-			_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s, game=%s): %d file(s) changed", reason, targetGameID, changed))
-		} else {
-			_ = e.logs.Write("info", "sync", fmt.Sprintf("sync cycle (%s): %d file(s) changed", reason, changed))
+		result, err := Reconcile(game, settings, e.logs)
+		if err != nil {
+			e.noteError("sync", fmt.Sprintf("sync %s failed: %v", game.Name, err))
+			e.finishJob(req.jobID, "failed", changed, bytes, conflictIDs, err.Error())
+			return
 		}
-	} else if e.debug {
-		if targetGameID != "" {
-			_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s, game=%s): no file changes", reason, targetGameID))
-		} else {
-			_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle (%s): no file changes", reason))
-		}
+		changed += result.ChangedFiles
+		bytes += result.Bytes
+		conflictIDs = append(conflictIDs, result.ConflictIDs...)
 	}
-
-	if targetGameID == "" {
-		e.pending.Store(0)
+	state := "completed"
+	if len(conflictIDs) > 0 {
+		state = "conflict"
 	}
+	e.finishJob(req.jobID, state, changed, bytes, conflictIDs, "")
+	e.pending.Store(0)
 	e.mu.Lock()
-	e.status.LastSyncTime = start.UTC()
+	e.status.LastSyncTime = time.Now().UTC()
+	e.status.LastError = ""
 	e.mu.Unlock()
-}
-
-// updates status atomically under engine mutex.
-func (e *Engine) setRunning(value bool) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	e.status.Running = value
-}
-
-// stores latest sync error in status snapshot.
-func (e *Engine) setLastError(msg string) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	e.status.LastError = msg
-}
-
-// records a sync error and updates status state.
-func (e *Engine) noteError(event, msg string) {
-	e.setLastError(msg)
-	_ = e.logs.Write("error", event, msg)
-}
-
-// evaluates filename and path patterns from configured ignore rules.
-func shouldIgnore(path string, patterns []string) bool {
-	name := filepath.Base(path)
-	for _, pattern := range patterns {
-		p := strings.TrimSpace(pattern)
-		if p == "" {
-			continue
-		}
-		if strings.EqualFold(name, p) {
-			return true
-		}
-		if matched, _ := filepath.Match(p, name); matched {
-			return true
-		}
-		if strings.Contains(strings.ToLower(path), strings.ToLower(string(os.PathSeparator)+p+string(os.PathSeparator))) {
-			return true
-		}
+	if e.debug {
+		_ = e.logs.Write("debug", "sync", fmt.Sprintf("sync cycle %s: %d files, %d bytes", req.reason, changed, bytes))
 	}
-	return false
+}
+
+func (e *Engine) finishJob(id, state string, changed int, bytes int64, conflicts []string, message string) {
+	e.updateJob(id, func(job *models.SyncJob) {
+		job.State = state
+		job.FinishedAt = time.Now().UTC()
+		job.ChangedFiles = changed
+		job.Bytes = bytes
+		job.ConflictIDs = conflicts
+		job.Error = message
+	})
+}
+func (e *Engine) storeJob(job models.SyncJob) {
+	e.jobsMu.Lock()
+	defer e.jobsMu.Unlock()
+	e.jobs[job.ID] = job
+	e.jobOrder = append(e.jobOrder, job.ID)
+	if len(e.jobOrder) > 100 {
+		delete(e.jobs, e.jobOrder[0])
+		e.jobOrder = e.jobOrder[1:]
+	}
+}
+func (e *Engine) updateJob(id string, edit func(*models.SyncJob)) {
+	if id == "" {
+		return
+	}
+	e.jobsMu.Lock()
+	defer e.jobsMu.Unlock()
+	job, ok := e.jobs[id]
+	if !ok {
+		return
+	}
+	edit(&job)
+	e.jobs[id] = job
+}
+func (e *Engine) setRunning(value bool) { e.mu.Lock(); defer e.mu.Unlock(); e.status.Running = value }
+func (e *Engine) noteError(event, msg string) {
+	e.mu.Lock()
+	e.status.LastError = msg
+	e.mu.Unlock()
+	_ = e.logs.Write("error", event, msg)
 }

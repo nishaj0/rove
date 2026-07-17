@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
+
+	"github.com/google/uuid"
 
 	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/models"
@@ -124,6 +127,9 @@ func DefaultSettings() models.Settings {
 		SnapshotOnExit:          true,
 		SnapshotPeriodic:        false,
 		SnapshotIntervalMinutes: defaultSnapshotIntervalMins,
+		DeviceID:                uuid.NewString(),
+		SyncRetention:           10,
+		ReviewConflicts:         true,
 		Games:                   []models.Game{},
 	}
 }
@@ -165,6 +171,12 @@ func (m *Manager) Update(next models.Settings) error {
 	if next.SnapshotIntervalMinutes < minSnapshotIntervalMins || next.SnapshotIntervalMinutes > maxSnapshotIntervalMins {
 		return fmt.Errorf("snapshot interval must be between %d and %d minutes", minSnapshotIntervalMins, maxSnapshotIntervalMins)
 	}
+	if strings.TrimSpace(next.DeviceID) == "" {
+		return errors.New("device id is required")
+	}
+	if next.SyncRetention < 1 || next.SyncRetention > 50 {
+		return errors.New("sync retention must be between 1 and 50")
+	}
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -179,6 +191,10 @@ func (m *Manager) Update(next models.Settings) error {
 	m.settings.SnapshotOnExit = next.SnapshotOnExit
 	m.settings.SnapshotPeriodic = next.SnapshotPeriodic
 	m.settings.SnapshotIntervalMinutes = next.SnapshotIntervalMinutes
+	m.settings.SyncRoot = next.SyncRoot
+	m.settings.DeviceID = next.DeviceID
+	m.settings.SyncRetention = next.SyncRetention
+	m.settings.ReviewConflicts = next.ReviewConflicts
 	return m.saveLocked()
 }
 
@@ -260,8 +276,26 @@ func normalizeSettings(settings *models.Settings) bool {
 		settings.SnapshotIntervalMinutes = defaults.SnapshotIntervalMinutes
 		changed = true
 	}
+	if strings.TrimSpace(settings.DeviceID) == "" {
+		settings.DeviceID = uuid.NewString()
+		changed = true
+	}
+	if settings.SyncRetention < 1 || settings.SyncRetention > 50 {
+		settings.SyncRetention = 10
+		changed = true
+	}
+	if !settings.ReviewConflicts {
+		// This migration intentionally favours data safety over legacy automatic
+		// policies. New sync installations always require review.
+		settings.ReviewConflicts = true
+		changed = true
+	}
 	for i := range settings.Games {
 		if normalizeBackupPolicy(&settings.Games[i].BackupPolicy) {
+			changed = true
+		}
+		if strings.TrimSpace(settings.Games[i].SyncID) == "" {
+			settings.Games[i].SyncID = uuid.NewString()
 			changed = true
 		}
 	}

@@ -5,7 +5,7 @@ import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
 import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import { type AppUpdateInfo, checkForAppUpdate } from "./update";
-import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, DebugInfo, Game, LogEntry, Settings, SnapshotSummary, Status } from "./types";
+import type { BackupHistoryEntry, BackupPolicy, DebugInfo, Game, LogEntry, Settings, SnapshotSummary, Status, SyncConflict, SyncJob } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -97,6 +97,8 @@ export default function App() {
   const [canGoForward, setCanGoForward] = useState(false);
 
   const [status, setStatus] = useState<Status | null>(null);
+  const [syncJobs, setSyncJobs] = useState<SyncJob[]>([]);
+  const [syncConflicts, setSyncConflicts] = useState<SyncConflict[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [settings, setSettings] = useState<Settings>(() => newDefaultSettings());
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -217,6 +219,13 @@ export default function App() {
     }
   }
 
+  async function onBrowseSyncRoot() {
+    try {
+      const selected = await pickFolder(settings.syncRoot || undefined);
+      if (selected) setSettings((current) => ({ ...current, syncRoot: selected }));
+    } catch (err) { setError(toFriendlyError(err)); }
+  }
+
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
@@ -228,8 +237,10 @@ export default function App() {
   async function refreshGamesData() {
     try {
       setError("");
-      const nextGames = await api.getGames();
+      const [nextGames, nextStatus, nextJobs] = await Promise.all([api.getGames(), api.getStatus(), api.getSyncJobs()]);
       setGames(nextGames);
+      setStatus(nextStatus);
+      setSyncJobs(nextJobs);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -238,13 +249,15 @@ export default function App() {
   async function refreshActivityData() {
     try {
       setError("");
-      const [nextStatus, nextLogs] = await Promise.all([
+      const [nextStatus, nextLogs, nextJobs] = await Promise.all([
         api.getStatus(),
         api.getRecentLogs(25),
+        api.getSyncJobs(),
       ]);
       const nextDebugInfo = await api.getDebugInfo().catch(() => null);
       setStatus(nextStatus);
       setLogs(nextLogs);
+      setSyncJobs(nextJobs);
       setDebugInfo(nextDebugInfo);
     } catch (e) {
       setError(toFriendlyError(e));
@@ -276,6 +289,11 @@ export default function App() {
     } catch (e) {
       setError(toFriendlyError(e));
     }
+  }
+
+  async function refreshSyncConflicts(gameID: string) {
+    if (!gameID) { setSyncConflicts([]); return; }
+    try { setSyncConflicts(await api.getSyncConflicts(gameID)); } catch (e) { setError(toFriendlyError(e)); }
   }
 
   async function loadInitialData() {
@@ -345,11 +363,13 @@ export default function App() {
 
     void refreshBackupHistory(selectedGameId);
     void refreshSnapshots(selectedGameId);
+    void refreshSyncConflicts(selectedGameId);
     const backupTimer = window.setInterval(() => {
       void refreshBackupHistory(selectedGameId);
     }, BACKUP_HISTORY_REFRESH_INTERVAL_MS);
     const snapshotTimer = window.setInterval(() => {
       void refreshSnapshots(selectedGameId);
+      void refreshSyncConflicts(selectedGameId);
     }, SNAPSHOT_REFRESH_INTERVAL_MS);
 
     return () => {
@@ -492,8 +512,8 @@ export default function App() {
 
   async function onTriggerSync() {
     try {
-      await api.triggerSync();
-      setToast("Global sync queued");
+      const result = await api.triggerSync();
+      setToast(`Global sync queued (${result.jobId.slice(0, 8)})`);
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -505,8 +525,8 @@ export default function App() {
       return;
     }
     try {
-      await api.syncGame({ gameId: selectedGame.id });
-      setToast("Game sync queued");
+      const result = await api.syncGame({ gameId: selectedGame.id });
+      setToast(`Game sync queued (${result.jobId.slice(0, 8)})`);
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -655,6 +675,20 @@ export default function App() {
     }
   }
 
+  async function onResolveSyncConflict(id: string, action: "local" | "remote" | "both") {
+    if (!selectedGame) return;
+    const confirmed = window.confirm(`Resolve this conflict by ${action === "local" ? "keeping your local save" : action === "remote" ? "using the remote save" : "keeping both saves"}?`);
+    if (!confirmed) return;
+    try { await api.resolveSyncConflict(id, action); setToast("Sync conflict resolved"); await Promise.all([refreshSyncConflicts(selectedGame.id), refreshGamesData()]); } catch (err) { setError(toFriendlyError(err)); }
+  }
+
+  async function onLinkCloudGame() {
+    if (!selectedGame) return;
+    const syncId = window.prompt("Paste the Cloud game ID from your other computer.", selectedGame.syncId ?? "");
+    if (!syncId?.trim()) return;
+    try { await api.linkGameToCloud({ gameId: selectedGame.id, syncId: syncId.trim() }); setToast("Cloud game linked"); await refreshGamesData(); } catch (err) { setError(toFriendlyError(err)); }
+  }
+
   function openGame(gameId: string) {
     setExportPath("");
     setImportPath("");
@@ -796,6 +830,7 @@ export default function App() {
             onOpenActivity={() => pushNavigation("activity")}
             onOpenGame={openGame}
             initials={initials}
+            status={status}
           />
         ) : null}
 
@@ -847,6 +882,11 @@ export default function App() {
             safeDateTime={safeDateTime}
             formatBytes={formatBytes}
             formatSnapshotTrigger={formatSnapshotTrigger}
+            syncJob={syncJobs.find((job) => job.gameId === selectedGameId) ?? null}
+            syncConfigured={status?.syncConfigured ?? settings.syncRoot.trim() !== ""}
+            syncConflicts={syncConflicts}
+            onResolveSyncConflict={(id, action) => void onResolveSyncConflict(id, action)}
+            onLinkCloudGame={() => void onLinkCloudGame()}
           />
         ) : null}
 
@@ -865,11 +905,13 @@ export default function App() {
           <SettingsView
             settings={settings}
             onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
-            onConflictPolicyChange={(value: ConflictPolicy) => setSettings((s) => ({ ...s, conflictPolicy: value }))}
             onThemeModeChange={(value) => void onThemeModeChange(value)}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
             onBrowseSnapshotVault={() => void onBrowseSnapshotVault()}
+            onBrowseSyncRoot={() => void onBrowseSyncRoot()}
+            onSyncRootChange={(value) => setSettings((s) => ({ ...s, syncRoot: value }))}
+            onSyncRetentionChange={(value) => setSettings((s) => ({ ...s, syncRetention: value }))}
             onSnapshotMaxPerGameChange={(value) => setSettings((s) => ({ ...s, snapshotMaxPerGame: value }))}
             onSnapshotOnExitChange={(value) => setSettings((s) => ({ ...s, snapshotOnExit: value }))}
             onSnapshotPeriodicChange={(value) => setSettings((s) => ({ ...s, snapshotPeriodic: value }))}

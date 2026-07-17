@@ -98,11 +98,111 @@ CREATE TABLE IF NOT EXISTS backup_history (
 	status TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_backup_history_game_created ON backup_history(game_id, created_at DESC, id DESC);
+CREATE TABLE IF NOT EXISTS sync_state (
+  game_id TEXT PRIMARY KEY,
+  revision_id TEXT NOT NULL DEFAULT '',
+  manifest_json TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS sync_conflicts (
+  id TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL,
+  path TEXT NOT NULL,
+  local_hash TEXT NOT NULL,
+  remote_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  state TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sync_conflicts_game_state ON sync_conflicts(game_id, state, created_at DESC);
 `
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("migrate schema: %w", err)
 	}
 	return nil
+}
+
+// SyncState is the last fully reconciled manifest for a local game.
+type SyncState struct {
+	RevisionID   string
+	ManifestJSON string
+}
+
+func (s *Store) SyncState(gameID string) (SyncState, error) {
+	if gameID == "" {
+		return SyncState{}, nil
+	}
+	var state SyncState
+	err := s.db.QueryRow(`SELECT revision_id, manifest_json FROM sync_state WHERE game_id = ?`, gameID).Scan(&state.RevisionID, &state.ManifestJSON)
+	if err == sql.ErrNoRows {
+		return SyncState{}, nil
+	}
+	if err != nil {
+		return SyncState{}, fmt.Errorf("query sync state: %w", err)
+	}
+	return state, nil
+}
+
+func (s *Store) SaveSyncState(gameID, revisionID, manifestJSON string) error {
+	if gameID == "" {
+		return fmt.Errorf("sync state requires game id")
+	}
+	_, err := s.db.Exec(`
+INSERT INTO sync_state(game_id, revision_id, manifest_json, updated_at) VALUES (?, ?, ?, ?)
+ON CONFLICT(game_id) DO UPDATE SET revision_id = excluded.revision_id, manifest_json = excluded.manifest_json, updated_at = excluded.updated_at`,
+		gameID, revisionID, manifestJSON, time.Now().UTC().Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("save sync state: %w", err)
+	}
+	return nil
+}
+
+func (s *Store) CreateSyncConflict(conflict models.SyncConflict) error {
+	if conflict.ID == "" || conflict.GameID == "" || conflict.Path == "" {
+		return fmt.Errorf("sync conflict is incomplete")
+	}
+	if conflict.CreatedAt.IsZero() {
+		conflict.CreatedAt = time.Now().UTC()
+	}
+	if conflict.State == "" {
+		conflict.State = "open"
+	}
+	_, err := s.db.Exec(`INSERT OR REPLACE INTO sync_conflicts(id, game_id, path, local_hash, remote_hash, created_at, state) VALUES (?, ?, ?, ?, ?, ?, ?)`, conflict.ID, conflict.GameID, conflict.Path, conflict.LocalHash, conflict.RemoteHash, conflict.CreatedAt.Format(time.RFC3339), conflict.State)
+	return err
+}
+
+func (s *Store) SyncConflicts(gameID string) ([]models.SyncConflict, error) {
+	rows, err := s.db.Query(`SELECT id, game_id, path, local_hash, remote_hash, created_at, state FROM sync_conflicts WHERE game_id = ? AND state = 'open' ORDER BY created_at DESC`, gameID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []models.SyncConflict{}
+	for rows.Next() {
+		var value models.SyncConflict
+		var raw string
+		if err := rows.Scan(&value.ID, &value.GameID, &value.Path, &value.LocalHash, &value.RemoteHash, &raw, &value.State); err != nil {
+			return nil, err
+		}
+		value.CreatedAt, _ = time.Parse(time.RFC3339, raw)
+		result = append(result, value)
+	}
+	return result, rows.Err()
+}
+
+func (s *Store) SyncConflict(id string) (models.SyncConflict, error) {
+	var value models.SyncConflict
+	var raw string
+	err := s.db.QueryRow(`SELECT id, game_id, path, local_hash, remote_hash, created_at, state FROM sync_conflicts WHERE id = ?`, id).Scan(&value.ID, &value.GameID, &value.Path, &value.LocalHash, &value.RemoteHash, &raw, &value.State)
+	if err != nil {
+		return models.SyncConflict{}, err
+	}
+	value.CreatedAt, _ = time.Parse(time.RFC3339, raw)
+	return value, nil
+}
+
+func (s *Store) ResolveSyncConflict(id string) error {
+	_, err := s.db.Exec(`UPDATE sync_conflicts SET state = 'resolved' WHERE id = ?`, id)
+	return err
 }
 
 func (s *Store) Close() error {

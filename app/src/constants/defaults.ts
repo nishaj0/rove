@@ -19,6 +19,10 @@ export const DEFAULT_SETTINGS: Settings = {
   snapshotOnExit: true,
   snapshotPeriodic: false,
   snapshotIntervalMinutes: 15,
+  syncRoot: "",
+  deviceId: "",
+  syncRetention: 10,
+  reviewConflicts: true,
   games: [],
 };
 

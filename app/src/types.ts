@@ -37,6 +37,7 @@ export interface Game {
   playtimeSeconds?: number;
   lastPlayedAt?: string;
   running?: boolean;
+  syncId?: string;
 }
 
 export interface Settings {
@@ -51,6 +52,10 @@ export interface Settings {
   snapshotOnExit: boolean;
   snapshotPeriodic: boolean;
   snapshotIntervalMinutes: number;
+  syncRoot: string;
+  deviceId: string;
+  syncRetention: number;
+  reviewConflicts: boolean;
   games: Game[];
 }
 
@@ -59,6 +64,30 @@ export interface Status {
   lastSyncTime: string;
   lastError?: string;
   pending: number;
+  syncConfigured: boolean;
+}
+
+export interface SyncJob {
+  id: string;
+  gameId?: string;
+  reason: string;
+  state: "queued" | "running" | "completed" | "conflict" | "failed" | "skipped" | "coalesced";
+  startedAt?: string;
+  finishedAt?: string;
+  changedFiles: number;
+  bytes: number;
+  error?: string;
+  conflictIds?: string[];
+}
+
+export interface SyncConflict {
+  id: string;
+  gameId: string;
+  path: string;
+  localHash: string;
+  remoteHash: string;
+  createdAt: string;
+  state: string;
 }
 
 export interface LogEntry {

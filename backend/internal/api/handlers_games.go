@@ -22,6 +22,7 @@ type gameResponse struct {
 	ExecutablePath  string              `json:"executablePath"`
 	CoverImageData  string              `json:"coverImageData,omitempty"`
 	BackupPolicy    models.BackupPolicy `json:"backupPolicy"`
+	SyncID          string              `json:"syncId,omitempty"`
 	PlaytimeSeconds int64               `json:"playtimeSeconds"`
 	LastPlayedAt    string              `json:"lastPlayedAt,omitempty"`
 	Running         bool                `json:"running"`
@@ -167,7 +168,7 @@ func (s *Server) handleGamePlay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := exec.Command(game.ExecutablePath)
+	cmd := exec.Command("cmd", "/c", "start", "", game.ExecutablePath)
 	cmd.Dir = filepath.Dir(game.ExecutablePath)
 	if err := cmd.Start(); err != nil {
 		writeErr(w, http.StatusInternalServerError, err)
@@ -204,9 +205,13 @@ func (s *Server) handleGameSync(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
-	s.engine.TriggerGame(req.GameID, syncer.TriggerReasonAPIGame)
+	if s.monitor != nil && s.monitor.IsRunning(game.ID) {
+		writeErr(w, http.StatusConflict, errors.New("game is running; wait for saves to settle before syncing"))
+		return
+	}
+	jobID := s.engine.TriggerGame(req.GameID, syncer.TriggerReasonAPIGame)
 	_ = s.logs.Write("info", "sync", "queued game sync for: "+game.Name)
-	writeJSON(w, http.StatusAccepted, map[string]string{"status": "queued"})
+	writeJSON(w, http.StatusAccepted, map[string]string{"status": "queued", "jobId": jobID})
 }
 
 func (s *Server) handleGameCover(w http.ResponseWriter, r *http.Request) {
@@ -286,6 +291,28 @@ func (s *Server) handleGameBackupPolicy(w http.ResponseWriter, r *http.Request) 
 	writeJSON(w, http.StatusOK, s.toGameResponse(updated, stat.PlaytimeSeconds+pending, stat.LastPlayedAt, running))
 }
 
+func (s *Server) handleGamePair(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		GameID string `json:"gameId"`
+		SyncID string `json:"syncId"`
+	}
+	if err := decodeJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	updated, err := s.cfg.SetGameSyncID(req.GameID, req.SyncID)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	_ = s.logs.Write("info", "sync", "paired game with cloud id: "+updated.Name)
+	writeJSON(w, http.StatusOK, s.toGameResponse(updated, 0, time.Time{}, false))
+}
+
 func (s *Server) toGameResponses(games []models.Game) []gameResponse {
 	if len(games) == 0 {
 		return []gameResponse{}
@@ -322,6 +349,7 @@ func (s *Server) toGameResponse(game models.Game, playtimeSeconds int64, lastPla
 		ExecutablePath:  game.ExecutablePath,
 		CoverImageData:  game.CoverImageData,
 		BackupPolicy:    game.BackupPolicy,
+		SyncID:          game.SyncID,
 		PlaytimeSeconds: playtimeSeconds,
 		Running:         running,
 	}

@@ -1,4 +1,4 @@
-import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, SnapshotSummary, Status, ThemeMode } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, SnapshotSummary, Status, SyncConflict, SyncJob, ThemeMode } from "../types";
 import { newDefaultBackupPolicy, newDefaultSettings } from "../constants/defaults";
 
 function isRecord(input: unknown): input is Record<string, unknown> {
@@ -57,6 +57,7 @@ export function normalizeGames(input: unknown): Game[] {
         playtimeSeconds: asNumber(value.playtimeSeconds, 0),
         lastPlayedAt: asString(value.lastPlayedAt),
         running: asBoolean(value.running, false),
+        syncId: asString(value.syncId),
       };
     })
     .filter((value): value is Game => value !== null);
@@ -146,18 +147,39 @@ export function normalizeSettings(input: unknown): Settings {
     snapshotOnExit: asBoolean(input.snapshotOnExit, defaults.snapshotOnExit),
     snapshotPeriodic: asBoolean(input.snapshotPeriodic, defaults.snapshotPeriodic),
     snapshotIntervalMinutes: asNumber(input.snapshotIntervalMinutes, defaults.snapshotIntervalMinutes),
+    syncRoot: asString(input.syncRoot),
+    deviceId: asString(input.deviceId),
+    syncRetention: asNumber(input.syncRetention, defaults.syncRetention),
+    reviewConflicts: asBoolean(input.reviewConflicts, true),
     games: normalizeGames(input.games),
   };
 }
 
 export function normalizeStatus(input: unknown): Status {
   if (!isRecord(input)) {
-    return { running: false, lastSyncTime: "", pending: 0 };
+    return { running: false, lastSyncTime: "", pending: 0, syncConfigured: false };
   }
   return {
     running: Boolean(input.running),
     lastSyncTime: asString(input.lastSyncTime),
     lastError: typeof input.lastError === "string" ? input.lastError : undefined,
     pending: asNumber(input.pending, 0),
+    syncConfigured: asBoolean(input.syncConfigured, false),
   };
+}
+
+export function normalizeSyncJobs(input: unknown): SyncJob[] {
+  if (!Array.isArray(input)) return [];
+  return input.filter(isRecord).map((value) => ({
+    id: asString(value.id), gameId: asString(value.gameId), reason: asString(value.reason),
+    state: asString(value.state, "failed") as SyncJob["state"], startedAt: asString(value.startedAt),
+    finishedAt: asString(value.finishedAt), changedFiles: asNumber(value.changedFiles, 0),
+    bytes: asNumber(value.bytes, 0), error: asString(value.error),
+    conflictIds: Array.isArray(value.conflictIds) ? value.conflictIds.filter((id): id is string => typeof id === "string") : [],
+  }));
+}
+
+export function normalizeSyncConflicts(input: unknown): SyncConflict[] {
+  if (!Array.isArray(input)) return [];
+  return input.filter(isRecord).map((value) => ({ id: asString(value.id), gameId: asString(value.gameId), path: asString(value.path), localHash: asString(value.localHash), remoteHash: asString(value.remoteHash), createdAt: asString(value.createdAt), state: asString(value.state) }));
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { newDefaultBackupPolicy } from "../constants/defaults";
-import type { BackupHistoryEntry, BackupPolicy, Game, SnapshotSummary } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, Game, SnapshotSummary, SyncConflict, SyncJob } from "../types";
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -32,6 +32,11 @@ type GameDetailViewProps = {
   safeDateTime: (value: string) => string;
   formatBytes: (bytes: number) => string;
   formatSnapshotTrigger: (trigger: string) => string;
+  syncJob: SyncJob | null;
+  syncConfigured: boolean;
+  syncConflicts: SyncConflict[];
+  onResolveSyncConflict: (id: string, action: "local" | "remote" | "both") => void;
+  onLinkCloudGame: () => void;
 };
 
 export function GameDetailView(props: GameDetailViewProps) {
@@ -65,6 +70,11 @@ export function GameDetailView(props: GameDetailViewProps) {
     safeDateTime,
     formatBytes,
     formatSnapshotTrigger,
+    syncJob,
+    syncConfigured,
+    syncConflicts,
+    onResolveSyncConflict,
+    onLinkCloudGame,
   } = props;
 
   const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? newDefaultBackupPolicy());
@@ -139,7 +149,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         </div>
         <div className="detail-actions">
           <button className="btn primary" onClick={onPlay} type="button">Play</button>
-          <button className="btn" onClick={onSyncGame} type="button">Sync This Game</button>
+          <button className="btn" onClick={onSyncGame} type="button" disabled={!syncConfigured || syncJob?.state === "queued" || syncJob?.state === "running"}>{syncJob?.state === "running" ? "Syncing..." : "Sync This Game"}</button>
           <button className="btn danger" onClick={onDelete} type="button">Remove Game</button>
         </div>
       </section>
@@ -283,6 +293,11 @@ export function GameDetailView(props: GameDetailViewProps) {
           <h2>Snapshots</h2>
           <button className="btn primary" onClick={onSaveSnapshotNow} type="button" disabled={!snapshotVaultConfigured}>Save Now</button>
         </div>
+        <p className={`backup-status state-text ${syncJob?.state === "failed" || syncJob?.state === "conflict" ? "warning" : "success"}`}>
+          {!syncConfigured ? "Cloud sync is not configured. Choose a synced folder in Settings." : syncJob ? `Sync ${syncJob.state}: ${syncJob.changedFiles} file${syncJob.changedFiles === 1 ? "" : "s"}${syncJob.error ? ` — ${syncJob.error}` : ""}${syncJob.conflictIds?.length ? " — review conflicts before applying changes" : ""}` : "Ready to sync this game."}
+        </p>
+        <p className="snapshot-meta">Cloud game ID: {game.syncId || "Not paired"}</p>
+        <button className="btn" onClick={onLinkCloudGame} type="button">Link Existing Cloud Game</button>
         {!snapshotVaultConfigured ? (
           <p className="empty-state">Choose a snapshot vault folder in Settings to enable versioned snapshots.</p>
         ) : snapshots.length === 0 ? (
@@ -312,6 +327,12 @@ export function GameDetailView(props: GameDetailViewProps) {
           </ul>
         )}
       </section>
+
+      {syncConflicts.length > 0 ? <section className="panel">
+        <h2>Sync conflicts need review</h2>
+        <p className="empty-state">No save is overwritten until you choose a resolution.</p>
+        <ul className="snapshot-list">{syncConflicts.map((conflict) => <li className="snapshot-row" key={conflict.id}><div className="snapshot-main"><p><strong>{conflict.path}</strong></p><p className="snapshot-meta">Local {conflict.localHash.slice(0, 8)} · Remote {conflict.remoteHash.slice(0, 8)}</p></div><div className="snapshot-actions"><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "local")} type="button">Keep local</button><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "remote")} type="button">Use remote</button><button className="btn primary" onClick={() => onResolveSyncConflict(conflict.id, "both")} type="button">Keep both</button></div></li>)}</ul>
+      </section> : null}
 
       <section className="panel">
         <h2>Local Backup History</h2>

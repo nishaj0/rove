@@ -1,87 +1,59 @@
 # Cloud Saver
 
-Cloud Saver is a Windows desktop app to track and back up game save folders.
+Cloud Saver is a Windows desktop app for tracking, backing up, and safely synchronizing game save folders. It is designed for games without dependable built-in cloud saves, including custom installs and non-store games.
 
-It is designed for games that do not have reliable cloud sync, including custom installs and non-store games.
+## What it does
 
-## Project Overview
+- Tracks arbitrary game save folders and launches configured game executables.
+- Creates local ZIP exports, automatic local backups, and versioned snapshots.
+- Synchronizes saves through a user-selected folder already managed by OneDrive, Dropbox, Syncthing, or another file-sync client.
+- Detects concurrent edits and requires a deliberate resolution: keep local, use remote, or keep both.
+- Keeps activity logs, game playtime, Windows startup, and tray support local to the device.
 
-The app runs as a lightweight local service and a desktop UI:
+## Cloud sync setup
 
-- `backend`: Go daemon for watching save folders, running sync jobs, handling tray behavior, and exposing a local API
-- `app`: Tauri + React desktop UI for settings, game management, logs, and backup actions
+Cloud Saver is provider-neutral: it does not request provider credentials or upload directly to an account.
 
-## Core Goals
+1. Create or choose a folder that your existing sync provider shares between computers.
+2. Open **Settings** in Cloud Saver, choose that folder as **Synced folder**, and save.
+3. Add a game and run **Sync This Game** while the game is closed.
+4. On another computer, add that computer's local save folder for the same game.
+5. Copy the first computer's **Cloud game ID** from its game page. On the other computer choose **Link Existing Cloud Game** and paste that ID.
 
-- Automatically sync changed game saves
-- Let users manually map any game save folder
-- Keep CPU/RAM usage low while running in background
-- Support safe conflict handling
-- Provide simple UI with tray and startup behavior on Windows
+The selected folder contains `.cloud-saver/v1`. It holds internal manifests, objects, and recovery versions; do not edit or remove it manually. ZIP backups and snapshot vaults remain separate from cloud sync.
 
-## Current MVP Features
+## Sync safety
 
-- Add and remove tracked game folders
-- Sync status dashboard
-- Manual sync trigger
-- Interval sync scheduling
-- Ignore pattern settings
-- Conflict policy setting (`latest_wins` or `keep_both`)
-- Local activity logs
-- ZIP export/import backup tools
-- Windows tray support
-- Windows startup setting (autostart)
+- Save contents are identified with SHA-256 hashes; unchanged files are reused.
+- Revisions are immutable and are published only after referenced files are complete.
+- Deleted files are represented by tombstones and propagate to paired machines.
+- A remote replacement archives the displaced local file before it is applied.
+- If the same path changed on two devices, sync stops without overwriting either copy.
+- Snapshot restore and manual game sync are blocked while the tracked game is running.
+- Ignore patterns apply to sync and snapshot scans.
 
-## Architecture
-
-1. Go daemon watches folders and manages sync state
-2. Daemon exposes local HTTP API on `127.0.0.1:7331`
-3. Tauri desktop UI calls the local API
-4. User interacts through desktop UI and tray menu
-
-## Tech Stack
-
-- Backend: Go
-- UI: Tauri + React + TypeScript + Vite
-- File watcher: fsnotify
-- Local metadata/log storage: SQLite
-
-## Project Structure
+## Project structure
 
 ```text
 cloud-saver/
-	backend/   # Go daemon
-	app/       # Tauri + React desktop app
+├── backend/  # Go daemon, SQLite metadata, sync engine, local HTTP API
+└── app/      # Tauri + React desktop UI
 ```
 
-## Windows Prerequisites
+The daemon listens only on `127.0.0.1:7331`; the desktop app calls that local API.
 
-Install once:
+## Development
 
-1. Go 1.23+
-2. Node.js 20+
-3. Rust (cargo/rustc)
-4. Visual Studio 2022 Build Tools (C++ workload)
+Prerequisites: Go 1.23+, Node.js 20+, Rust, and Visual Studio 2022 Build Tools with the C++ workload.
 
-## Development Run Guide
-
-Use 2 terminals.
-
-Terminal A: backend
-
-```powershell
-cd backend
-go run ./cmd/daemon --no-tray
-```
-
-For troubleshooting, run with verbose debug output:
+Start the daemon:
 
 ```powershell
 cd backend
 go run ./cmd/daemon --no-tray --debug
 ```
 
-Terminal B: desktop UI
+Start the desktop app in a second terminal:
 
 ```powershell
 cd app
@@ -89,170 +61,42 @@ npm install
 .\dev-tauri.cmd
 ```
 
-Why use `.\dev-tauri.cmd` instead of `npm run dev`:
+Use `dev-tauri.cmd` because it loads the Visual Studio build environment needed by Tauri on Windows.
 
-- It loads Visual Studio build environment
-- It ensures Cargo is available in PATH
-
-## How to Verify It Is Working
-
-If you are new, use this checklist.
-
-1. Start backend in Terminal A:
+## Verification
 
 ```powershell
 cd backend
-go run ./cmd/daemon --no-tray
+go test ./...
+
+cd ..\app
+npm run type-check
+npm run build
 ```
 
-If this command shows no extra output and just keeps running, that is normal.
+Useful local endpoints:
 
-2. Open backend status endpoint in browser:
+- `GET /status`
+- `GET /games`
+- `POST /sync`
+- `GET /sync/jobs?gameId=...`
+- `GET /sync/conflicts?gameId=...`
+- `POST /sync/conflicts`
+- `GET /debug/info`
 
-- http://127.0.0.1:7331/status
+## Troubleshooting
 
-Expected result: JSON like this:
+- **Backend unavailable:** start the daemon, then visit `http://127.0.0.1:7331/debug/info`.
+- **Sync folder not configured:** choose a Synced folder in Settings and save.
+- **Conflict detected:** open the affected game and choose a resolution; Cloud Saver has not overwritten either version.
+- **Second computer created a separate cloud stream:** use **Link Existing Cloud Game** and paste the Cloud game ID from the first computer.
+- **`link.exe` or Cargo missing:** start the app through `app\dev-tauri.cmd` and confirm Visual Studio Build Tools are installed.
 
-```json
-{"running":true,"lastSyncTime":"...","pending":0}
-```
-
-3. (Optional) Verify backend using Postman:
-
-- `GET http://127.0.0.1:7331/status`
-- `GET http://127.0.0.1:7331/games`
-- `POST http://127.0.0.1:7331/sync`
-
-4. Start UI in Terminal B:
-
-```powershell
-cd app
-.\dev-tauri.cmd
-```
-
-Expected result:
-
-- Vite shows `Local: http://localhost:5173/`
-- Tauri starts and opens the desktop window
-
-5. Quick functional test in UI:
-
-- Add one game folder in Games view
-- Click Sync Now
-- Open Logs view and confirm new activity entries
-
-6. Open backend diagnostics endpoint:
-
-- http://127.0.0.1:7331/debug/info
-
-This shows whether debug mode is enabled, current PID, uptime, config file path, and SQLite log DB path.
-
-## Tray + Startup Apps
-
-Yes, you can run this from tray and enable startup with Windows.
-
-For reliable startup app behavior, use a built daemon EXE instead of `go run`.
-
-Build daemon EXE:
-
-```powershell
-cd backend
-go build -o cloud-saver-daemon.exe ./cmd/daemon
-```
-
-Run daemon with tray:
-
-```powershell
-cd backend
-.\cloud-saver-daemon.exe
-```
-
-Then in UI:
-
-1. Open Settings
-2. Enable "Start on Windows login"
-3. Save settings
-
-This writes a per-user Run registry entry used by Startup Apps.
-
-## Build for Release
-
-Local package build (Windows):
+## Release build
 
 ```powershell
 cd app
 npm run tauri:build
 ```
 
-This build now stages the backend daemon into the Tauri bundle resources before packaging.
-
-If you only want to build the daemon manually:
-
-```powershell
-cd backend
-go build -o cloud-saver-daemon.exe ./cmd/daemon
-```
-
-## Windows Installer Behavior
-
-The generated package is an NSIS Windows setup executable, so users get a standard installer wizard with Next/Back flow.
-
-1. The installer presents normal setup steps and lets users choose installation scope.
-2. Installation scope is configured as `both`, so users can choose:
-	- current user install (user profile location)
-	- all users install (system-wide)
-3. Because scope selection is enabled, Windows may show a UAC permission prompt during setup.
-4. The wizard includes install location handling as part of the normal Windows installer experience.
-
-## Automated GitHub Release Flow
-
-Production releases are tag-driven.
-
-1. Ensure your branch is ready and tests/type checks pass.
-2. Push a semver tag in the form `vX.Y.Z`.
-
-```powershell
-git tag v0.1.1
-git push origin v0.1.1
-```
-
-When the tag is pushed, the `release-windows` workflow will:
-
-1. Sync version fields from the tag to:
-	- `app/package.json`
-	- `app/src-tauri/tauri.conf.json`
-	- `app/src-tauri/Cargo.toml`
-	- `app/src/constants/updates.ts`
-2. Validate synced versions.
-3. Run frontend type-check (`npm run type-check`).
-4. Run backend compile verification (`go build ./...`).
-5. Build backend daemon and stage it under Tauri resources.
-6. Build the Windows Tauri bundle.
-7. Publish bundle artifacts and `release-checksums.txt` to the matching GitHub Release.
-
-Post-release quick verification:
-
-1. Install the generated Windows package.
-2. Confirm the desktop app opens and can reach local backend API.
-3. Confirm the update banner points users to the new GitHub release page when a newer version exists.
-
-## Troubleshooting
-
-- `cargo metadata ... program not found`
-	- Run from `app` using `.\dev-tauri.cmd`
-- `Unexpected token '??='` while running Vite
-	- Your Node.js is too old (usually Node 14)
-	- Install/use Node 20+ (`nvm use 24.12.0` if using nvm-windows)
-- `link.exe not found`
-	- Install Visual Studio 2022 Build Tools with C++ tools
-- UI cannot connect to backend
-	- Start backend first and confirm service on `127.0.0.1:7331`
-	- Use `go run ./cmd/daemon --no-tray --debug` and watch terminal output for API and watcher errors
-	- Open `http://127.0.0.1:7331/debug/info` to verify backend process details
-
-## Roadmap (Next)
-
-- Real cloud provider integration (Google Drive path)
-- Better conflict visibility in UI
-- Production packaging flow improvements
-- Optional one-click dev/run scripts
+The packaging step stages the backend daemon into the Tauri bundle and produces an NSIS Windows installer.

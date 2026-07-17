@@ -412,6 +412,43 @@ func materializeSnapshotState(gameDir string, entries []indexSnapshot, targetID 
 }
 
 func copyDirectoryContents(srcRoot, dstRoot string) error {
+	// A restore must be an exact state, not an overlay. Remove files that are
+	// absent from the materialized snapshot before copying its files back.
+	wanted := make(map[string]struct{})
+	if err := filepath.WalkDir(srcRoot, func(path string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(srcRoot, path)
+		if err != nil {
+			return err
+		}
+		wanted[filepath.Clean(rel)] = struct{}{}
+		return nil
+	}); err != nil {
+		return err
+	}
+	if err := filepath.WalkDir(dstRoot, func(path string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(dstRoot, path)
+		if err != nil {
+			return err
+		}
+		if _, ok := wanted[filepath.Clean(rel)]; !ok {
+			return os.Remove(path)
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
 	return filepath.WalkDir(srcRoot, func(path string, d fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr

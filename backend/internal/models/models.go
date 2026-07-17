@@ -32,6 +32,9 @@ type Game struct {
 	ExecutablePath string       `json:"executablePath"`
 	CoverImageData string       `json:"coverImageData,omitempty"`
 	BackupPolicy   BackupPolicy `json:"backupPolicy"`
+	// SyncID identifies this title in a shared sync folder. It deliberately differs
+	// from the local ID so the same game can be paired on another computer.
+	SyncID string `json:"syncId,omitempty"`
 }
 
 // stores persisted runtime totals used by status views.
@@ -53,15 +56,45 @@ type Settings struct {
 	SnapshotOnExit          bool           `json:"snapshotOnExit"`
 	SnapshotPeriodic        bool           `json:"snapshotPeriodic"`
 	SnapshotIntervalMinutes int            `json:"snapshotIntervalMinutes"`
+	SyncRoot                string         `json:"syncRoot"`
+	DeviceID                string         `json:"deviceId"`
+	SyncRetention           int            `json:"syncRetention"`
+	ReviewConflicts         bool           `json:"reviewConflicts"`
 	Games                   []Game         `json:"games"`
 }
 
 // reports current engine state for api status responses.
 type Status struct {
-	Running      bool      `json:"running"`
-	LastSyncTime time.Time `json:"lastSyncTime"`
-	LastError    string    `json:"lastError,omitempty"`
-	Pending      int       `json:"pending"`
+	Running        bool      `json:"running"`
+	LastSyncTime   time.Time `json:"lastSyncTime"`
+	LastError      string    `json:"lastError,omitempty"`
+	Pending        int       `json:"pending"`
+	SyncConfigured bool      `json:"syncConfigured"`
+}
+
+// SyncJob reports the lifecycle of one explicit or scheduled sync request.
+type SyncJob struct {
+	ID           string    `json:"id"`
+	GameID       string    `json:"gameId,omitempty"`
+	Reason       string    `json:"reason"`
+	State        string    `json:"state"`
+	StartedAt    time.Time `json:"startedAt,omitempty"`
+	FinishedAt   time.Time `json:"finishedAt,omitempty"`
+	ChangedFiles int       `json:"changedFiles"`
+	Bytes        int64     `json:"bytes"`
+	Error        string    `json:"error,omitempty"`
+	ConflictIDs  []string  `json:"conflictIds,omitempty"`
+}
+
+// SyncConflict is a non-destructive collision requiring an explicit decision.
+type SyncConflict struct {
+	ID         string    `json:"id"`
+	GameID     string    `json:"gameId"`
+	Path       string    `json:"path"`
+	LocalHash  string    `json:"localHash"`
+	RemoteHash string    `json:"remoteHash"`
+	CreatedAt  time.Time `json:"createdAt"`
+	State      string    `json:"state"`
 }
 
 // stores a single sqlite-backed event returned by log endpoints.

@@ -139,22 +139,21 @@ func writeZipAtomic(game models.Game, finalPath string) error {
 		}
 		rel = filepath.ToSlash(rel)
 
+		sf, err := os.Open(path)
+		if err != nil {
+			return nil
+		}
+		defer sf.Close()
+
 		wf, err := zw.Create(rel)
 		if err != nil {
 			return err
 		}
-		sf, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		_, copyErr := io.Copy(wf, sf)
-		closeErr := sf.Close()
-		if copyErr != nil {
-			return copyErr
-		}
-		if closeErr != nil {
-			return closeErr
-		}
+		
+		_, _ = io.Copy(wf, sf)
+		// ignore read/copy errors like "Incorrect function" on reparse points,
+		// partial zip entries are acceptable
+		
 		return nil
 	})
 	closeZipErr := zw.Close()

@@ -1,13 +1,15 @@
-import type { ConflictPolicy, Settings, ThemeMode } from "../types";
+import type { Settings, ThemeMode } from "../types";
 
 type SettingsViewProps = {
   settings: Settings;
   onSyncIntervalChange: (value: number) => void;
-  onConflictPolicyChange: (value: ConflictPolicy) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onAutostartChange: (value: boolean) => void;
   onIgnorePatternsChange: (value: string[]) => void;
   onBrowseSnapshotVault: () => void;
+  onBrowseSyncRoot: () => void;
+  onSyncRootChange: (value: string) => void;
+  onSyncRetentionChange: (value: number) => void;
   onSnapshotMaxPerGameChange: (value: number) => void;
   onSnapshotOnExitChange: (value: boolean) => void;
   onSnapshotPeriodicChange: (value: boolean) => void;
@@ -19,11 +21,13 @@ export function SettingsView(props: SettingsViewProps) {
   const {
     settings,
     onSyncIntervalChange,
-    onConflictPolicyChange,
     onThemeModeChange,
     onAutostartChange,
     onIgnorePatternsChange,
     onBrowseSnapshotVault,
+    onBrowseSyncRoot,
+    onSyncRootChange,
+    onSyncRetentionChange,
     onSnapshotMaxPerGameChange,
     onSnapshotOnExitChange,
     onSnapshotPeriodicChange,
@@ -34,6 +38,7 @@ export function SettingsView(props: SettingsViewProps) {
   return (
     <section className="panel">
       <h2>Global Settings</h2>
+      <p className="empty-state">Cloud changes are never applied automatically when both copies changed; conflicts require review.</p>
       <div className="settings-grid">
         <label>
           Sync interval (seconds)
@@ -43,16 +48,6 @@ export function SettingsView(props: SettingsViewProps) {
             value={settings.syncIntervalSeconds}
             onChange={(e) => onSyncIntervalChange(Number(e.target.value))}
           />
-        </label>
-        <label>
-          Conflict policy
-          <select
-            value={settings.conflictPolicy}
-            onChange={(e) => onConflictPolicyChange(e.target.value as ConflictPolicy)}
-          >
-            <option value="latest_wins">Latest modified wins</option>
-            <option value="keep_both">Keep both copies</option>
-          </select>
         </label>
         <label>
           Theme
@@ -95,6 +90,20 @@ export function SettingsView(props: SettingsViewProps) {
             placeholder="Select a local vault folder"
             readOnly
           />
+        </label>
+        <label>
+          Synced folder (OneDrive, Dropbox, Syncthing, etc.)
+          <input
+            className="picker-input"
+            value={settings.syncRoot}
+            onClick={onBrowseSyncRoot}
+            onChange={(e) => onSyncRootChange(e.target.value)}
+            placeholder="Select a folder shared between your devices"
+          />
+        </label>
+        <label>
+          Cloud revision retention
+          <input type="number" min={1} max={50} value={settings.syncRetention} onChange={(e) => onSyncRetentionChange(Number(e.target.value))} />
         </label>
         <label>
           Max snapshots per game

@@ -1,4 +1,4 @@
-import type { Game } from "../types";
+import type { Game, Status } from "../types";
 import { HOME_KICKER_LABEL } from "../constants/branding";
 
 type HomeViewProps = {
@@ -7,10 +7,11 @@ type HomeViewProps = {
   onOpenActivity: () => void;
   onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
+  status: Status | null;
 };
 
 export function HomeView(props: HomeViewProps) {
-  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials } = props;
+  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials, status } = props;
 
   return (
     <>
@@ -22,6 +23,11 @@ export function HomeView(props: HomeViewProps) {
           <button className="btn primary" onClick={onOpenLibrary} type="button">Open Library</button>
           <button className="btn" onClick={onOpenActivity} type="button">View Activity</button>
         </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head"><h2>Cloud Sync</h2><span className={`state-text ${status?.syncConfigured ? "success" : "warning"}`}>{status?.syncConfigured ? "Ready" : "Setup needed"}</span></div>
+        <p className="empty-state">{status?.syncConfigured ? `Last completed: ${status.lastSyncTime ? new Date(status.lastSyncTime).toLocaleString() : "Not yet"}. ${status.pending} request${status.pending === 1 ? "" : "s"} pending.` : "Choose a synced folder in Settings. Your existing local backups remain unchanged."}</p>
       </section>
 
       <section className="panel">

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -50,6 +51,7 @@ func (m *Manager) AddGameWithPolicy(name, path, executablePath, coverImageData s
 		ExecutablePath: executablePath,
 		CoverImageData: coverImageData,
 		BackupPolicy:   backupPolicy,
+		SyncID:         uuid.NewString(),
 	}
 	m.settings.Games = append(m.settings.Games, game)
 	if err := m.saveLocked(); err != nil {
@@ -135,6 +137,26 @@ func (m *Manager) UpdateGameBackupPolicy(id string, policy models.BackupPolicy) 
 		return models.Game{}, err
 	}
 	return m.settings.Games[idx], nil
+}
+
+// SetGameSyncID pairs a local game with an existing shared-folder game.
+func (m *Manager) SetGameSyncID(id, syncID string) (models.Game, error) {
+	if id == "" || strings.TrimSpace(syncID) == "" {
+		return models.Game{}, errors.New("id and syncId are required")
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for i := range m.settings.Games {
+		if m.settings.Games[i].ID != id {
+			continue
+		}
+		m.settings.Games[i].SyncID = strings.TrimSpace(syncID)
+		if err := m.saveLocked(); err != nil {
+			return models.Game{}, err
+		}
+		return m.settings.Games[i], nil
+	}
+	return models.Game{}, errors.New("game not found")
 }
 
 func (m *Manager) DeleteGame(id string) error {

@@ -72,6 +72,10 @@ func (s *Server) handleSnapshotRestore(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
+	if s.monitor != nil && s.monitor.IsRunning(req.GameID) {
+		writeErr(w, http.StatusConflict, errors.New("cannot restore while the game is running"))
+		return
+	}
 	if err := s.snapshots.Restore(req.GameID, req.SnapshotID); err != nil {
 		status := http.StatusInternalServerError
 		if err.Error() == "game not found" || err.Error() == "snapshot not found" {
