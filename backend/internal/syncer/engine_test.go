@@ -165,6 +165,24 @@ func TestConfigurationChangedRefreshesProtectionTargetAndProviderState(t *testin
 	}
 }
 
+func TestStructuredProviderRateLimitClassification(t *testing.T) {
+	t.Parallel()
+	retryAfter := 7 * time.Minute
+	err := fmt.Errorf("upload object: %w", &ProviderOperationError{
+		Code:       "rate_limited",
+		Retryable:  true,
+		RetryAfter: retryAfter,
+		Err:        errors.New("provider rate limit"),
+	})
+	code, state, _, retryable := classifyProviderError(err)
+	if code != "rate_limited" || state != models.ProviderRateLimited || !retryable {
+		t.Fatalf("unexpected rate classification: code=%q state=%q retryable=%t", code, state, retryable)
+	}
+	if got := providerRetryAfter(err); got != retryAfter {
+		t.Fatalf("expected %s Retry-After, got %s", retryAfter, got)
+	}
+}
+
 func TestRecoveryLibraryRestorePublishesOnlyVerifiedRevision(t *testing.T) {
 	root := t.TempDir()
 	saveRoot := filepath.Join(root, "save")

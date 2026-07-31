@@ -145,7 +145,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
-		if err := networkwatch.Watch(ctx, a.engine.RetryNow); err != nil {
+		if err := networkwatch.Watch(ctx, a.engine.RetryConnectivity); err != nil {
 			a.logEvent("warning", "network", err.Error())
 		}
 	}()

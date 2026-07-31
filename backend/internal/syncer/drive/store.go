@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -23,7 +24,19 @@ import (
 	"cloud-saver/backend/internal/syncer"
 )
 
-const folderMIMEType = "application/vnd.google-apps.folder"
+const (
+	folderMIMEType                 = "application/vnd.google-apps.folder"
+	maxDriveRequestsPerSecond      = 8
+	driveUploadChunkSize           = 8 * 1024 * 1024
+	driveChunkTransferTimeout      = 5 * time.Minute
+	driveChunkRetryDeadline        = 10 * time.Minute
+)
+
+var driveMediaOptions = []googleapi.MediaOption{
+	googleapi.ChunkSize(driveUploadChunkSize),
+	googleapi.ChunkTransferTimeout(driveChunkTransferTimeout),
+	googleapi.ChunkRetryDeadline(driveChunkRetryDeadline),
+}
 
 // Store maps the immutable Cloud Saver revision layout to Drive folders/files.
 type Store struct {
@@ -36,7 +49,9 @@ func New(ctx context.Context, client *http.Client) (*Store, error) {
 	if client == nil {
 		return nil, errors.New("Google Drive client is unavailable")
 	}
-	svc, err := drive.NewService(ctx, option.WithHTTPClient(client), option.WithScopes(drive.DriveFileScope))
+	driveClient := *client
+	driveClient.Transport = newPacedTransport(client.Transport, maxDriveRequestsPerSecond)
+	svc, err := drive.NewService(ctx, option.WithHTTPClient(&driveClient), option.WithScopes(drive.DriveFileScope))
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +104,12 @@ func (s *Store) ListGameProfiles(ctx context.Context) ([]models.GameProfile, err
 		}
 		page, err := call.Do()
 		if err != nil {
-			return nil, err
+			return nil, wrapDriveError(err)
 		}
 		for _, file := range page.Files {
 			response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
 			if err != nil {
-				continue
+				return nil, wrapDriveError(err)
 			}
 			var profile models.GameProfile
 			decodeErr := json.NewDecoder(io.LimitReader(response.Body, 1024*1024)).Decode(&profile)
@@ -125,7 +140,7 @@ func (s *Store) DeleteRecoveryPoint(ctx context.Context, syncID, pointID string)
 	if err != nil {
 		return err
 	}
-	return s.service.Files.Delete(file.Id).Context(ctx).Do()
+	return wrapDriveError(s.service.Files.Delete(file.Id).Context(ctx).Do())
 }
 func (s *Store) ReadManifest(ctx context.Context, syncID, revisionID string) (*syncer.Manifest, error) {
 	payload, err := s.readFile(ctx, syncID, "revisions/"+revisionID+".json")
@@ -178,7 +193,7 @@ func (s *Store) downloadNamedFile(ctx context.Context, syncID, name string) (io.
 	}
 	response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
 	if err != nil {
-		return nil, err
+		return nil, wrapDriveError(err)
 	}
 	return response.Body, nil
 }
@@ -199,8 +214,8 @@ func (s *Store) writeNamedReader(ctx context.Context, syncID, logicalName string
 		}
 		_, err = s.service.Files.Update(existing.Id, &drive.File{
 			AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
-		}).Media(data, googleapi.ChunkSize(8*1024*1024)).Context(ctx).Do()
-		return err
+		}).Media(data, driveMediaOptions...).Context(ctx).Do()
+		return wrapDriveError(err)
 	}
 	if !errors.Is(findErr, errNotFound) {
 		return findErr
@@ -209,8 +224,8 @@ func (s *Store) writeNamedReader(ctx context.Context, syncID, logicalName string
 		Name:          name,
 		Parents:       []string{parent},
 		AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
-	}).Media(data, googleapi.ChunkSize(8*1024*1024)).Context(ctx).Do()
-	return err
+	}).Media(data, driveMediaOptions...).Context(ctx).Do()
+	return wrapDriveError(err)
 }
 
 func logicalType(name string) string {
@@ -267,6 +282,9 @@ func (s *Store) ensureFolder(ctx context.Context, parent, name string) (string, 
 	file, err := s.findChild(ctx, parent, name)
 	if errors.Is(err, errNotFound) {
 		file, err = s.service.Files.Create(&drive.File{Name: name, MimeType: folderMIMEType, Parents: []string{parent}}).Context(ctx).Do()
+		if err != nil {
+			err = wrapDriveError(err)
+		}
 	}
 	if err != nil {
 		return "", err
@@ -283,7 +301,7 @@ func (s *Store) findChild(ctx context.Context, parent, name string) (*drive.File
 	q := fmt.Sprintf("name = '%s' and '%s' in parents and trashed = false", strings.ReplaceAll(name, "'", "\\'"), parent)
 	list, err := s.service.Files.List().Q(q).Fields("files(id,name,mimeType)").PageSize(10).Context(ctx).Do()
 	if err != nil {
-		return nil, err
+		return nil, wrapDriveError(err)
 	}
 	if len(list.Files) == 0 {
 		return nil, errNotFound
@@ -292,3 +310,95 @@ func (s *Store) findChild(ctx context.Context, parent, name string) (*drive.File
 }
 
 var _ syncer.RevisionStore = (*Store)(nil)
+
+type pacedTransport struct {
+	base     http.RoundTripper
+	interval time.Duration
+	mu       sync.Mutex
+	next     time.Time
+}
+
+func newPacedTransport(base http.RoundTripper, requestsPerSecond int) http.RoundTripper {
+	if base == nil {
+		base = http.DefaultTransport
+	}
+	if requestsPerSecond < 1 {
+		requestsPerSecond = 1
+	}
+	return &pacedTransport{base: base, interval: time.Second / time.Duration(requestsPerSecond)}
+}
+
+func (transport *pacedTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	transport.mu.Lock()
+	now := time.Now()
+	start := now
+	if transport.next.After(start) {
+		start = transport.next
+	}
+	transport.next = start.Add(transport.interval)
+	transport.mu.Unlock()
+
+	if wait := time.Until(start); wait > 0 {
+		timer := time.NewTimer(wait)
+		defer timer.Stop()
+		select {
+		case <-request.Context().Done():
+			return nil, request.Context().Err()
+		case <-timer.C:
+		}
+	}
+	return transport.base.RoundTrip(request)
+}
+
+func wrapDriveError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var apiErr *googleapi.Error
+	if !errors.As(err, &apiErr) {
+		return err
+	}
+	message := strings.ToLower(apiErr.Message + " " + apiErr.Error())
+	reasons := make([]string, 0, len(apiErr.Errors))
+	for _, item := range apiErr.Errors {
+		reasons = append(reasons, strings.ToLower(item.Reason))
+	}
+	joinedReasons := strings.Join(reasons, " ")
+	code, retryable := "provider_unavailable", false
+	switch {
+	case apiErr.Code == http.StatusUnauthorized || strings.Contains(joinedReasons, "autherror") || strings.Contains(joinedReasons, "invalidcredentials"):
+		code = "authentication_required"
+	case apiErr.Code == http.StatusTooManyRequests || strings.Contains(joinedReasons, "ratelimit") || strings.Contains(joinedReasons, "userratelimit") || strings.Contains(message, "rate limit"):
+		code, retryable = "rate_limited", true
+	case strings.Contains(joinedReasons, "storagequota") || strings.Contains(message, "storage quota") || strings.Contains(message, "storagequota"):
+		code = "quota_full"
+	case apiErr.Code == http.StatusRequestTimeout || apiErr.Code >= 500:
+		code, retryable = "provider_unavailable", true
+	case apiErr.Code == http.StatusForbidden:
+		code = "permission_denied"
+	}
+	return &syncer.ProviderOperationError{
+		Code:       code,
+		Retryable:  retryable,
+		RetryAfter: parseRetryAfter(apiErr.Header.Get("Retry-After"), time.Now()),
+		Err:        err,
+	}
+}
+
+func parseRetryAfter(value string, now time.Time) time.Duration {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0
+	}
+	if seconds, err := strconv.Atoi(value); err == nil {
+		if seconds <= 0 {
+			return 0
+		}
+		return time.Duration(seconds) * time.Second
+	}
+	when, err := http.ParseTime(value)
+	if err != nil || !when.After(now) {
+		return 0
+	}
+	return when.Sub(now)
+}

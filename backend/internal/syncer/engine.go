@@ -134,7 +134,7 @@ func (e *Engine) Resume() {
 	control.PauseUntilLogin = false
 	control.Reason = ""
 	_ = e.SetServiceControl("", control)
-	e.retryNow()
+	e.retryNow(false)
 }
 
 func (e *Engine) GlobalControl() models.ServiceControlState {
@@ -842,7 +842,8 @@ func (e *Engine) runOnce(request syncTrigger) {
 		code, state, action, retryable := classifyProviderError(err)
 		e.noteProviderFailure(code, state, action, err)
 		if retryable {
-			e.retryJob(request.jobID, code, err)
+			e.retryJob(request.jobID, code, err, providerRetryAfter(err))
+			e.noteProviderRetryAt(e.job(request.jobID).NextRetryAt)
 		} else {
 			stage := code
 			if code == "quota_full" {
@@ -979,11 +980,14 @@ func (e *Engine) uploadsPaused(gameID string) bool {
 	return !e.cfg.Get().AutomaticUpload || global.PauseScope == models.PauseUploads || game.PauseScope == models.PauseUploads
 }
 
-func (e *Engine) retryNow() {
+func (e *Engine) retryNow(force bool) {
 	now := time.Now().UTC()
 	jobs, _ := e.logs.ProtectionJobs("", 500)
 	for _, job := range jobs {
 		if job.State != "waiting_for_network" && job.State != "failed" && job.State != "paused" && job.State != "waiting" {
+			continue
+		}
+		if !force && job.ErrorCode == "rate_limited" && job.NextRetryAt.After(now) {
 			continue
 		}
 		job.NextRetryAt = now
@@ -996,24 +1000,45 @@ func (e *Engine) retryNow() {
 	e.signalStatus()
 }
 
-func (e *Engine) RetryNow() { e.retryNow() }
+func (e *Engine) RetryNow() { e.retryNow(false) }
+
+// RetryConnectivity retries only failures that can plausibly be resolved by a
+// Windows network-change event. It deliberately preserves provider-enforced
+// rate-limit deadlines.
+func (e *Engine) RetryConnectivity() {
+	now := time.Now().UTC()
+	jobs, _ := e.logs.ProtectionJobs("", 500)
+	for _, job := range jobs {
+		if job.ErrorCode != "offline" && job.ErrorCode != "provider_unavailable" {
+			continue
+		}
+		job.NextRetryAt = now
+		job.State, job.Stage, job.UpdatedAt = "waiting", "waiting", now
+		_ = e.logs.SaveProtectionJob(job)
+	}
+	e.signalStatus()
+}
 
 // ConfigurationChanged refreshes provider health immediately after settings
 // select a different protection target. Provider work remains asynchronous;
 // this only prevents UI/tray state from reporting the previous destination.
 func (e *Engine) ConfigurationChanged() {
 	e.refreshHealth()
-	e.retryNow()
+	e.retryNow(true)
 	e.signalStatus()
 }
 
-func (e *Engine) retryJob(id, code string, err error) {
+func (e *Engine) retryJob(id, code string, err error, retryAfter ...time.Duration) {
 	e.updateJob(id, func(job *models.SyncJob) {
 		job.RetryCount++
 		job.ErrorCode = code
 		job.Error = userProviderMessage(code)
 		job.State, job.Stage = "waiting_for_network", "waiting_for_network"
-		job.NextRetryAt = time.Now().UTC().Add(retryDelay(job.RetryCount, job.ID))
+		delay := retryDelay(job.RetryCount, job.ID)
+		if len(retryAfter) > 0 && retryAfter[0] > delay {
+			delay = retryAfter[0]
+		}
+		job.NextRetryAt = time.Now().UTC().Add(delay)
 	})
 	_ = e.logs.WriteActivity(models.ActivityEvent{
 		Category: "provider", Severity: "warning", GameID: e.job(id).GameID,
@@ -1056,6 +1081,23 @@ func classifyLocalError(err error) string {
 }
 
 func classifyProviderError(err error) (code string, state models.ProviderState, action string, retryable bool) {
+	var providerErr *ProviderOperationError
+	if errors.As(err, &providerErr) {
+		switch providerErr.Code {
+		case "authentication_required":
+			return providerErr.Code, models.ProviderAuthRequired, "Reconnect provider", providerErr.Retryable
+		case "quota_full":
+			return providerErr.Code, models.ProviderQuotaFull, "Manage provider storage", providerErr.Retryable
+		case "rate_limited":
+			return providerErr.Code, models.ProviderRateLimited, "Retry later", providerErr.Retryable
+		case "permission_denied":
+			return providerErr.Code, models.ProviderRemoteProblem, "Review provider access", providerErr.Retryable
+		case "offline":
+			return providerErr.Code, models.ProviderOffline, "Retry connection", providerErr.Retryable
+		default:
+			return "provider_unavailable", models.ProviderUnavailable, "Retry connection", providerErr.Retryable
+		}
+	}
 	message := strings.ToLower(err.Error())
 	var netErr net.Error
 	switch {
@@ -1072,6 +1114,14 @@ func classifyProviderError(err error) (code string, state models.ProviderState, 
 	default:
 		return "provider_unavailable", models.ProviderUnavailable, "Retry connection", true
 	}
+}
+
+func providerRetryAfter(err error) time.Duration {
+	var providerErr *ProviderOperationError
+	if errors.As(err, &providerErr) && providerErr.RetryAfter > 0 {
+		return providerErr.RetryAfter
+	}
+	return 0
 }
 
 func userProviderMessage(code string) string {
@@ -1113,6 +1163,16 @@ func (e *Engine) noteProviderFailure(code string, state models.ProviderState, ac
 	if e.debug {
 		_ = e.logs.Write("warning", "provider", err.Error())
 	}
+}
+
+func (e *Engine) noteProviderRetryAt(next time.Time) {
+	if next.IsZero() {
+		return
+	}
+	e.mu.Lock()
+	e.health.NextRetryAt = next
+	e.mu.Unlock()
+	e.persistHealth()
 }
 
 func (e *Engine) noteProviderSuccess() {

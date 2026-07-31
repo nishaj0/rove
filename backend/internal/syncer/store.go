@@ -55,6 +55,30 @@ type RecoveryPointStore interface {
 
 var ErrConcurrentRevision = errors.New("provider head changed on another device")
 
+// ProviderOperationError carries provider-neutral retry instructions across
+// the RevisionStore boundary. Implementations may wrap SDK-specific errors,
+// but the engine only depends on this stable contract.
+type ProviderOperationError struct {
+	Code       string
+	Retryable  bool
+	RetryAfter time.Duration
+	Err        error
+}
+
+func (e *ProviderOperationError) Error() string {
+	if e == nil || e.Err == nil {
+		return "provider operation failed"
+	}
+	return e.Err.Error()
+}
+
+func (e *ProviderOperationError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.Err
+}
+
 // StageRevision copies immutable content and publishes the originating device
 // head without moving the shared compatibility head.
 func StageRevision(ctx context.Context, source, destination RevisionStore, syncID, revisionID string) (*Manifest, Result, error) {
