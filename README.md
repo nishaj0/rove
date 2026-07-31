@@ -34,6 +34,25 @@ The selected folder contains `.cloud-saver/v1`. It holds internal manifests, obj
 - Snapshot restore and manual game sync are blocked while the tracked game is running.
 - Ignore patterns apply to sync and snapshot scans.
 
+## Performance and resource notes
+
+Cloud Saver runs as a local background daemon. The default reconciliation interval
+is 30 seconds, and each reconciliation currently walks and SHA-256 hashes the
+files in the save folders being synchronized. This is lightweight for normal save
+folders, but very large folders can cause noticeable disk and CPU activity even
+when no file changed. Filesystem events can trigger an earlier scan, while the
+interval scan remains the recovery fallback.
+
+Cloud content is deduplicated by hash, but immutable revisions and displaced-file
+recovery copies are retained. Automatic cloud revision/object garbage collection
+is not implemented yet, so the `.cloud-saver/v1` directory can grow over time.
+The configured retention value is stored for the retention feature, but should not
+currently be treated as an active deletion guarantee. Local snapshots and ZIP
+backups are separate storage and have their own policies.
+
+For the detailed algorithm, complexity, background timers, and known performance
+limits, see the [developer guide](docs/DEVELOPER_GUIDE.md#performance-and-resource-model).
+
 ## Project structure
 
 ```text

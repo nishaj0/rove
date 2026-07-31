@@ -116,6 +116,83 @@ Object writes and JSON writes use temporary paths followed by rename. A newly co
 
 Resolution rejects stale conflicts whose remote hash no longer matches the current head.
 
+## Performance and resource model
+
+Cloud Saver is a local daemon. The desktop app talks to it over loopback
+(`127.0.0.1:7331`). Provider network activity is limited to the selected provider
+implementation: a folder provider performs local filesystem I/O and lets
+OneDrive/Dropbox/Syncthing transfer data, while the Google Drive provider makes
+Drive API calls during sync jobs.
+
+### Reconciliation complexity
+
+For one game, let `F` be the number of regular files, `B` the total bytes in those
+files, and `Δ` the bytes in files that changed since the previous baseline.
+
+| Operation | Current cost |
+| --- | --- |
+| Scheduled or watcher-triggered scan | `O(F + B)` time; every file is currently read and SHA-256 hashed. |
+| Manifest comparison | `O(F)` time and memory. |
+| Local publish | The scan reads `B`; changed files may be read again for verification and object publication, so local read I/O is approximately `B + 2Δ` or more. |
+| Remote apply | `O(F)` metadata work plus bytes archived and downloaded; writes use temporary files and rename. |
+| Conflict detection | `O(F)`; it compares manifest hashes rather than re-reading both versions. |
+
+Memory is proportional to manifest metadata (`O(F)`), not normally to the total
+save size. Local-folder object writes stream through temporary files. The current
+Google Drive implementation uses `io.ReadAll` for object uploads and displaced
+archives, so a large individual Drive object can temporarily consume memory close
+to that file's size.
+
+### Background work while running
+
+The default timers are:
+
+| Service | Cadence / behavior |
+| --- | --- |
+| Game monitor | Enumerates processes every 3 seconds. |
+| Sync engine | Reconciles on the configured interval, default 30 seconds; minimum 5 seconds. |
+| Auto-backup coordinator | Checks due backups every 30 seconds; a configured backup then reads/compresses the game folder. |
+| Snapshot coordinator | Checks due snapshots every 30 seconds; periodic snapshots default to 15 minutes. |
+| Filesystem watcher | Event-driven watches for currently running tracked games. Each watched directory consumes an OS watch/handle. |
+| Tray status | Polls running-game state every 2 seconds when the tray is enabled. |
+| UI | Polls local status/jobs every 5 seconds; game backup/snapshot/conflict data refreshes every 15 seconds. |
+
+Only one reconciliation runs at a time. The trigger channel has capacity one, so
+bursts are coalesced rather than creating an unbounded queue. This bounds memory
+and prevents concurrent writers, but a large game can delay other games. The
+watcher currently passes only an event trigger, not a game-specific path, and
+does not debounce until a file is stable; a burst can therefore cause a full
+multi-game scan.
+
+### Storage growth and provider traffic
+
+Content-addressed objects deduplicate identical file contents, but every
+published manifest is immutable. Remote replacements also create displaced-file
+archives under `versions/`. `syncRetention` is persisted and exposed in the UI,
+but automated reachability-based pruning of manifests and objects is not
+implemented. Cloud storage can therefore grow indefinitely until an explicit,
+carefully designed cleanup feature is added. Local snapshots and ZIP backups are
+separate stores.
+
+For folder sync, Cloud Saver performs local reads/writes and the user's provider
+handles Internet transfer. For Google Drive, unchanged objects are skipped when
+the provider already has the hash, but metadata lookups and manifest/head requests
+still occur. There is no persistent application-level network stream.
+
+### Safety/performance trade-offs and known limits
+
+- Full hashing on every reconciliation favors detection correctness over minimum I/O.
+- Atomic object/manifest/head publication avoids exposing incomplete revisions.
+- There is no provider-level distributed lock or compare-and-swap on `head.json`; simultaneous publishers can race, with the filesystem/provider deciding the final head.
+- A pending watcher count is reset after a successful cycle; failed cycles can leave pending work visible until a later success.
+- Google Drive buffering and absent revision garbage collection are the two largest current resource risks.
+
+Recommended future optimizations are metadata-based hash caching, per-game event
+mapping and debounce, per-game queues, periodic full verification instead of full
+hashing every interval, streaming Drive transfers, retention garbage collection,
+and an atomic head compare-and-swap/lock protocol. These are not part of the
+current implementation.
+
 ### Current protocol limits
 
 - The current head pointer is last-writer-wins at the filesystem level. Immutable revisions make incomplete reads detectable, but there is no provider-level distributed lock.

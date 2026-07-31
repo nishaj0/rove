@@ -70,6 +70,26 @@ When you choose **Sync This Game**, Cloud Saver:
 
 Files deleted on one synchronized computer are deleted on the other after a successful sync. Before applying a remote replacement or deletion, Cloud Saver copies the displaced local file into the private cloud-version store for recovery.
 
+### Performance and storage expectations
+
+Cloud Saver is designed to run continuously as a local background service. It
+normally uses little CPU while idle, but a sync scan currently reads and hashes
+all regular files in the selected save folders. A large save folder can therefore
+produce disk activity every 30 seconds (the default interval), even when the
+contents have not changed. A file change can also trigger an earlier scan.
+
+Cloud Saver runs locally on your computer. With a provider-synced folder, your
+OneDrive, Dropbox, Syncthing, or similar client handles Internet transfer. With
+Google Drive selected, Cloud Saver makes Drive API requests only while it is
+performing sync work.
+
+The `.cloud-saver/v1` directory contains immutable revisions, deduplicated file
+objects, and recovery copies. Do not delete it manually. Automatic pruning of old
+cloud revisions is not implemented yet, so this directory may grow as revisions
+accumulate. The **Cloud revision retention** setting is stored, but it should not
+currently be understood as an active deletion guarantee. Snapshots and ZIP backups
+are separate and follow their own retention settings.
+
 ## Resolve a sync conflict
 
 A conflict means the same file changed on both computers after their last common sync. Cloud Saver does not pick a winner automatically.
@@ -105,7 +125,7 @@ Cloud Saver creates a pre-restore snapshot first. Restore is exact: files that d
 | Sync interval | How often the daemon checks for scheduled sync work. |
 | Ignore patterns | Comma-separated filenames, wildcard patterns, or directory names to skip, such as `*.tmp`, `*.log`, or `cache`. |
 | Synced folder | The shared local folder used for cloud revisions. |
-| Cloud revision retention | The configured limit for cloud revision retention. |
+| Cloud revision retention | The saved retention policy for future cloud revision cleanup; automatic pruning is not yet active. |
 | Snapshot vault | Local directory that stores snapshots. |
 | Max snapshots per game | Number of local snapshots retained for each game. |
 | Snapshot on game exit | Creates a snapshot when a monitored game stops. |
@@ -129,6 +149,20 @@ No provider password is stored. Google Drive keeps a Windows-protected connectio
 ### Why is Sync This Game disabled or rejected?
 
 Configure and save a synced folder first. It is also blocked while the configured game executable is detected as running.
+
+### Why does a sync use disk or CPU when I did not change a save?
+
+The current safety fallback scans and hashes the save folder on each scheduled
+reconciliation. This makes missed filesystem events recoverable, but it means a
+large save directory can be expensive to scan. Close unnecessary games, increase
+the sync interval, and use ignore patterns for temporary files when appropriate.
+
+### Does Cloud Saver delete old cloud revisions automatically?
+
+Not yet. Cloud Saver keeps immutable revisions and displaced-file recovery copies
+so they remain available for safety. The retention setting is persisted for the
+planned cleanup feature, but old cloud objects are currently not removed
+automatically.
 
 ### What if I accidentally choose the wrong Cloud game ID?
 
