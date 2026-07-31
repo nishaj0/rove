@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:\\Users\\njnis\\.pyenv\\pyenv-win\\versions\\3.10.11\\Scripts\\graphify.EXE hook-check"
+          }
+        ]
+      }
+    ]
+  }
+}

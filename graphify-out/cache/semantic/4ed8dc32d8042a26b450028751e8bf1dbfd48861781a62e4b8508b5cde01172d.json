@@ -1,0 +1,1 @@
+{"nodes": [{"id": "sync_version_script", "label": "Version synchronization script", "file_type": "code", "source_file": "scripts/sync-version.mjs", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
