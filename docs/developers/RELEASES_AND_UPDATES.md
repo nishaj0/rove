@@ -7,7 +7,7 @@ Cloud Saver updates directly from stable GitHub Releases. There is no VPS, custo
 The React client calls native Tauri commands in `app/src-tauri/src/updater.rs`:
 
 1. `update_status` restores the schema-versioned state from the application update cache.
-2. `check_for_update` uses the official Tauri updater parser against `https://github.com/njnis/cloud-saver/releases/latest/download/latest.json`.
+2. `check_for_update` uses the official Tauri updater parser against `https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json`.
 3. A successful check is cached for six hours. Startup and pre-launch calls reuse it; a check is bounded to three seconds.
 4. `download_update` streams the signed NSIS updater payload (`-setup.exe` in the current Tauri output, with archive compatibility) to a versioned `.part` file. A 45-second no-progress watchdog, ten-minute request limit, and three attempts bound failure.
 5. The completed archive is minisign-verified, SHA-256 recorded, synced, and atomically renamed. Only then does the state become `ready`.
@@ -43,10 +43,14 @@ The script refuses to overwrite existing material unless `--force` is supplied. 
 
 Do not put either value in source, workflow YAML, issues, logs, release assets, or contributor setup. Ordinary contributors and all end users need neither value. Losing the private key means existing installations cannot trust future updates; rotating it requires an installer release that deliberately migrates the public key.
 
-The Google Drive release variables remain separate:
+Store these signing secrets in the `PROD` GitHub Actions environment. The `release` job explicitly selects that environment with `deployment: false`, so the secrets are available without creating a GitHub Deployment record.
 
-- repository variable `GOOGLE_OAUTH_CLIENT_ID`;
-- repository secret `GOOGLE_OAUTH_CLIENT_SECRET`.
+Store the Google Drive release configuration in the same `PROD` environment:
+
+- environment variable `GOOGLE_OAUTH_CLIENT_ID` (a public OAuth client identifier);
+- environment secret `GOOGLE_OAUTH_CLIENT_SECRET` (the `installed.client_secret` value from the Desktop OAuth JSON file).
+
+Repository-level values also work, but environment scope is preferred because only the release job needs them. Do not put the OAuth client secret in documentation, source, or issue comments.
 
 ## Release notes and documentation maintenance
 

@@ -23,7 +23,7 @@ use tauri_plugin_updater::{Update, UpdaterExt};
 use crate::{backend_running, ensure_backend_running, BACKEND_API_ADDR};
 
 const UPDATE_ENDPOINT: &str =
-    "https://github.com/njnis/cloud-saver/releases/latest/download/latest.json";
+    "https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json";
 const UPDATE_STATE_SCHEMA: u32 = 1;
 const CHECK_CACHE_SECONDS: u64 = 6 * 60 * 60;
 const CHECK_TIMEOUT: Duration = Duration::from_secs(3);

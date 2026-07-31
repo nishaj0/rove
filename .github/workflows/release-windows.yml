@@ -11,6 +11,9 @@ permissions:
 jobs:
   release:
     runs-on: windows-2025
+    environment:
+      name: PROD
+      deployment: false
 
     steps:
       - name: checkout
@@ -63,7 +66,7 @@ jobs:
           CLOUD_SAVER_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:CLOUD_SAVER_GOOGLE_CLIENT_SECRET)) {
-            throw "Repository secret GOOGLE_OAUTH_CLIENT_SECRET is required for an end-user Google Drive release"
+            throw "PROD environment secret GOOGLE_OAUTH_CLIENT_SECRET is required for an end-user Google Drive release"
           }
 
       - name: validate updater signing configuration
@@ -73,10 +76,10 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY)) {
-            throw "Repository secret TAURI_SIGNING_PRIVATE_KEY is required"
+            throw "PROD environment secret TAURI_SIGNING_PRIVATE_KEY is required"
           }
           if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD)) {
-            throw "Repository secret TAURI_SIGNING_PRIVATE_KEY_PASSWORD is required"
+            throw "PROD environment secret TAURI_SIGNING_PRIVATE_KEY_PASSWORD is required"
           }
           $publicKey = Get-Content -Raw app/src-tauri/updater-public-key.txt
           if ([string]::IsNullOrWhiteSpace($publicKey)) {
