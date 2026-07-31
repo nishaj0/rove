@@ -1,6 +1,7 @@
 # Node
 app/node_modules/
 app/dist/
+app/coverage/
 
 # Tauri/Rust
 app/src-tauri/target/

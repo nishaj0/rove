@@ -28,12 +28,15 @@ $env:GOCACHE="$PWD\.cache\go-build"
 go test ./...
 
 cd ..\app
+npm run test:run
 npm run type-check
 npm run build
 
 cd src-tauri
 cargo check
 ```
+
+See [Testing](docs/TESTING.md) for the test-path matrix, coverage commands, API contract checklist, and Windows-only release scenarios.
 
 Update the user and developer documentation when behavior, API contracts, settings, recovery semantics, provider configuration, or implementation boundaries change. Describe only behavior that is actually implemented.
 

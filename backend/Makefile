@@ -1,4 +1,4 @@
-.PHONY: help tray run debug build verify tidy test vet fmt clean
+.PHONY: help tray run debug build verify tidy test test-race coverage vet fmt clean
 
 BINARY ?= cloud-saver-daemon.exe
 CMD_PATH := ./cmd/daemon
@@ -12,6 +12,8 @@ help:
 	@echo "  make verify  - compile all packages"
 	@echo "  make tidy    - tidy modules"
 	@echo "  make test    - run tests"
+	@echo "  make test-race - run tests with the race detector"
+	@echo "  make coverage - write coverage.out"
 	@echo "  make vet     - run go vet"
 	@echo "  make fmt     - run go fmt"
 	@echo "  make clean   - remove built daemon executable"
@@ -36,6 +38,12 @@ tidy:
 
 test:
 	go test ./...
+
+test-race:
+	go test -race ./...
+
+coverage:
+	go test ./... -coverprofile coverage.out
 
 vet:
 	go vet ./...
