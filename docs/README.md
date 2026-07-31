@@ -12,6 +12,7 @@
 - [Architecture and protection workflow](developers/ARCHITECTURE.md)
 - [Provider interface](developers/PROVIDER_INTERFACE.md)
 - [Google Drive development and release setup](developers/GOOGLE_DRIVE_DEVELOPMENT.md)
+- [Application updates and release pipeline](developers/RELEASES_AND_UPDATES.md)
 - [Windows startup, daemon, and tray](developers/WINDOWS_LIFECYCLE.md)
 - [Complete developer guide](DEVELOPER_GUIDE.md)
 

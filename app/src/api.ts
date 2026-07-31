@@ -8,7 +8,6 @@ import type {
   DebugInfo,
   Game,
   GameProtectionStatus,
-  LatestReleaseInfo,
   LogEntry,
   PlayGameRequest,
   RecoveryLibraryEntry,
@@ -205,9 +204,6 @@ export const api = {
   },
   getDiagnostics() {
     return request<Record<string, unknown>>("/diagnostics");
-  },
-  getLatestRelease() {
-    return request<LatestReleaseInfo>("/updates/latest");
   },
   exportBackup(payload: BackupExportRequest) {
     return request<BackupExportResponse>("/backup/export", {

@@ -8,13 +8,13 @@ import (
 
 	googledriveauth "cloud-saver/backend/internal/auth/googledrive"
 	"cloud-saver/backend/internal/backup"
+	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/snapshots"
 	"cloud-saver/backend/internal/syncer"
-	"cloud-saver/backend/internal/updater"
 )
 
 type Server struct {
@@ -29,11 +29,11 @@ type Server struct {
 	configPath     string
 	sqlitePath     string
 	onGamesChanged func([]models.Game)
-	updater        *updater.Client
+	prepareUpdate  func()
 	googleDrive    *googledriveauth.Service
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, googleDrive *googledriveauth.Service, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, googleDrive *googledriveauth.Service, debug bool, onGamesChanged func([]models.Game), prepareUpdate func()) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
@@ -46,7 +46,7 @@ func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backu
 		configPath:     cfg.Path(),
 		sqlitePath:     logs.Path(),
 		onGamesChanged: onGamesChanged,
-		updater:        updaterClient,
+		prepareUpdate:  prepareUpdate,
 		googleDrive:    googleDrive,
 	}
 }
@@ -77,6 +77,13 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/activity", s.handleActivity)
 	mux.HandleFunc("/diagnostics", s.handleDiagnostics)
 	mux.HandleFunc("/status", s.handleStatus)
+	mux.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"version": branding.Version})
+	})
 	mux.HandleFunc("/settings", s.handleSettings)
 	mux.HandleFunc("/providers/google-drive/connect", s.handleGoogleDriveConnect)
 	mux.HandleFunc("/providers/google-drive/disconnect", s.handleGoogleDriveDisconnect)
@@ -89,7 +96,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/snapshots", s.handleSnapshots)
 	mux.HandleFunc("/snapshots/restore", s.handleSnapshotRestore)
 	mux.HandleFunc("/snapshots/", s.handleSnapshotByID)
-	mux.HandleFunc("/updates/latest", s.handleUpdatesLatest)
+	mux.HandleFunc("/lifecycle/prepare-update", s.handlePrepareUpdate)
 
 	handler := localhostOnly(mux)
 	handler = withLoopbackCORS(handler)

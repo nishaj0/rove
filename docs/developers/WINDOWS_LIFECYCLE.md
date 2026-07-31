@@ -37,4 +37,6 @@ Timed/per-game pauses are currently configured in the desktop UI. Pending jobs a
 
 ## Shutdown
 
-The normal application stop cancels contexts, stops monitor/watcher/API components, and closes persistent storage. Jobs, revisions, dirty metadata, provider health, and pause state are already persisted during operation; an interrupted provider transfer resumes idempotently from its revision.
+The normal application stop cancels contexts, stops monitor/watcher/API components, waits for workers, and closes SQLite last. Jobs, revisions, dirty metadata, provider health, and pause state are already persisted during operation; an interrupted provider transfer resumes idempotently from its revision.
+
+Before an application update, `POST /lifecycle/prepare-update` refuses shutdown while a tracked game or protection job is active. Once accepted, the response is flushed, the tray loop exits, the API stops accepting traffic, workers finish, and SQLite closes. The desktop waits for port `7331` to close before launching the passive NSIS updater. On later startup, a bundled desktop/daemon version mismatch gets one controlled restart attempt; an unsafe or incompatible stale daemon produces a recoverable error instead of being killed blindly.

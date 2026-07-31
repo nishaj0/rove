@@ -39,7 +39,9 @@ Modern optional capabilities are `DeviceHeadStore`, `ProfileStore`, and `Recover
 
 ## Google Drive
 
-The Drive provider uses `drive.file`, app properties for logical type/sync ID/name, streaming media, and 8 MiB resumable chunks. It owns only files created through its OAuth client. Refresh tokens use DPAPI. OAuth JSON is never copied into the repository; official builds inject the required Desktop client credential from a protected CI secret. Local setup, configuration precedence, expected diagnostic stages, and fork release configuration are documented in [Google Drive development](GOOGLE_DRIVE_DEVELOPMENT.md).
+The Drive provider uses `drive.file`, app properties for logical type/sync ID/name, streaming media, and 8 MiB resumable chunks. Requests are paced to eight per second and the engine permits one provider transfer globally. Rate-limit responses honor Google `Retry-After`; the resulting cooldown is persisted and is not bypassed by reconnect, manual retry, or network-change events. Chunk requests have a five-minute bound, the overall retry path has a ten-minute bound, and typed errors distinguish authentication, quota, permission, rate limit, temporary outage, and connectivity failures. A local revision is never recaptured merely because its replication retry failed.
+
+The provider owns only files created through its OAuth client. Refresh tokens use DPAPI. OAuth JSON is never copied into the repository; official builds inject the required Desktop client credential from a protected CI secret. Local setup, configuration precedence, expected diagnostic stages, and fork release configuration are documented in [Google Drive development](GOOGLE_DRIVE_DEVELOPMENT.md).
 
 The current provider lists app-owned profile metadata. SQLite has cursor storage reserved, but Drive Changes API cursor consumption is not active yet. Add cursor-expiration recovery and persist Drive file/folder IDs before removing name-based lookup fallback.
 

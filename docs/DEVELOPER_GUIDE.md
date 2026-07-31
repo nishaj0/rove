@@ -6,6 +6,7 @@ This guide covers the implemented Windows-focused, offline-first protection engi
 - [Provider interface](developers/PROVIDER_INTERFACE.md)
 - [Google Drive development and release setup](developers/GOOGLE_DRIVE_DEVELOPMENT.md)
 - [Windows lifecycle and tray](developers/WINDOWS_LIFECYCLE.md)
+- [Application updates and release pipeline](developers/RELEASES_AND_UPDATES.md)
 
 ## Repository map
 
@@ -24,7 +25,7 @@ backend/internal/
   tray/             event-driven Windows tray
 app/
   src/              React UI and typed API client
-  src-tauri/        Tauri bootstrap and official autostart plugin
+  src-tauri/        Tauri bootstrap, autostart, and signed persistent updater
 ```
 
 ## Invariants
@@ -97,6 +98,8 @@ Important routes:
 | `GET /activity` | structured user events |
 | `GET /diagnostics` | sanitized report |
 | `GET/POST /settings` | settings and target selection |
+| `GET /version` | bundled daemon version compatibility |
+| `POST /lifecycle/prepare-update` | refuse unsafe install or begin graceful daemon shutdown |
 
 All endpoints bind to loopback and JSON decoding rejects unknown fields.
 
@@ -112,8 +115,10 @@ npm run type-check
 npm run build
 
 cd src-tauri
-cargo check
+cargo test
 ```
+
+The updater uses the official Tauri release check and signature format, but streams the NSIS updater payload into the application cache instead of retaining it only in memory. A `.part` file is never installable. Completion performs signature verification before atomic rename; installation rechecks SHA-256 and the minisign signature through a read-only mapping. The download has a 45-second no-progress watchdog, a ten-minute request bound, and three attempts. See [Application updates and releases](developers/RELEASES_AND_UPDATES.md) for the state file, key ceremony, CI publication ordering, and rollback rules.
 
 ## Google Drive OAuth diagnostics
 

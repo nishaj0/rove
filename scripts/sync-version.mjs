@@ -101,6 +101,17 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const normalizedVersion = normalizeVersion(sourceVersion);
 
 updateJsonVersion(path.join(rootDir, "app", "package.json"), normalizedVersion);
+updateJsonVersion(path.join(rootDir, "app", "package-lock.json"), normalizedVersion);
+const packageLock = readJson(path.join(rootDir, "app", "package-lock.json"));
+if (packageLock.packages?.[""]) {
+  if (checkOnly && packageLock.packages[""].version !== normalizedVersion) {
+    exitWithError(`app/package-lock.json root package has version '${packageLock.packages[""].version}', expected '${normalizedVersion}'`);
+  }
+  if (!checkOnly) {
+    packageLock.packages[""].version = normalizedVersion;
+    writeJson(path.join(rootDir, "app", "package-lock.json"), packageLock);
+  }
+}
 updateJsonVersion(path.join(rootDir, "app", "src-tauri", "tauri.conf.json"), normalizedVersion);
 updateCargoVersion(path.join(rootDir, "app", "src-tauri", "Cargo.toml"), normalizedVersion);
 updateFallbackVersionConstant(path.join(rootDir, "app", "src", "constants", "updates.ts"), normalizedVersion);

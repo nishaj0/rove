@@ -15,6 +15,9 @@ backend/*.exe
 backend/*.test
 backend/coverage.out
 .cache/
+.secrets/
+latest.json
+release-checksums.txt
 
 # IDE
 .vscode/

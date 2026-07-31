@@ -84,6 +84,16 @@ Old snapshot vaults are not scheduled and new legacy snapshots cannot be created
 
 The current tray provides status, provider/pending count, **Protect now**, **Create Recovery Point** for running games, **Retry connection**, **Review conflicts**, upload pause, all-protection pause, a single-running-game pause, resume, open, and quit. Its updates are event-driven rather than polled.
 
+## Application updates
+
+Cloud Saver checks stable GitHub Releases when the desktop opens and before launching a game if its last successful check is older than six hours. A launch-time check stops after three seconds and never prevents play.
+
+When an update is available before launch, choose **Download and play**, **Not now**, or **Cancel launch**. Downloading can continue while the game runs, but installation remains disabled until tracked games close and active local protection finishes. A verified completed download remains ready after an app restart. Installation replaces the existing program in place and restarts Cloud Saver; do not uninstall first. Failed and offline checks leave the installed version and all protection data unchanged.
+
+When a signed download completes, Cloud Saver opens a **What's new** window with the release notes. Choose **Install update** when nothing is running, or **Install later** to keep the verified update ready. You can reopen the notes from the update banner or Settings at any time.
+
+Settings > **Application updates** shows the installed/available versions, check time, release notes, byte progress, automatic-check option, retry action, and install action. Source/development builds intentionally cannot install releases.
+
 ## Activity and diagnostics
 
 Activity contains useful protection, recovery, provider, conflict, and pause events. Routine requests, watcher noise, PIDs, database paths, and internal scans are excluded.

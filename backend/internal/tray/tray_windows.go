@@ -28,6 +28,8 @@ func (m *Manager) SetRunning(v bool) {
 	m.running.Store(v)
 }
 
+func (m *Manager) Quit() { systray.Quit() }
+
 func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 	systray.Run(func() {
 		systray.SetTitle(branding.DisplayName)

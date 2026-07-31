@@ -276,11 +276,6 @@ export interface DebugInfo {
   startupCommandExists?: boolean;
 }
 
-export interface LatestReleaseInfo {
-  tagName: string;
-  htmlUrl: string;
-}
-
 export interface BackupExportRequest {
   gameId: string;
   destinationPath: string;

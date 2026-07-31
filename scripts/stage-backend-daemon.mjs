@@ -9,6 +9,7 @@ const resourcesDir = path.join(rootDir, "app", "src-tauri", "resources", "backen
 const outputBinary = path.join(resourcesDir, process.platform === "win32" ? "cloud-saver-daemon.exe" : "cloud-saver-daemon");
 const sourceTrayIcon = path.join(rootDir, "app", "src-tauri", "icons", "icon.ico");
 const stagedTrayIcon = path.join(resourcesDir, "icon.ico");
+const appPackage = JSON.parse(fs.readFileSync(path.join(rootDir, "app", "package.json"), "utf8"));
 
 fs.mkdirSync(resourcesDir, { recursive: true });
 
@@ -29,6 +30,7 @@ if (oauthJSONPath && (!oauthClientID || !oauthClientSecret)) {
 
 const args = ["build"];
 const linkerValues = [];
+linkerValues.push(`-X=cloud-saver/backend/internal/branding.Version=${String(appPackage.version).trim()}`);
 if (oauthClientID) {
   linkerValues.push(`-X=cloud-saver/backend/internal/auth/googledrive.defaultClientID=${oauthClientID}`);
 }

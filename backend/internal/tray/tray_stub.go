@@ -10,6 +10,8 @@ func New() *Manager { return &Manager{} }
 
 func (m *Manager) SetRunning(_ bool) {}
 
+func (m *Manager) Quit() {}
+
 func (m *Manager) Run(_ <-chan Status, _ Actions) {
 	<-context.Background().Done()
 }

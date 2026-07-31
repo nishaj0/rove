@@ -4,13 +4,19 @@ use std::{
     net::{SocketAddr, TcpStream},
     path::PathBuf,
     process::Command,
+    sync::Mutex,
     time::Duration,
 };
 use tauri::Manager;
 use tauri_plugin_autostart::ManagerExt;
 
+mod updater;
+
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
+
+#[cfg(not(debug_assertions))]
+use std::io::{Read, Write};
 
 const BACKEND_API_ADDR: &str = "127.0.0.1:7331";
 
@@ -39,11 +45,31 @@ fn is_autostart_enabled(app: tauri::AppHandle) -> Result<bool, String> {
     app.autolaunch().is_enabled().map_err(|err| err.to_string())
 }
 
+#[derive(Default)]
+struct DaemonBootstrapState(Mutex<Option<String>>);
+
+#[tauri::command]
+fn daemon_bootstrap_error(state: tauri::State<'_, DaemonBootstrapState>) -> Option<String> {
+    state.0.lock().unwrap().clone()
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![set_autostart, is_autostart_enabled])
+        .invoke_handler(tauri::generate_handler![
+            set_autostart,
+            is_autostart_enabled,
+            daemon_bootstrap_error,
+            updater::update_status,
+            updater::check_for_update,
+            updater::download_update,
+            updater::install_downloaded_update,
+            updater::discard_downloaded_update,
+            updater::set_automatic_update_checks,
+        ])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(DaemonBootstrapState::default())
         .plugin(
             tauri_plugin_single_instance::Builder::new()
                 .callback(|app, argv, _cwd| {
@@ -59,14 +85,18 @@ fn main() {
                 .build(),
         )
         .setup(|app| {
+            app.manage(updater::UpdateManager::load(app.handle()));
             app.handle()
                 .plugin(tauri_plugin_autostart::init(
                     tauri_plugin_autostart::MacosLauncher::LaunchAgent,
                     Some(vec!["--background"]),
                 ))
                 .map_err(|err| Box::<dyn std::error::Error>::from(err))?;
-            if let Err(err) = ensure_backend_running(app) {
+            if let Err(err) = ensure_backend_running(app.handle()) {
                 eprintln!("failed to ensure backend daemon is running: {err}");
+                *app.state::<DaemonBootstrapState>().0.lock().unwrap() = Some(format!(
+                    "Cloud Saver could not start a compatible background service: {err}. Your saves and settings were not changed."
+                ));
             }
             if std::env::args().any(|arg| arg == "--background") {
                 if let Some(window) = app.get_webview_window("main") {
@@ -81,7 +111,7 @@ fn main() {
 }
 
 // avoids spawning extra daemon processes when one is already serving the local API.
-fn backend_running() -> bool {
+pub(crate) fn backend_running() -> bool {
     let addr: SocketAddr = match BACKEND_API_ADDR.parse() {
         Ok(value) => value,
         Err(_) => return false,
@@ -90,7 +120,7 @@ fn backend_running() -> bool {
 }
 
 // resolves the packaged backend binary path for installed builds and local bundle runs.
-fn locate_backend_binary(app: &tauri::App) -> Option<PathBuf> {
+fn locate_backend_binary(app: &tauri::AppHandle) -> Option<PathBuf> {
     let mut candidates: Vec<PathBuf> = Vec::new();
 
     if let Ok(resource_dir) = app.path().resource_dir() {
@@ -114,9 +144,29 @@ fn locate_backend_binary(app: &tauri::App) -> Option<PathBuf> {
 }
 
 // starts the packaged backend daemon in background when the API is not already reachable.
-fn ensure_backend_running(app: &tauri::App) -> Result<(), String> {
+pub(crate) fn ensure_backend_running(app: &tauri::AppHandle) -> Result<(), String> {
     if backend_running() {
+        #[cfg(debug_assertions)]
         return Ok(());
+
+        #[cfg(not(debug_assertions))]
+        {
+            let desktop_version = app.package_info().version.to_string();
+            let daemon_version = backend_version()?;
+            if daemon_version == desktop_version {
+                return Ok(());
+            }
+            request_backend_restart()?;
+            let started = std::time::Instant::now();
+            while backend_running() && started.elapsed() < Duration::from_secs(10) {
+                std::thread::sleep(Duration::from_millis(150));
+            }
+            if backend_running() {
+                return Err(format!(
+                    "background service version {daemon_version} is still running; expected {desktop_version}"
+                ));
+            }
+        }
     }
 
     let backend_path = locate_backend_binary(app)
@@ -125,10 +175,76 @@ fn ensure_backend_running(app: &tauri::App) -> Result<(), String> {
     let mut command = Command::new(&backend_path);
     apply_platform_process_flags(&mut command);
 
-    command
-        .spawn()
-        .map(|_| ())
-        .map_err(|err| format!("failed to launch backend from '{}': {err}", backend_path.display()))
+    command.spawn().map(|_| ()).map_err(|err| {
+        format!(
+            "failed to launch backend from '{}': {err}",
+            backend_path.display()
+        )
+    })
+}
+
+#[cfg(not(debug_assertions))]
+fn backend_version() -> Result<String, String> {
+    let response = backend_http_request(
+        "GET /version HTTP/1.1\r\nHost: 127.0.0.1:7331\r\nConnection: close\r\n\r\n",
+    )?;
+    if !response
+        .lines()
+        .next()
+        .unwrap_or_default()
+        .contains(" 200 ")
+    {
+        return Err(
+            "the running background service does not expose compatible version information".into(),
+        );
+    }
+    let body = response.split("\r\n\r\n").nth(1).unwrap_or_default();
+    let value: serde_json::Value = serde_json::from_str(body).map_err(|err| err.to_string())?;
+    value
+        .get("version")
+        .and_then(|version| version.as_str())
+        .map(str::to_owned)
+        .ok_or_else(|| "the running background service returned no version".into())
+}
+
+#[cfg(not(debug_assertions))]
+fn request_backend_restart() -> Result<(), String> {
+    let response = backend_http_request(concat!(
+        "POST /lifecycle/prepare-update HTTP/1.1\r\n",
+        "Host: 127.0.0.1:7331\r\n",
+        "Content-Length: 0\r\n",
+        "Connection: close\r\n\r\n"
+    ))?;
+    if response
+        .lines()
+        .next()
+        .unwrap_or_default()
+        .contains(" 202 ")
+    {
+        Ok(())
+    } else {
+        Err("the stale background service could not be restarted safely; close tracked games and restart Cloud Saver".into())
+    }
+}
+
+#[cfg(not(debug_assertions))]
+fn backend_http_request(request: &str) -> Result<String, String> {
+    let addr: SocketAddr = BACKEND_API_ADDR
+        .parse()
+        .map_err(|err| format!("invalid background service address: {err}"))?;
+    let mut stream =
+        TcpStream::connect_timeout(&addr, Duration::from_secs(2)).map_err(|err| err.to_string())?;
+    stream
+        .set_read_timeout(Some(Duration::from_secs(3)))
+        .map_err(|err| err.to_string())?;
+    stream
+        .write_all(request.as_bytes())
+        .map_err(|err| err.to_string())?;
+    let mut response = String::new();
+    stream
+        .read_to_string(&mut response)
+        .map_err(|err| err.to_string())?;
+    Ok(response)
 }
 
 #[cfg(target_os = "windows")]

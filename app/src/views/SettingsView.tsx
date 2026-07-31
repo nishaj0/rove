@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { PauseScope, ProtectionTarget, Settings, ThemeMode } from "../types";
+import type { AppUpdateState } from "../update";
 
 type SettingsViewProps = {
   settings: Settings;
@@ -16,13 +17,23 @@ type SettingsViewProps = {
   onProtectionEnabled: (enabled: boolean) => Promise<void>;
   onRetry: () => Promise<void>;
   onSaveSettings: () => void;
+  updateState: AppUpdateState | null;
+  updateInstallBlocked: boolean;
+  onCheckForUpdate: () => void;
+  onDownloadUpdate: () => void;
+  onInstallUpdate: () => void;
+  onDiscardUpdate: () => void;
+  onAutomaticUpdateChecks: (enabled: boolean) => void;
+  onViewUpdateNotes: () => void;
 };
 
 export function SettingsView(props: SettingsViewProps) {
   const {
     settings, activeProtectionTarget, onChange, onThemeModeChange, onTargetChange, onConnectGoogleDrive,
     onDisconnectGoogleDrive, onBrowseSyncRoot, onAutostartChange, onPause,
-    onResume, onProtectionEnabled, onRetry, onSaveSettings,
+    onResume, onProtectionEnabled, onRetry, onSaveSettings, updateState,
+    updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
+    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes,
   } = props;
   const [googleBusy, setGoogleBusy] = useState(false);
   async function runGoogle(action: () => Promise<void>) {
@@ -94,6 +105,52 @@ export function SettingsView(props: SettingsViewProps) {
         </div>
       </section>
 
+      <section className="panel" data-window-title="APPLICATION.UPDATES">
+        <div className="panel-head">
+          <h2>Application updates</h2>
+          <span className={`state-text ${updateState?.lifecycle === "error" ? "warning" : updateState?.lifecycle === "ready" ? "success" : ""}`}>
+            {(updateState?.lifecycle ?? "unavailable").replace(/_/g, " ")}
+          </span>
+        </div>
+        <p className="empty-state">
+          Signed updates replace the installed application in place. Saves, settings, local revisions, and provider credentials remain in your application-data folder.
+        </p>
+        {updateState ? (
+          <div className="settings-grid update-settings-grid">
+            <div><span className="snapshot-meta">Installed version</span><strong>{updateState.currentVersion}</strong></div>
+            <div><span className="snapshot-meta">Available version</span><strong>{updateState.availableVersion ?? "Up to date"}</strong></div>
+            <div><span className="snapshot-meta">Last successful check</span><strong>{updateState.lastCheckedAt ? new Date(updateState.lastCheckedAt * 1000).toLocaleString() : "Not checked yet"}</strong></div>
+            <label className="inline-check">
+              <input
+                type="checkbox"
+                checked={updateState.automaticChecksEnabled}
+                disabled={updateState.development}
+                onChange={(event) => onAutomaticUpdateChecks(event.target.checked)}
+              />
+              Check automatically every six hours
+            </label>
+          </div>
+        ) : <p className="empty-state">Native update status is unavailable in browser preview mode.</p>}
+        {updateState?.notes ? <div className="update-notes" aria-label="Release notes">{updateState.notes}</div> : null}
+        {updateState?.lifecycle === "downloading" ? (
+          <div className="update-progress" aria-live="polite">
+            <progress max={updateState.totalBytes ?? Math.max(1, updateState.downloadedBytes)} value={updateState.downloadedBytes} />
+            <span>{formatUpdateBytes(updateState.downloadedBytes)}{updateState.totalBytes ? ` of ${formatUpdateBytes(updateState.totalBytes)}` : " downloaded"}</span>
+          </div>
+        ) : null}
+        {updateState?.error ? <p className="banner error" role="alert">{updateState.error}</p> : null}
+        {updateInstallBlocked && updateState?.lifecycle === "ready" ? <p className="snapshot-meta">Close tracked games and wait for active protection to finish before installing.</p> : null}
+        {updateState?.development ? <p className="snapshot-meta">Installation is disabled in source/development builds. Release builds embed the public signing key.</p> : null}
+        <div className="detail-actions">
+          <button className="btn" type="button" disabled={updateState?.lifecycle === "checking" || updateState?.lifecycle === "downloading" || updateState?.development} onClick={onCheckForUpdate}>Check now</button>
+          {updateState?.lifecycle === "available" ? <button className="btn primary" type="button" onClick={onDownloadUpdate}>Download update</button> : null}
+          {updateState?.lifecycle === "ready" ? <button className="btn primary" type="button" disabled={updateInstallBlocked} onClick={onInstallUpdate}>Install v{updateState.availableVersion}</button> : null}
+          {updateState?.lifecycle === "ready" ? <button className="btn" type="button" onClick={onViewUpdateNotes}>What's new</button> : null}
+          {updateState?.lifecycle === "ready" ? <button className="btn" type="button" onClick={onDiscardUpdate}>Discard download</button> : null}
+          {updateState?.lifecycle === "error" && updateState.retryable ? <button className="btn primary" type="button" onClick={onCheckForUpdate}>Retry</button> : null}
+        </div>
+      </section>
+
       <section className="panel" data-window-title="SYSTEM.SETTINGS">
         <h2>Defaults and behavior</h2>
         <div className="settings-grid">
@@ -137,4 +194,10 @@ export function SettingsView(props: SettingsViewProps) {
       </section>
     </>
   );
+}
+
+function formatUpdateBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

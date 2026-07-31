@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"cloud-saver/backend/internal/api"
 	googledriveauth "cloud-saver/backend/internal/auth/googledrive"
@@ -25,7 +26,6 @@ import (
 	"cloud-saver/backend/internal/syncer"
 	googledrivestore "cloud-saver/backend/internal/syncer/drive"
 	"cloud-saver/backend/internal/tray"
-	"cloud-saver/backend/internal/updater"
 	"cloud-saver/backend/internal/watcher"
 )
 
@@ -44,6 +44,8 @@ type Application struct {
 	httpSrv         *http.Server
 	cancel          context.CancelFunc
 	wg              sync.WaitGroup
+	stopOnce        sync.Once
+	stopErr         error
 }
 
 // captures startup configuration for daemon runtime.
@@ -158,7 +160,6 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.logEvent("error", "watcher", err.Error())
 	}
 
-	updaterClient := updater.New()
 	// keep watcher roots in sync when game list changes via api.
 	apiSvc := api.New(
 		a.cfg,
@@ -168,7 +169,6 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.monitor,
 		a.snapshots,
 		a.googleDriveAuth,
-		updaterClient,
 		a.debug,
 		func(_ []models.Game) {
 			a.monitor.ForcePoll()
@@ -177,6 +177,12 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 			if err := a.reloadWatcherForRunningGames(running); err != nil {
 				a.logEvent("error", "watcher", err.Error())
 			}
+		},
+		func() {
+			if a.cancel != nil {
+				a.cancel()
+			}
+			a.tray.Quit()
 		},
 	)
 	a.logEvent("info", "http", fmt.Sprintf("api listening on %s", a.httpSrvAddr()))
@@ -293,31 +299,46 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 				_ = openUI()
 			},
 			Exit: func() {
-				_ = a.Stop()
+				if a.cancel != nil {
+					a.cancel()
+				}
 			},
 		},
 	)
-	return nil
+	return a.Stop()
 }
 
 // gracefully tears down watcher, http server, logging, and worker goroutines.
 func (a *Application) Stop() error {
-	if a.cancel != nil {
-		a.cancel()
-	}
-	a.logEvent("info", "app", "application stopping")
-	if a.watcher != nil {
-		_ = a.watcher.Close()
-	}
-	if a.httpSrv != nil {
-		// stop accepting api traffic before waiting on goroutines.
-		_ = a.httpSrv.Shutdown(context.Background())
-	}
-	if a.logs != nil {
-		_ = a.logs.Close()
-	}
-	a.wg.Wait()
-	return nil
+	a.stopOnce.Do(func() {
+		if a.cancel != nil {
+			a.cancel()
+		}
+		a.logEvent("info", "app", "application stopping")
+		if a.watcher != nil {
+			if err := a.watcher.Close(); err != nil && a.stopErr == nil {
+				a.stopErr = err
+			}
+		}
+		if a.httpSrv != nil {
+			// Stop accepting API traffic before waiting on workers, but never
+			// let a stuck loopback client block an application update forever.
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			if err := a.httpSrv.Shutdown(shutdownCtx); err != nil && a.stopErr == nil {
+				a.stopErr = err
+			}
+			cancel()
+		}
+		// Workers may still write their final durable state and diagnostics.
+		// Keep SQLite open until every goroutine has observed cancellation.
+		a.wg.Wait()
+		if a.logs != nil {
+			if err := a.logs.Close(); err != nil && a.stopErr == nil {
+				a.stopErr = err
+			}
+		}
+	})
+	return a.stopErr
 }
 
 // builds the loopback bind address from current config port.

@@ -11,6 +11,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": [
       "nsis"
     ],
@@ -22,6 +23,17 @@
     "resources": [
       "resources/backend"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUxNEFBM0Q0MzdCMDZCQjYKUldTMmE3QTMxS05LNFd1STZ0Q3dzdkxkN1pFa0NKdi9FMDRYVG1CU1gyRGo4SlRkQnR4Ni9semwK",
+      "endpoints": [
+        "https://github.com/njnis/cloud-saver/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   },
   "app": {
     "windows": [

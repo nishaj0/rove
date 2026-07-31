@@ -34,6 +34,7 @@ Objects use SHA-256 names, manifests are immutable, and a head is published only
 - [Provider interface](docs/developers/PROVIDER_INTERFACE.md)
 - [Google Drive development](docs/developers/GOOGLE_DRIVE_DEVELOPMENT.md)
 - [Windows startup and tray](docs/developers/WINDOWS_LIFECYCLE.md)
+- [Application updates and releases](docs/developers/RELEASES_AND_UPDATES.md)
 
 ## Repository
 
@@ -97,8 +98,12 @@ cargo check
 
 The Tauri release build uses the official autostart plugin and registers `Cloud Saver.exe --background`. The background bootstrap ensures the single daemon is running, opens no main window, and exits.
 
+Installed releases check the stable GitHub Releases update manifest at startup and before a game launch when the last successful check is more than six hours old. Checks time out after three seconds and never block play. Accepted updates download as signed NSIS updater archives in the background, survive application restarts, and install in place after tracked games and active protection work close. Manual uninstall is neither required nor recommended. Source/development builds can check the UI state but cannot install updates.
+
 ## Security
 
 Never commit Google OAuth JSON downloads, client credentials, refresh tokens, save contents, or personal paths. Google requires the Desktop client credential during token exchange even though it cannot be confidential in a distributed desktop binary. Official releases inject it from a protected CI secret. Local developers point `CLOUD_SAVER_GOOGLE_OAUTH_JSON` at their downloaded file; normal users enter nothing. User refresh tokens remain local and Windows-protected.
+
+The updater public key is committed at `app/src-tauri/updater-public-key.txt`. Its private key and password must never enter Git; the local key ceremony stores them under ignored `.secrets/` files, and releases read them from GitHub Actions secrets. End users and ordinary contributors do not supply signing keys.
 
 The OAuth loading and release-injection paths are defined in `backend/internal/auth/googledrive/service.go` and `scripts/stage-backend-daemon.mjs`. For sanitized OAuth-stage logs during local development, start the daemon with `--debug` or set `CLOUD_SAVER_DEBUG=1`.

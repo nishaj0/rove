@@ -5,7 +5,17 @@ import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
 import { SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
-import { type AppUpdateInfo, checkForAppUpdate } from "./update";
+import {
+  type AppUpdateState,
+  checkForAppUpdate,
+  discardDownloadedUpdate,
+  downloadAppUpdate,
+  getUpdateStatus,
+  installDownloadedUpdate,
+  listenForUpdateProgress,
+  setAutomaticUpdateChecks,
+  updateActionLabel,
+} from "./update";
 import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
@@ -105,8 +115,12 @@ export default function App() {
   const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
-  const [availableUpdate, setAvailableUpdate] = useState<AppUpdateInfo | null>(null);
+  const [updateState, setUpdateState] = useState<AppUpdateState | null>(null);
   const [updateDismissed, setUpdateDismissed] = useState(false);
+  const [launchUpdatePromptOpen, setLaunchUpdatePromptOpen] = useState(false);
+  const [updateNotesOpen, setUpdateNotesOpen] = useState(false);
+  const launchUpdateChoiceRef = useRef<((choice: "download" | "later" | "cancel") => void) | null>(null);
+  const previousUpdateLifecycleRef = useRef<AppUpdateState["lifecycle"] | null>(null);
 
   const [newName, setNewName] = useState("");
   const [newPath, setNewPath] = useState("");
@@ -312,6 +326,7 @@ export default function App() {
   async function loadInitialData() {
     try {
       setError("");
+      const daemonBootstrapError = await invoke<string | null>("daemon_bootstrap_error").catch(() => null);
       const [nextGames, nextSettings, nextStatus, nextRecoveryLibrary, googleDriveStatus] = await Promise.all([
         api.getGames(),
         api.getSettings(),
@@ -328,8 +343,10 @@ export default function App() {
       });
       setStatus(nextStatus);
       setRecoveryLibrary(nextRecoveryLibrary);
+      if (daemonBootstrapError) setError(daemonBootstrapError);
     } catch (e) {
-      setError(toFriendlyError(e));
+      const daemonBootstrapError = await invoke<string | null>("daemon_bootstrap_error").catch(() => null);
+      setError(daemonBootstrapError || toFriendlyError(e));
     }
   }
 
@@ -339,19 +356,34 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
+    let unlisten: (() => void) | undefined;
 
     async function loadUpdateInfo() {
-      const update = await checkForAppUpdate();
-      if (!cancelled && update) {
-        setAvailableUpdate(update);
-        setUpdateDismissed(false);
-        setToast(`New version ${update.latestVersion} is available`);
+      try {
+        const restored = await getUpdateStatus();
+        if (cancelled) return;
+        setUpdateState(restored);
+        unlisten = await listenForUpdateProgress((next) => {
+          if (!cancelled) setUpdateState(next);
+        });
+        const checked = await checkForAppUpdate(false);
+        if (!cancelled) {
+          setUpdateState(checked);
+          if (checked.lifecycle === "available") {
+            setUpdateDismissed(false);
+            setToast(`New version ${checked.availableVersion} is available`);
+          }
+        }
+      } catch {
+        // The browser-only Vite preview has no native updater. Installed builds
+        // report actionable update errors through UpdateState instead.
       }
     }
 
     void loadUpdateInfo();
     return () => {
       cancelled = true;
+      unlisten?.();
     };
   }, []);
 
@@ -376,6 +408,32 @@ export default function App() {
       }
     };
   }, [activeView]);
+
+  useEffect(() => {
+    if (!launchUpdatePromptOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") resolveLaunchUpdateChoice("cancel");
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [launchUpdatePromptOpen]);
+
+  useEffect(() => {
+    if (!updateNotesOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setUpdateNotesOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [updateNotesOpen]);
+
+  useEffect(() => {
+    const previousLifecycle = previousUpdateLifecycleRef.current;
+    if (previousLifecycle !== null && previousLifecycle !== "ready" && updateState?.lifecycle === "ready") {
+      setUpdateNotesOpen(true);
+    }
+    previousUpdateLifecycleRef.current = updateState?.lifecycle ?? null;
+  }, [updateState?.lifecycle]);
 
   useEffect(() => {
     if (activeView !== "game" || !selectedGameId) {
@@ -540,9 +598,28 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
+    let latest = updateState;
+    try {
+      latest = await checkForAppUpdate(false);
+      setUpdateState(latest);
+    } catch {
+      // Update availability never blocks launching a game.
+    }
+
+    let downloadAfterLaunch = false;
+    if (latest?.lifecycle === "available") {
+      const choice = await new Promise<"download" | "later" | "cancel">((resolve) => {
+        launchUpdateChoiceRef.current = resolve;
+        setLaunchUpdatePromptOpen(true);
+      });
+      if (choice === "cancel") return;
+      downloadAfterLaunch = choice === "download";
+    }
+
     try {
       const result = await api.playGame({ gameId: selectedGame.id });
       setToast(result.status === "already_running" ? "Game is already running" : "Game launched");
+      if (downloadAfterLaunch) void onDownloadUpdate();
       await refreshGamesData();
     } catch (err) {
       const message = toFriendlyError(err);
@@ -642,6 +719,13 @@ export default function App() {
       setError(toFriendlyError(err));
       return false;
     }
+  }
+
+  function resolveLaunchUpdateChoice(choice: "download" | "later" | "cancel") {
+    setLaunchUpdatePromptOpen(false);
+    const resolve = launchUpdateChoiceRef.current;
+    launchUpdateChoiceRef.current = null;
+    resolve?.(choice);
   }
 
   async function onSetProtectionControl(
@@ -873,13 +957,51 @@ export default function App() {
     return `${(value / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   }
 
-  function onDownloadUpdate() {
-    if (!availableUpdate) {
-      return;
+  async function onDownloadUpdate() {
+    try {
+      setUpdateDismissed(false);
+      if (updateState?.lifecycle === "available" || updateState?.lifecycle === "error") {
+        const refreshed = await checkForAppUpdate(true);
+        setUpdateState(refreshed);
+        if (refreshed.lifecycle !== "available") return;
+      }
+      setUpdateState(await downloadAppUpdate());
+    } catch (err) {
+      setError(toFriendlyError(err));
+      setUpdateState(await getUpdateStatus().catch(() => updateState));
     }
-    const opened = window.open(availableUpdate.releaseUrl, "_blank", "noopener,noreferrer");
-    if (!opened) {
-      window.location.href = availableUpdate.releaseUrl;
+  }
+
+  async function onInstallUpdate() {
+    try {
+      setUpdateState(await installDownloadedUpdate());
+    } catch (err) {
+      setError(toFriendlyError(err));
+      setUpdateState(await getUpdateStatus().catch(() => updateState));
+    }
+  }
+
+  async function onCheckForUpdate() {
+    try {
+      setUpdateState(await checkForAppUpdate(true));
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onDiscardUpdate() {
+    try {
+      setUpdateState(await discardDownloadedUpdate());
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onAutomaticUpdateChecks(enabled: boolean) {
+    try {
+      setUpdateState(await setAutomaticUpdateChecks(enabled));
+    } catch (err) {
+      setError(toFriendlyError(err));
     }
   }
 
@@ -925,22 +1047,35 @@ export default function App() {
           </div>
           <p className="app-utility-title">{currentViewTitle}</p>
           <div className="app-utility-actions">
-            {availableUpdate ? (
-              <button className="update-indicator" type="button" onClick={onDownloadUpdate}>
-                Update {availableUpdate.latestVersion}
+            {updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle) ? (
+              <button
+                className="update-indicator"
+                type="button"
+                onClick={() => updateState.lifecycle === "ready" ? void onInstallUpdate() : pushNavigation("settings")}
+                disabled={updateState.lifecycle === "downloading" || updateState.lifecycle === "installing"}
+              >
+                {updateActionLabel(updateState)}
               </button>
             ) : null}
           </div>
         </div>
 
         {error ? <div className="banner error">{error}</div> : null}
-        {availableUpdate && !updateDismissed ? (
+        {updateState && !updateDismissed && ["available", "downloading", "ready", "error"].includes(updateState.lifecycle) ? (
           <div className="banner toast update-banner">
             <p>
-              New version {availableUpdate.latestVersion} is available. You are on {availableUpdate.currentVersion}.
+              {updateState.lifecycle === "ready"
+                ? `Version ${updateState.availableVersion} is verified and ready to install.`
+                : updateState.lifecycle === "downloading"
+                  ? `Downloading version ${updateState.availableVersion}: ${formatBytes(updateState.downloadedBytes)}${updateState.totalBytes ? ` of ${formatBytes(updateState.totalBytes)}` : ""}.`
+                  : updateState.lifecycle === "error"
+                    ? updateState.error ?? "The update needs attention. Your current installation is unchanged."
+                    : `New version ${updateState.availableVersion} is available. You are on ${updateState.currentVersion}.`}
             </p>
             <div className="update-banner-actions">
-              <button className="btn primary" type="button" onClick={onDownloadUpdate}>Download</button>
+              {updateState.lifecycle === "available" || updateState.lifecycle === "error" ? <button className="btn primary" type="button" onClick={() => void (updateState.lifecycle === "available" ? onDownloadUpdate() : onCheckForUpdate())}>{updateState.lifecycle === "available" ? "Download" : "Retry"}</button> : null}
+              {updateState.lifecycle === "ready" ? <button className="btn primary" type="button" disabled={games.some((game) => game.running) || Boolean(status?.activeJobId)} onClick={() => void onInstallUpdate()}>Install update</button> : null}
+              {updateState.lifecycle === "ready" ? <button className="btn" type="button" onClick={() => setUpdateNotesOpen(true)}>What's new</button> : null}
               <button className="btn" type="button" onClick={() => setUpdateDismissed(true)}>Dismiss</button>
             </div>
           </div>
@@ -1044,9 +1179,59 @@ export default function App() {
             onProtectionEnabled={(enabled) => onSetProtectionControl(undefined, enabled ? "none" : "all", "manual", enabled)}
             onRetry={async () => { await api.retryProtection(); setToast("Provider retry requested"); }}
             onSaveSettings={() => void onSaveSettings()}
+            updateState={updateState}
+            updateInstallBlocked={games.some((game) => game.running) || Boolean(status?.activeJobId)}
+            onCheckForUpdate={() => void onCheckForUpdate()}
+            onDownloadUpdate={() => void onDownloadUpdate()}
+            onInstallUpdate={() => void onInstallUpdate()}
+            onDiscardUpdate={() => void onDiscardUpdate()}
+            onAutomaticUpdateChecks={(enabled) => void onAutomaticUpdateChecks(enabled)}
+            onViewUpdateNotes={() => setUpdateNotesOpen(true)}
           />
         ) : null}
       </main>
+
+      {launchUpdatePromptOpen && updateState?.availableVersion ? (
+        <div className="add-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) resolveLaunchUpdateChoice("cancel"); }}>
+          <section className="add-modal update-launch-dialog" role="dialog" aria-modal="true" aria-labelledby="update-launch-title">
+            <div className="modal-head">
+              <div>
+                <span className="eyebrow">APPLICATION.UPDATE</span>
+                <h2 id="update-launch-title">Version {updateState.availableVersion} is available</h2>
+              </div>
+            </div>
+            <p>Cloud Saver can download the signed update in the background while your game launches. Installation will wait until every tracked game and protection job has finished.</p>
+            {updateState.notes ? <div className="update-notes">{updateState.notes}</div> : null}
+            <div className="modal-actions">
+              <button className="btn primary" autoFocus type="button" onClick={() => resolveLaunchUpdateChoice("download")}>Download and play</button>
+              <button className="btn" type="button" onClick={() => resolveLaunchUpdateChoice("later")}>Not now</button>
+              <button className="btn" type="button" onClick={() => resolveLaunchUpdateChoice("cancel")}>Cancel launch</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {updateNotesOpen && updateState?.lifecycle === "ready" && updateState.availableVersion ? (
+        <div className="add-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUpdateNotesOpen(false); }}>
+          <section className="add-modal update-notes-dialog" role="dialog" aria-modal="true" aria-labelledby="update-notes-title" aria-describedby="update-notes-copy">
+            <div className="modal-head">
+              <div>
+                <span className="eyebrow">APPLICATION.UPDATE</span>
+                <h2 id="update-notes-title">What's new in v{updateState.availableVersion}</h2>
+              </div>
+            </div>
+            <p id="update-notes-copy">The signed update is downloaded and verified. Review the release notes, then install whenever no tracked game or protection job is active.</p>
+            <div className="update-notes" tabIndex={0} aria-label={`Release notes for version ${updateState.availableVersion}`}>
+              {updateState.notes || "No release notes were supplied for this update."}
+            </div>
+            {games.some((game) => game.running) || Boolean(status?.activeJobId) ? <p className="snapshot-meta">Installation is waiting for tracked games and active protection to finish.</p> : null}
+            <div className="modal-actions">
+              <button className="btn primary" autoFocus type="button" disabled={games.some((game) => game.running) || Boolean(status?.activeJobId)} onClick={() => { setUpdateNotesOpen(false); void onInstallUpdate(); }}>Install update</button>
+              <button className="btn" type="button" onClick={() => setUpdateNotesOpen(false)}>Install later</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

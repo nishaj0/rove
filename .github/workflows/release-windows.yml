@@ -39,6 +39,13 @@ jobs:
       - name: sync version from tag
         run: node scripts/sync-version.mjs "${{ github.ref_name }}"
 
+      - name: validate stable updater tag
+        shell: powershell
+        run: |
+          if ("${{ github.ref_name }}" -notmatch '^v\d+\.\d+\.\d+$') {
+            throw "Automatic updater releases must use a stable vX.Y.Z tag"
+          }
+
       - name: validate version sync
         run: node scripts/sync-version.mjs "${{ github.ref_name }}" --check
 
@@ -59,19 +66,58 @@ jobs:
             throw "Repository secret GOOGLE_OAUTH_CLIENT_SECRET is required for an end-user Google Drive release"
           }
 
+      - name: validate updater signing configuration
+        shell: powershell
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY)) {
+            throw "Repository secret TAURI_SIGNING_PRIVATE_KEY is required"
+          }
+          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD)) {
+            throw "Repository secret TAURI_SIGNING_PRIVATE_KEY_PASSWORD is required"
+          }
+          $publicKey = Get-Content -Raw app/src-tauri/updater-public-key.txt
+          if ([string]::IsNullOrWhiteSpace($publicKey)) {
+            throw "The committed updater public key is empty"
+          }
+          $configKey = (Get-Content -Raw app/src-tauri/tauri.conf.json | ConvertFrom-Json).plugins.updater.pubkey
+          if ($publicKey.Trim() -ne $configKey.Trim()) {
+            throw "tauri.conf.json updater key does not match updater-public-key.txt"
+          }
+
       - name: build tauri release bundle
         working-directory: app
         env:
           CLOUD_SAVER_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_OAUTH_CLIENT_ID }}
           CLOUD_SAVER_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run tauri:build
+
+      - name: generate and validate updater manifest
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $env:CLOUD_SAVER_RELEASE_NOTES = gh api --method POST "repos/${{ github.repository }}/releases/generate-notes" -f "tag_name=${{ github.ref_name }}" --jq '.body'
+          node scripts/generate-update-manifest.mjs "app/src-tauri/target/release/bundle/nsis" "${{ github.ref_name }}" "${{ github.repository }}"
+          node scripts/generate-update-manifest.mjs "app/src-tauri/target/release/bundle/nsis" "${{ github.ref_name }}" "${{ github.repository }}" --check
+          $archive = Get-ChildItem "app/src-tauri/target/release/bundle/nsis/*" -File |
+            Where-Object { ($_.Name -like "*.nsis.zip" -or $_.Name -like "*-setup.exe") -and (Test-Path "$($_.FullName).sig") } |
+            Select-Object -First 1
+          if (-not $archive) { throw "No signed NSIS updater payload found" }
+          $env:CLOUD_SAVER_VERIFY_UPDATE_ARTIFACT = $archive.FullName
+          $env:CLOUD_SAVER_VERIFY_UPDATE_SIGNATURE = "$($archive.FullName).sig"
+          cargo test --manifest-path app/src-tauri/Cargo.toml release_signature_matches_committed_key_when_requested
 
       - name: generate checksums
         shell: powershell
         run: |
           $bundleRoot = "app/src-tauri/target/release/bundle"
           $files = Get-ChildItem -Path $bundleRoot -File -Recurse |
-            Where-Object { $_.Extension -in ".exe", ".msi", ".zip" }
+            Where-Object { $_.Extension -in ".exe", ".msi", ".zip", ".sig" }
           if (-not $files) {
             Write-Error "no bundle artifacts found under $bundleRoot"
             exit 1
@@ -85,11 +131,27 @@ jobs:
           }
           Set-Content -Path release-checksums.txt -Value $lines -Encoding ascii
 
-      - name: publish github release assets
+      - name: create draft github release and upload assets
         uses: softprops/action-gh-release@v3
         with:
+          draft: true
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
             app/src-tauri/target/release/bundle/nsis/**/*
+            latest.json
             release-checksums.txt
+
+      - name: validate draft assets and publish last
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets = gh release view "${{ github.ref_name }}" --json assets --jq '.assets[].name'
+          $required = @("latest.json", "release-checksums.txt")
+          foreach ($name in $required) {
+            if ($assets -notcontains $name) { throw "Draft release is missing $name" }
+          }
+          if (-not ($assets | Where-Object { $_ -like "*-setup.exe" })) { throw "Draft release is missing the Windows installer" }
+          if (-not ($assets | Where-Object { $_ -like "*-setup.exe.sig" -or $_ -like "*.nsis.zip.sig" })) { throw "Draft release is missing the updater signature" }
+          gh release edit "${{ github.ref_name }}" --draft=false --latest

@@ -25,11 +25,11 @@ import (
 )
 
 const (
-	folderMIMEType                 = "application/vnd.google-apps.folder"
-	maxDriveRequestsPerSecond      = 8
-	driveUploadChunkSize           = 8 * 1024 * 1024
-	driveChunkTransferTimeout      = 5 * time.Minute
-	driveChunkRetryDeadline        = 10 * time.Minute
+	folderMIMEType            = "application/vnd.google-apps.folder"
+	maxDriveRequestsPerSecond = 8
+	driveUploadChunkSize      = 8 * 1024 * 1024
+	driveChunkTransferTimeout = 5 * time.Minute
+	driveChunkRetryDeadline   = 10 * time.Minute
 )
 
 var driveMediaOptions = []googleapi.MediaOption{
