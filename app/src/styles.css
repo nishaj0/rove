@@ -143,6 +143,13 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 
 label { display: grid; gap: 6px; color: var(--body); font-size: 13px; font-weight: 700; }
 .settings-help { color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.35; }
+.provider-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.provider-card, .provider-status { display: grid; gap: 7px; padding: 16px; border: 1px solid var(--border); border-radius: 3px; background: var(--window); color: var(--body); text-align: left; }
+.provider-card { cursor: pointer; }
+.provider-card strong { color: var(--heading); font-size: 16px; }
+.provider-card span { color: var(--muted); font-size: 13px; font-weight: 400; }
+.provider-card.selected { border-color: var(--brand-strong); box-shadow: inset 3px 0 0 var(--brand-strong); }
+.provider-status { grid-column: 1 / -1; }
 input, select { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 3px; background: #fff2e7; color: var(--body); }
 input::placeholder { color: var(--muted); }
 .picker-input { cursor: pointer; }
@@ -197,6 +204,7 @@ input::placeholder { color: var(--muted); }
   .nav-count { display: none; }
   .main-panel { height: auto; min-height: 0; overflow: visible; padding: 18px; }
   .settings-grid, .add-game-form, .backup-policy-grid, .split, .activity-summary, .game-detail-hero { grid-template-columns: 1fr; }
+  .provider-picker { grid-template-columns: 1fr; }
   .split .backup-pane + .backup-pane { padding-top: 20px; padding-left: 0; border-top: 1px solid var(--border); border-left: 0; }
   .library-toolbar { grid-template-columns: 1fr; }
 }

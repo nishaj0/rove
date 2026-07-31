@@ -23,6 +23,8 @@ export const DEFAULT_SETTINGS: Settings = {
   deviceId: "",
   syncRetention: 10,
   reviewConflicts: true,
+  cloudProvider: "folder",
+  googleDrive: { connected: false },
   games: [],
 };
 

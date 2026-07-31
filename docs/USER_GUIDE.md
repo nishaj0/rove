@@ -36,6 +36,12 @@ The first sync creates Cloud Saver's private `.cloud-saver/v1` data inside the s
 
 The Home screen changes from **Setup needed** to **Ready** after a sync folder is saved. The game page shows the most recent job state and the number of changed files.
 
+### Google Drive option
+
+In **Settings**, choose **Google Drive** and select **Connect Google Drive**. Complete sign-in in your browser, then save Settings. Cloud Saver only accesses the save-sync files it creates; it cannot browse the rest of your Drive. You can disconnect at any time or continue using a synced folder instead.
+
+You do not need to enter a client ID, client secret, or any developer setting. The app includes the public connection information it needs and keeps your account connection protected locally.
+
 ## Link the same game on another computer
 
 Cloud Saver must know which two local save folders represent the same game. It uses a **Cloud game ID**, not the local folder path or game name.
@@ -110,11 +116,15 @@ Cloud Saver creates a pre-restore snapshot first. Restore is exact: files that d
 
 ### Does Cloud Saver support Google Drive directly?
 
-Not directly. Put the sync folder inside Google Drive for desktop, OneDrive, Dropbox, Syncthing, or another provider that exposes a normal Windows folder. Direct OAuth provider connections are not required for the current product.
+Yes, as an optional choice in Settings. You can also keep using a synced folder; Google Drive is never required.
+
+### What can Cloud Saver see in my Google account?
+
+Only the save-sync files Cloud Saver creates. It cannot browse the rest of your Drive.
 
 ### Is my provider password stored in Cloud Saver?
 
-No. Authentication belongs to the provider's own Windows client.
+No provider password is stored. Google Drive keeps a Windows-protected connection token locally after you choose to connect it.
 
 ### Why is Sync This Game disabled or rejected?
 

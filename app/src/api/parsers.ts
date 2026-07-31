@@ -1,4 +1,4 @@
-import type { BackupHistoryEntry, BackupPolicy, ConflictPolicy, Game, LogEntry, Settings, SnapshotSummary, Status, SyncConflict, SyncJob, ThemeMode } from "../types";
+import type { BackupHistoryEntry, BackupPolicy, CloudProvider, ConflictPolicy, Game, GoogleDriveConnection, LogEntry, Settings, SnapshotSummary, Status, SyncConflict, SyncJob, ThemeMode } from "../types";
 import { newDefaultBackupPolicy, newDefaultSettings } from "../constants/defaults";
 
 function isRecord(input: unknown): input is Record<string, unknown> {
@@ -84,6 +84,8 @@ export function normalizeBackupHistory(input: unknown): BackupHistoryEntry[] {
     })
     .filter((value): value is BackupHistoryEntry => value !== null);
 }
+function asCloudProvider(input: unknown, fallback: CloudProvider): CloudProvider { return input === "google_drive" || input === "folder" ? input : fallback; }
+function normalizeGoogleDrive(input: unknown): GoogleDriveConnection { return isRecord(input) ? { connected: asBoolean(input.connected, false), accountEmail: asString(input.accountEmail), reconnectRequired: asBoolean(input.reconnectRequired, false) } : { connected: false }; }
 
 export function normalizeSnapshots(input: unknown): SnapshotSummary[] {
   if (!Array.isArray(input)) {
@@ -151,6 +153,8 @@ export function normalizeSettings(input: unknown): Settings {
     deviceId: asString(input.deviceId),
     syncRetention: asNumber(input.syncRetention, defaults.syncRetention),
     reviewConflicts: asBoolean(input.reviewConflicts, true),
+    cloudProvider: asCloudProvider(input.cloudProvider, defaults.cloudProvider),
+    googleDrive: normalizeGoogleDrive(input.googleDrive),
     games: normalizeGames(input.games),
   };
 }

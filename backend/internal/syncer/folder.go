@@ -5,6 +5,7 @@ package syncer
 // normal directory and therefore need no stored credentials here.
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -56,7 +57,27 @@ type Result struct {
 
 // ResolveConflict applies one explicit user decision. It never guesses which
 // side should win; the caller must choose local, remote, or both.
+// ResolveConflict keeps the synced-folder entry point for existing callers.
 func ResolveConflict(game models.Game, settings models.Settings, logs *logstore.Store, conflictID, action string) error {
+	if strings.TrimSpace(settings.SyncRoot) == "" {
+		return errors.New("sync folder is not configured")
+	}
+	return ResolveConflictWithStore(context.Background(), NewFolderStore(settings.SyncRoot), game.Path, game.ID, game.SyncID, settings.DeviceID, settings.IgnorePatterns, logs, conflictID, action)
+}
+
+// Reconcile keeps folder sync as the default while using the provider-neutral
+// reconciliation algorithm shared with direct cloud stores.
+func Reconcile(game models.Game, settings models.Settings, logs *logstore.Store) (Result, error) {
+	if strings.TrimSpace(settings.SyncRoot) == "" {
+		return Result{}, errors.New("sync folder is not configured")
+	}
+	if rel, err := filepath.Rel(game.Path, settings.SyncRoot); err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return Result{}, errors.New("sync folder cannot be inside a game save folder")
+	}
+	return ReconcileWithStore(context.Background(), NewFolderStore(settings.SyncRoot), game.Path, game.ID, game.SyncID, settings.DeviceID, settings.IgnorePatterns, logs)
+}
+
+func resolveConflictFolderLegacy(game models.Game, settings models.Settings, logs *logstore.Store, conflictID, action string) error {
 	conflict, err := logs.SyncConflict(conflictID)
 	if err != nil {
 		return err
@@ -116,7 +137,7 @@ func ResolveConflict(game models.Game, settings models.Settings, logs *logstore.
 }
 
 // Reconcile performs one safe two-way reconciliation for a game.
-func Reconcile(game models.Game, settings models.Settings, logs *logstore.Store) (Result, error) {
+func reconcileFolderLegacy(game models.Game, settings models.Settings, logs *logstore.Store) (Result, error) {
 	if strings.TrimSpace(settings.SyncRoot) == "" {
 		return Result{}, errors.New("sync folder is not configured")
 	}

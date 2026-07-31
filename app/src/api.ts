@@ -158,6 +158,9 @@ export const api = {
     const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
     return normalizeBackupHistory(payload);
   },
+  googleDriveStatus() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean }>("/providers/google-drive/status"); },
+  connectGoogleDrive() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean }>("/providers/google-drive/connect", { method: "POST" }); },
+  disconnectGoogleDrive() { return request<void>("/providers/google-drive/disconnect", { method: "POST" }); },
   linkGameToCloud(payload: { gameId: string; syncId: string }) {
     return request<Game>("/games/pair", { method: "POST", body: JSON.stringify(payload) });
   },

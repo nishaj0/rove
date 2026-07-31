@@ -14,7 +14,7 @@ For step-by-step help, see the [user guide](docs/USER_GUIDE.md). Contributors sh
 
 ## Cloud sync setup
 
-Cloud Saver is provider-neutral: it does not request provider credentials or upload directly to an account.
+Cloud Saver supports a provider-neutral synced folder by default and an optional direct Google Drive connection. Google Drive only accesses the files Cloud Saver creates for save sync.
 
 1. Create or choose a folder that your existing sync provider shares between computers.
 2. Open **Settings** in Cloud Saver, choose that folder as **Synced folder**, and save.

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"cloud-saver/backend/internal/api"
+	googledriveauth "cloud-saver/backend/internal/auth/googledrive"
 	"cloud-saver/backend/internal/autobackup"
 	"cloud-saver/backend/internal/autostart"
 	"cloud-saver/backend/internal/backup"
@@ -24,6 +25,7 @@ import (
 	runtimecfg "cloud-saver/backend/internal/runtime"
 	"cloud-saver/backend/internal/snapshots"
 	"cloud-saver/backend/internal/syncer"
+	googledrivestore "cloud-saver/backend/internal/syncer/drive"
 	"cloud-saver/backend/internal/tray"
 	"cloud-saver/backend/internal/updater"
 	"cloud-saver/backend/internal/watcher"
@@ -31,19 +33,20 @@ import (
 
 // coordinates daemon services and runtime lifecycle.
 type Application struct {
-	cfg        *config.Manager
-	logs       *logstore.Store
-	engine     *syncer.Engine
-	watcher    *watcher.Manager
-	monitor    *gamemon.Monitor
-	tray       *tray.Manager
-	backup     *backup.Service
-	autoBackup *autobackup.Service
-	snapshots  *snapshots.Service
-	debug      bool
-	httpSrv    *http.Server
-	cancel     context.CancelFunc
-	wg         sync.WaitGroup
+	cfg             *config.Manager
+	logs            *logstore.Store
+	engine          *syncer.Engine
+	watcher         *watcher.Manager
+	monitor         *gamemon.Monitor
+	tray            *tray.Manager
+	backup          *backup.Service
+	autoBackup      *autobackup.Service
+	snapshots       *snapshots.Service
+	googleDriveAuth *googledriveauth.Service
+	debug           bool
+	httpSrv         *http.Server
+	cancel          context.CancelFunc
+	wg              sync.WaitGroup
 }
 
 // captures startup configuration for daemon runtime.
@@ -67,6 +70,17 @@ func New(opts Options) (*Application, error) {
 	}
 
 	engine := syncer.New(cfg, logs, opts.Debug)
+	googleDriveAuth := googledriveauth.New(cfg)
+	engine.SetStoreFactory(func(ctx context.Context, settings models.Settings) (syncer.RevisionStore, error) {
+		if settings.CloudProvider == models.CloudProviderGoogleDrive {
+			client, err := googleDriveAuth.HTTPClient(ctx)
+			if err != nil {
+				return nil, err
+			}
+			return googledrivestore.New(ctx, client)
+		}
+		return syncer.NewFolderStore(settings.SyncRoot), nil
+	})
 	watchMgr := watcher.New(func(err error) {
 		if err != nil {
 			_ = logs.Write("error", "watcher", err.Error())
@@ -89,16 +103,17 @@ func New(opts Options) (*Application, error) {
 	snapshotSvc := snapshots.New(cfg, logs)
 
 	a := &Application{
-		cfg:        cfg,
-		logs:       logs,
-		engine:     engine,
-		watcher:    watchMgr,
-		monitor:    monitor,
-		tray:       trayMgr,
-		backup:     backupSvc,
-		autoBackup: autoBackupSvc,
-		snapshots:  snapshotSvc,
-		debug:      opts.Debug,
+		cfg:             cfg,
+		logs:            logs,
+		engine:          engine,
+		watcher:         watchMgr,
+		monitor:         monitor,
+		tray:            trayMgr,
+		backup:          backupSvc,
+		autoBackup:      autoBackupSvc,
+		snapshots:       snapshotSvc,
+		googleDriveAuth: googleDriveAuth,
+		debug:           opts.Debug,
 	}
 	a.monitor.SetOnRunningChanged(func(runningIDs []string) {
 		a.autoBackup.UpdateRunning(runningIDs)
@@ -145,6 +160,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.backup,
 		a.monitor,
 		a.snapshots,
+		a.googleDriveAuth,
 		daemonExePath,
 		startupCommand,
 		updaterClient,

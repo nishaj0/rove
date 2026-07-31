@@ -1,0 +1,209 @@
+// Package drive implements syncer.RevisionStore on the Google Drive v3 API.
+// It owns only files created by Cloud Saver and requests drive.file exclusively.
+package drive
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"path/filepath"
+	"strings"
+	"sync"
+	"time"
+
+	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
+
+	"cloud-saver/backend/internal/syncer"
+)
+
+const folderMIMEType = "application/vnd.google-apps.folder"
+
+// Store maps the immutable Cloud Saver revision layout to Drive folders/files.
+type Store struct {
+	service *drive.Service
+	mu      sync.Mutex
+	folders map[string]string
+}
+
+func New(ctx context.Context, client *http.Client) (*Store, error) {
+	if client == nil {
+		return nil, errors.New("Google Drive client is unavailable")
+	}
+	svc, err := drive.NewService(ctx, option.WithHTTPClient(client), option.WithScopes(drive.DriveFileScope))
+	if err != nil {
+		return nil, err
+	}
+	return &Store{service: svc, folders: map[string]string{}}, nil
+}
+
+func (s *Store) ReadHead(ctx context.Context, syncID string) (string, error) {
+	payload, err := s.readFile(ctx, syncID, "head.json")
+	if errors.Is(err, errNotFound) {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	var value struct {
+		RevisionID string `json:"revisionId"`
+	}
+	if err := json.Unmarshal(payload, &value); err != nil || value.RevisionID == "" {
+		return "", errors.New("Google Drive revision is incomplete; retry shortly")
+	}
+	return value.RevisionID, nil
+}
+func (s *Store) WriteHead(ctx context.Context, syncID, revisionID string) error {
+	payload, _ := json.Marshal(struct {
+		RevisionID string `json:"revisionId"`
+	}{revisionID})
+	return s.writeNamedFile(ctx, syncID, "head.json", payload, false)
+}
+func (s *Store) ReadManifest(ctx context.Context, syncID, revisionID string) (*syncer.Manifest, error) {
+	payload, err := s.readFile(ctx, syncID, "revisions/"+revisionID+".json")
+	if err != nil {
+		return nil, err
+	}
+	var value syncer.Manifest
+	if err := json.Unmarshal(payload, &value); err != nil || value.ID != revisionID || value.Files == nil {
+		return nil, errors.New("Google Drive revision is invalid; retry shortly")
+	}
+	return &value, nil
+}
+func (s *Store) WriteManifest(ctx context.Context, syncID string, m *syncer.Manifest) error {
+	payload, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, syncID, "revisions/"+m.ID+".json", payload, true)
+}
+func (s *Store) ReadObject(ctx context.Context, syncID, sha string) (io.ReadCloser, error) {
+	return s.downloadNamedFile(ctx, syncID, "objects/"+sha)
+}
+func (s *Store) WriteObject(ctx context.Context, syncID, sha string, r io.Reader) error {
+	if _, err := s.findNamedFile(ctx, syncID, "objects/"+sha); err == nil {
+		return nil
+	} else if !errors.Is(err, errNotFound) {
+		return err
+	}
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, syncID, "objects/"+sha, data, true)
+}
+func (s *Store) ArchiveDisplaced(ctx context.Context, syncID, deviceID, relPath string, r io.Reader) error {
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	name := fmt.Sprintf("versions/%s/%s-%s", deviceID, time.Now().UTC().Format("20060102T150405.000000000Z"), strings.ReplaceAll(filepath.ToSlash(relPath), "/", "__"))
+	return s.writeNamedFile(ctx, syncID, name, data, true)
+}
+
+var errNotFound = errors.New("Google Drive file not found")
+
+func (s *Store) readFile(ctx context.Context, syncID, name string) ([]byte, error) {
+	in, err := s.downloadNamedFile(ctx, syncID, name)
+	if err != nil {
+		return nil, err
+	}
+	defer in.Close()
+	return io.ReadAll(in)
+}
+func (s *Store) downloadNamedFile(ctx context.Context, syncID, name string) (io.ReadCloser, error) {
+	file, err := s.findNamedFile(ctx, syncID, name)
+	if err != nil {
+		return nil, err
+	}
+	response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+func (s *Store) writeNamedFile(ctx context.Context, syncID, logicalName string, data []byte, immutable bool) error {
+	parent, name, err := s.parentAndName(ctx, syncID, logicalName)
+	if err != nil {
+		return err
+	}
+	existing, findErr := s.findChild(ctx, parent, name)
+	if findErr == nil {
+		if immutable {
+			return nil
+		}
+		_, err = s.service.Files.Update(existing.Id, nil).Media(bytes.NewReader(data)).Context(ctx).Do()
+		return err
+	}
+	if !errors.Is(findErr, errNotFound) {
+		return findErr
+	}
+	_, err = s.service.Files.Create(&drive.File{Name: name, Parents: []string{parent}}).Media(bytes.NewReader(data)).Context(ctx).Do()
+	return err
+}
+
+func (s *Store) findNamedFile(ctx context.Context, syncID, logicalName string) (*drive.File, error) {
+	parent, name, err := s.parentAndName(ctx, syncID, logicalName)
+	if err != nil {
+		return nil, err
+	}
+	return s.findChild(ctx, parent, name)
+}
+func (s *Store) parentAndName(ctx context.Context, syncID, logicalName string) (string, string, error) {
+	parts := strings.Split(strings.Trim(logicalName, "/"), "/")
+	if len(parts) == 0 || parts[0] == "" {
+		return "", "", errors.New("invalid Google Drive path")
+	}
+	segments := []string{".cloud-saver", "v1", "games", syncID}
+	segments = append(segments, parts[:len(parts)-1]...)
+	parent := "root"
+	var err error
+	for _, segment := range segments {
+		parent, err = s.ensureFolder(ctx, parent, segment)
+		if err != nil {
+			return "", "", err
+		}
+	}
+	return parent, parts[len(parts)-1], nil
+}
+func (s *Store) ensureFolder(ctx context.Context, parent, name string) (string, error) {
+	key := parent + "/" + name
+	s.mu.Lock()
+	if id := s.folders[key]; id != "" {
+		s.mu.Unlock()
+		return id, nil
+	}
+	s.mu.Unlock()
+	file, err := s.findChild(ctx, parent, name)
+	if errors.Is(err, errNotFound) {
+		file, err = s.service.Files.Create(&drive.File{Name: name, MimeType: folderMIMEType, Parents: []string{parent}}).Context(ctx).Do()
+	}
+	if err != nil {
+		return "", err
+	}
+	if file.MimeType != folderMIMEType {
+		return "", fmt.Errorf("Google Drive path component %q is not a folder", name)
+	}
+	s.mu.Lock()
+	s.folders[key] = file.Id
+	s.mu.Unlock()
+	return file.Id, nil
+}
+func (s *Store) findChild(ctx context.Context, parent, name string) (*drive.File, error) {
+	q := fmt.Sprintf("name = '%s' and '%s' in parents and trashed = false", strings.ReplaceAll(name, "'", "\\'"), parent)
+	list, err := s.service.Files.List().Q(q).Fields("files(id,name,mimeType)").PageSize(10).Context(ctx).Do()
+	if err != nil {
+		return nil, err
+	}
+	if len(list.Files) == 0 {
+		return nil, errNotFound
+	}
+	return list.Files[0], nil
+}
+
+var _ syncer.RevisionStore = (*Store)(nil)

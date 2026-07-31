@@ -130,6 +130,7 @@ func DefaultSettings() models.Settings {
 		DeviceID:                uuid.NewString(),
 		SyncRetention:           10,
 		ReviewConflicts:         true,
+		CloudProvider:           models.CloudProviderFolder,
 		Games:                   []models.Game{},
 	}
 }
@@ -165,6 +166,12 @@ func (m *Manager) Update(next models.Settings) error {
 	if next.ThemeMode != models.ThemeDark && next.ThemeMode != models.ThemeLight && next.ThemeMode != models.ThemeSystem {
 		return errors.New("invalid theme mode")
 	}
+	if next.CloudProvider != models.CloudProviderFolder && next.CloudProvider != models.CloudProviderGoogleDrive {
+		return errors.New("invalid cloud provider")
+	}
+	if next.CloudProvider == models.CloudProviderGoogleDrive && !next.GoogleDrive.Connected {
+		return errors.New("connect Google Drive before selecting it as the cloud provider")
+	}
 	if next.SnapshotMaxPerGame < minSnapshotMaxPerGame || next.SnapshotMaxPerGame > maxSnapshotMaxPerGame {
 		return fmt.Errorf("snapshot max per game must be between %d and %d", minSnapshotMaxPerGame, maxSnapshotMaxPerGame)
 	}
@@ -195,6 +202,43 @@ func (m *Manager) Update(next models.Settings) error {
 	m.settings.DeviceID = next.DeviceID
 	m.settings.SyncRetention = next.SyncRetention
 	m.settings.ReviewConflicts = next.ReviewConflicts
+	m.settings.CloudProvider = next.CloudProvider
+	// The UI never receives the encrypted token. Preserve the existing value on
+	// ordinary settings saves; connect/disconnect use dedicated methods below.
+	m.settings.GoogleDrive.Connected = next.GoogleDrive.Connected
+	m.settings.GoogleDrive.AccountEmail = next.GoogleDrive.AccountEmail
+	m.settings.GoogleDrive.ReconnectRequired = next.GoogleDrive.ReconnectRequired
+	if strings.TrimSpace(next.GoogleDrive.EncryptedRefreshToken) != "" {
+		m.settings.GoogleDrive.EncryptedRefreshToken = next.GoogleDrive.EncryptedRefreshToken
+	}
+	return m.saveLocked()
+}
+
+// SetGoogleDriveConnection persists encrypted credentials after an OAuth flow.
+func (m *Manager) SetGoogleDriveConnection(email, encryptedRefreshToken string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.settings.GoogleDrive = models.GoogleDriveSettings{Connected: true, AccountEmail: strings.TrimSpace(email), EncryptedRefreshToken: encryptedRefreshToken}
+	return m.saveLocked()
+}
+
+// ClearGoogleDriveConnection removes all locally stored Google credentials.
+func (m *Manager) ClearGoogleDriveConnection() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.settings.GoogleDrive = models.GoogleDriveSettings{}
+	if m.settings.CloudProvider == models.CloudProviderGoogleDrive {
+		m.settings.CloudProvider = models.CloudProviderFolder
+	}
+	return m.saveLocked()
+}
+
+// MarkGoogleDriveReconnectRequired keeps the provider choice but makes sync
+// failures actionable without exposing an OAuth error to the UI.
+func (m *Manager) MarkGoogleDriveReconnectRequired() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.settings.GoogleDrive.ReconnectRequired = true
 	return m.saveLocked()
 }
 
@@ -288,6 +332,14 @@ func normalizeSettings(settings *models.Settings) bool {
 		// This migration intentionally favours data safety over legacy automatic
 		// policies. New sync installations always require review.
 		settings.ReviewConflicts = true
+		changed = true
+	}
+	if settings.CloudProvider == "" {
+		settings.CloudProvider = models.CloudProviderFolder
+		changed = true
+	}
+	if settings.CloudProvider != models.CloudProviderFolder && settings.CloudProvider != models.CloudProviderGoogleDrive {
+		settings.CloudProvider = models.CloudProviderFolder
 		changed = true
 	}
 	for i := range settings.Games {

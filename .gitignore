@@ -16,3 +16,8 @@ backend/coverage.out
 
 # IDE
 .vscode/
+
+# OAuth credential downloads contain private client secrets. Cloud Saver only
+# uses the public installed-app client ID and PKCE; never commit these files.
+client_secret_*.json
+google-oauth-client*.json

@@ -578,6 +578,13 @@ export default function App() {
     }
   }
 
+  async function onConnectGoogleDrive() {
+    try { const status = await api.connectGoogleDrive(); setSettings((s) => ({ ...s, cloudProvider: "google_drive", googleDrive: status })); setToast("Google Drive connected. Save Settings to use it for sync."); } catch (err) { setError("Google Drive could not be connected. Please try again."); }
+  }
+  async function onDisconnectGoogleDrive() {
+    try { await api.disconnectGoogleDrive(); setSettings((s) => ({ ...s, cloudProvider: "folder", googleDrive: { connected: false } })); setToast("Google Drive disconnected"); } catch (err) { setError("Google Drive could not be disconnected. Please try again."); }
+  }
+
   async function onSaveSnapshotNow() {
     if (!selectedGame) {
       return;
@@ -870,6 +877,9 @@ export default function App() {
           <SettingsView
             settings={settings}
             onThemeModeChange={(value) => setSettings((s) => ({ ...s, themeMode: value }))}
+            onCloudProviderChange={(value) => setSettings((s) => ({ ...s, cloudProvider: value }))}
+            onConnectGoogleDrive={onConnectGoogleDrive}
+            onDisconnectGoogleDrive={onDisconnectGoogleDrive}
             onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
             onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
             onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}

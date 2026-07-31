@@ -54,7 +54,7 @@ func (s *Server) handleSyncConflicts(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusConflict, errors.New("cannot resolve a conflict while the game is running"))
 			return
 		}
-		if err := syncer.ResolveConflict(game, s.cfg.Get(), s.logs, req.ID, strings.TrimSpace(req.Action)); err != nil {
+		if err := s.engine.ResolveConflict(game, req.ID, strings.TrimSpace(req.Action)); err != nil {
 			writeErr(w, http.StatusConflict, err)
 			return
 		}

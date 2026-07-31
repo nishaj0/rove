@@ -13,6 +13,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		settings := s.cfg.Get()
+		settings.GoogleDrive.EncryptedRefreshToken = ""
 		enabled, err := autostart.IsEnabled(branding.AutostartKeyName)
 		if err != nil {
 			_ = s.logs.Write("error", "autostart", err.Error())
@@ -26,6 +27,9 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
+		// Credentials are only written by the OAuth flow, never accepted from the
+		// loopback UI settings endpoint.
+		req.GoogleDrive.EncryptedRefreshToken = ""
 
 		previousAutostart := s.cfg.Get().Autostart
 		enabled, err := autostart.IsEnabled(branding.AutostartKeyName)
@@ -56,6 +60,7 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 		}
 
 		settings := s.cfg.Get()
+		settings.GoogleDrive.EncryptedRefreshToken = ""
 		enabled, err = autostart.IsEnabled(branding.AutostartKeyName)
 		if err != nil {
 			_ = s.logs.Write("error", "autostart", err.Error())

@@ -8,13 +8,27 @@ type ConflictPolicy string
 // defines ui theme behavior as dark, light, or system-driven.
 type ThemeMode string
 
+// CloudProvider selects the optional backing store used for sync revisions.
+type CloudProvider string
+
 const (
-	ConflictLatestWins ConflictPolicy = "latest_wins"
-	ConflictKeepBoth   ConflictPolicy = "keep_both"
-	ThemeDark          ThemeMode      = "dark"
-	ThemeLight         ThemeMode      = "light"
-	ThemeSystem        ThemeMode      = "system"
+	ConflictLatestWins       ConflictPolicy = "latest_wins"
+	ConflictKeepBoth         ConflictPolicy = "keep_both"
+	ThemeDark                ThemeMode      = "dark"
+	ThemeLight               ThemeMode      = "light"
+	ThemeSystem              ThemeMode      = "system"
+	CloudProviderFolder      CloudProvider  = "folder"
+	CloudProviderGoogleDrive CloudProvider  = "google_drive"
 )
+
+// GoogleDriveSettings deliberately stores the refresh token only in encrypted
+// form. API handlers must remove it before returning settings to the UI.
+type GoogleDriveSettings struct {
+	Connected             bool   `json:"connected"`
+	AccountEmail          string `json:"accountEmail,omitempty"`
+	EncryptedRefreshToken string `json:"encryptedRefreshToken,omitempty"`
+	ReconnectRequired     bool   `json:"reconnectRequired,omitempty"`
+}
 
 // stores per-game rules for automatic local backups.
 type BackupPolicy struct {
@@ -45,22 +59,24 @@ type GameStats struct {
 
 // stores persisted daemon configuration from settings.json.
 type Settings struct {
-	Port                    int            `json:"port"`
-	SyncIntervalSeconds     int            `json:"syncIntervalSeconds"`
-	ConflictPolicy          ConflictPolicy `json:"conflictPolicy"`
-	ThemeMode               ThemeMode      `json:"themeMode"`
-	Autostart               bool           `json:"autostart"`
-	IgnorePatterns          []string       `json:"ignorePatterns"`
-	SnapshotVaultPath       string         `json:"snapshotVaultPath"`
-	SnapshotMaxPerGame      int            `json:"snapshotMaxPerGame"`
-	SnapshotOnExit          bool           `json:"snapshotOnExit"`
-	SnapshotPeriodic        bool           `json:"snapshotPeriodic"`
-	SnapshotIntervalMinutes int            `json:"snapshotIntervalMinutes"`
-	SyncRoot                string         `json:"syncRoot"`
-	DeviceID                string         `json:"deviceId"`
-	SyncRetention           int            `json:"syncRetention"`
-	ReviewConflicts         bool           `json:"reviewConflicts"`
-	Games                   []Game         `json:"games"`
+	Port                    int                 `json:"port"`
+	SyncIntervalSeconds     int                 `json:"syncIntervalSeconds"`
+	ConflictPolicy          ConflictPolicy      `json:"conflictPolicy"`
+	ThemeMode               ThemeMode           `json:"themeMode"`
+	Autostart               bool                `json:"autostart"`
+	IgnorePatterns          []string            `json:"ignorePatterns"`
+	SnapshotVaultPath       string              `json:"snapshotVaultPath"`
+	SnapshotMaxPerGame      int                 `json:"snapshotMaxPerGame"`
+	SnapshotOnExit          bool                `json:"snapshotOnExit"`
+	SnapshotPeriodic        bool                `json:"snapshotPeriodic"`
+	SnapshotIntervalMinutes int                 `json:"snapshotIntervalMinutes"`
+	SyncRoot                string              `json:"syncRoot"`
+	DeviceID                string              `json:"deviceId"`
+	SyncRetention           int                 `json:"syncRetention"`
+	ReviewConflicts         bool                `json:"reviewConflicts"`
+	CloudProvider           CloudProvider       `json:"cloudProvider"`
+	GoogleDrive             GoogleDriveSettings `json:"googleDrive"`
+	Games                   []Game              `json:"games"`
 }
 
 // reports current engine state for api status responses.

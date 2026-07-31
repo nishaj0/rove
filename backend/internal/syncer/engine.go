@@ -15,27 +15,40 @@ import (
 )
 
 type syncTrigger struct{ reason, gameID, jobID string }
+type StoreFactory func(context.Context, models.Settings) (RevisionStore, error)
 
 // Engine serializes reconciliation work, coalesces watcher bursts, and retains
 // a bounded in-memory job history for the local UI.
 type Engine struct {
-	cfg      *config.Manager
-	logs     *logstore.Store
-	debug    bool
-	mu       sync.RWMutex
-	status   models.Status
-	trigger  chan syncTrigger
-	pending  atomic.Int64
-	started  atomic.Bool
-	running  atomic.Bool
-	paused   atomic.Bool
-	jobsMu   sync.RWMutex
-	jobs     map[string]models.SyncJob
-	jobOrder []string
+	cfg          *config.Manager
+	logs         *logstore.Store
+	debug        bool
+	mu           sync.RWMutex
+	status       models.Status
+	trigger      chan syncTrigger
+	pending      atomic.Int64
+	started      atomic.Bool
+	running      atomic.Bool
+	paused       atomic.Bool
+	jobsMu       sync.RWMutex
+	jobs         map[string]models.SyncJob
+	jobOrder     []string
+	ctx          context.Context
+	storeFactory StoreFactory
 }
 
 func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
-	return &Engine{cfg: cfg, logs: logs, debug: debug, trigger: make(chan syncTrigger, 1), jobs: make(map[string]models.SyncJob)}
+	return &Engine{cfg: cfg, logs: logs, debug: debug, trigger: make(chan syncTrigger, 1), jobs: make(map[string]models.SyncJob), ctx: context.Background(), storeFactory: func(_ context.Context, settings models.Settings) (RevisionStore, error) {
+		return NewFolderStore(settings.SyncRoot), nil
+	}}
+}
+
+// SetStoreFactory lets application composition add direct providers without
+// coupling the reconciliation package to a provider implementation.
+func (e *Engine) SetStoreFactory(factory StoreFactory) {
+	if factory != nil {
+		e.storeFactory = factory
+	}
 }
 
 func (e *Engine) Start(ctx context.Context) {
@@ -44,6 +57,7 @@ func (e *Engine) Start(ctx context.Context) {
 		return
 	}
 	e.running.Store(true)
+	e.ctx = ctx
 	e.paused.Store(false)
 	e.setRunning(true)
 	_ = e.logs.Write("info", "sync", "sync engine started")
@@ -91,7 +105,8 @@ func (e *Engine) Status() models.Status {
 	defer e.mu.RUnlock()
 	value := e.status
 	value.Pending = int(e.pending.Load())
-	value.SyncConfigured = e.cfg.Get().SyncRoot != ""
+	settings := e.cfg.Get()
+	value.SyncConfigured = settings.CloudProvider == models.CloudProviderGoogleDrive && settings.GoogleDrive.Connected || settings.CloudProvider != models.CloudProviderGoogleDrive && settings.SyncRoot != ""
 	return value
 }
 func (e *Engine) Jobs(gameID string) []models.SyncJob {
@@ -105,6 +120,17 @@ func (e *Engine) Jobs(gameID string) []models.SyncJob {
 		}
 	}
 	return result
+}
+
+// ResolveConflict selects the active provider before applying an explicit
+// user decision, keeping the choice independent of storage transport.
+func (e *Engine) ResolveConflict(game models.Game, conflictID, action string) error {
+	settings := e.cfg.Get()
+	store, err := e.storeFactory(e.ctx, settings)
+	if err != nil {
+		return err
+	}
+	return ResolveConflictWithStore(e.ctx, store, game.Path, game.ID, game.SyncID, settings.DeviceID, settings.IgnorePatterns, e.logs, conflictID, action)
 }
 
 func (e *Engine) loop(ctx context.Context) {
@@ -138,12 +164,25 @@ func (e *Engine) runOnce(req syncTrigger) {
 	}
 	settings := e.cfg.Get()
 	e.updateJob(req.jobID, func(job *models.SyncJob) { job.State = "running"; job.StartedAt = time.Now().UTC() })
-	if settings.SyncRoot == "" {
+	if settings.CloudProvider == models.CloudProviderFolder && settings.SyncRoot == "" {
 		e.updateJob(req.jobID, func(job *models.SyncJob) {
 			job.State = "skipped"
 			job.FinishedAt = time.Now().UTC()
 			job.Error = "Choose a sync folder in Settings to enable cloud sync."
 		})
+		return
+	}
+	if settings.CloudProvider == models.CloudProviderGoogleDrive && !settings.GoogleDrive.Connected {
+		e.updateJob(req.jobID, func(job *models.SyncJob) {
+			job.State = "skipped"
+			job.FinishedAt = time.Now().UTC()
+			job.Error = "Connect Google Drive in Settings to enable cloud sync."
+		})
+		return
+	}
+	store, err := e.storeFactory(e.ctx, settings)
+	if err != nil {
+		e.finishJob(req.jobID, "failed", 0, 0, nil, err.Error())
 		return
 	}
 	games := settings.Games
@@ -164,7 +203,7 @@ func (e *Engine) runOnce(req syncTrigger) {
 	var bytes int64
 	conflictIDs := []string{}
 	for _, game := range games {
-		result, err := Reconcile(game, settings, e.logs)
+		result, err := ReconcileWithStore(e.ctx, store, game.Path, game.ID, game.SyncID, settings.DeviceID, settings.IgnorePatterns, e.logs)
 		if err != nil {
 			e.noteError("sync", fmt.Sprintf("sync %s failed: %v", game.Name, err))
 			e.finishJob(req.jobID, "failed", changed, bytes, conflictIDs, err.Error())

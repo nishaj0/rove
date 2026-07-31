@@ -73,7 +73,7 @@ SQLite is configured for WAL and a single open connection to reduce lock churn.
 
 ## Sync protocol
 
-The protocol is implemented in `backend/internal/syncer/folder.go`. It is storage-provider neutral: the provider only needs to synchronize a local directory reliably.
+The reconciliation logic is provider-independent. `syncer.RevisionStore` transports immutable heads, manifests, objects, and displaced-file archives; `FolderStore` implements the existing folder path and `syncer/drive` maps the same layout to Google Drive.
 
 ### Layout
 
@@ -146,6 +146,9 @@ All payloads are JSON. `decodeJSON` rejects unknown fields. The daemon binds to 
 | `/games/pair` | POST | Assign `{gameId, syncId}` to link a local game to an existing shared game. |
 | `/status` | GET | Engine status and sync configuration state. |
 | `/settings` | GET, POST | Read/update persisted settings. |
+| `/providers/google-drive/connect` | POST | Starts PKCE browser sign-in on a temporary loopback callback. |
+| `/providers/google-drive/disconnect` | POST | Revokes and removes the locally protected connection. |
+| `/providers/google-drive/status` | GET | Returns connection state and account email, never credentials. |
 | `/snapshots` | GET, POST | List or create snapshots. |
 | `/snapshots/restore` | POST | Restore snapshot; API rejects a running game. |
 | `/backup/export`, `/backup/import` | POST | ZIP operations. |
@@ -162,6 +165,8 @@ Snapshots are independent from cloud revisions. `snapshots.Service` supports man
 `app/src/App.tsx` is the stateful coordinator. It owns navigation, refresh timers, toast/error handling, dialogs, and calls to `api.ts`. Views are mostly presentational and receive callbacks/typed state.
 
 The UI uses the Nostalgia visual system. Light mode is the default: toasted-cream desktop `#FFEEDD`, warm window bodies `#F6E6D6`, espresso headings `#381C00`, taupe `#C7AE8E` hairlines, and orange `#D94A00` primary actions. Every major content block is a bordered desktop-style window with a labeled title bar, decorative control dots, a 3px radius, and a directional warm shadow. Use serif faces only for page headings and mono for system data. The Settings view persists the explicit Light desktop or opt-in CRT desktop palette (`#1E140C` / `#2A1C12`) through `Settings.ThemeMode`; the selected palette previews immediately and is stored when the settings form is saved. Do not add pills, glass, blur-heavy shadows, or gradients outside chart area fills.
+
+Google Drive uses the public installed-app client ID compiled into the desktop build, so end users never enter credentials or environment variables. The downloaded OAuth JSON's client secret is intentionally ignored: installed desktop apps cannot keep it confidential, and the flow uses PKCE with only `drive.file`. `CLOUD_SAVER_GOOGLE_CLIENT_ID` remains an optional override for maintainers building a fork with their own Google Cloud project; never commit the downloaded JSON or a client secret.
 
 Key UI flows:
 

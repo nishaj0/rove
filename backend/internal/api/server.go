@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	googledriveauth "cloud-saver/backend/internal/auth/googledrive"
 	"cloud-saver/backend/internal/backup"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/gamemon"
@@ -31,9 +32,10 @@ type Server struct {
 	exePath        string
 	startupCommand string
 	updater        *updater.Client
+	googleDrive    *googledriveauth.Service
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, googleDrive *googledriveauth.Service, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
@@ -49,6 +51,7 @@ func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backu
 		exePath:        exePath,
 		startupCommand: startupCommand,
 		updater:        updaterClient,
+		googleDrive:    googleDrive,
 	}
 }
 
@@ -67,6 +70,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/sync/conflicts", s.handleSyncConflicts)
 	mux.HandleFunc("/status", s.handleStatus)
 	mux.HandleFunc("/settings", s.handleSettings)
+	mux.HandleFunc("/providers/google-drive/connect", s.handleGoogleDriveConnect)
+	mux.HandleFunc("/providers/google-drive/disconnect", s.handleGoogleDriveDisconnect)
+	mux.HandleFunc("/providers/google-drive/status", s.handleGoogleDriveStatus)
 	mux.HandleFunc("/logs/recent", s.handleLogsRecent)
 	mux.HandleFunc("/debug/info", s.handleDebugInfo)
 	mux.HandleFunc("/backup/export", s.handleBackupExport)

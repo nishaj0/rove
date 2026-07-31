@@ -1,5 +1,7 @@
 export type ConflictPolicy = "latest_wins" | "keep_both";
 export type ThemeMode = "dark" | "light" | "system";
+export type CloudProvider = "folder" | "google_drive";
+export interface GoogleDriveConnection { connected: boolean; accountEmail?: string; reconnectRequired?: boolean; }
 
 export interface BackupPolicy {
   enabled: boolean;
@@ -56,6 +58,8 @@ export interface Settings {
   deviceId: string;
   syncRetention: number;
   reviewConflicts: boolean;
+  cloudProvider: CloudProvider;
+  googleDrive: GoogleDriveConnection;
   games: Game[];
 }
 
