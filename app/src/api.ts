@@ -1,4 +1,5 @@
 import type {
+  ActivityEvent,
   BackupHistoryEntry,
   BackupPolicy,
   BackupExportRequest,
@@ -6,13 +7,21 @@ import type {
   BackupImportRequest,
   DebugInfo,
   Game,
+  GameProtectionStatus,
   LatestReleaseInfo,
   LogEntry,
   PlayGameRequest,
+  RecoveryLibraryEntry,
+  StorageUsage,
+  RecoveryPoint,
+  Revision,
+  ServiceControlState,
   Settings,
+  SettingsUpdate,
   SnapshotCreateResponse,
   SnapshotSummary,
   SyncGameRequest,
+  SyncPolicy,
   Status,
 } from "./types";
 import {
@@ -118,6 +127,12 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  updateGameProtectionPolicy(payload: { gameId: string; policy: SyncPolicy }) {
+    return request<Game>("/games/protection-policy", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
   async getStatus() {
     const payload = await request<unknown>("/status");
     return normalizeStatus(payload);
@@ -126,11 +141,12 @@ export const api = {
     const payload = await request<unknown>("/settings");
     return normalizeSettings(payload);
   },
-  saveSettings(payload: Settings) {
-    return request<Settings>("/settings", {
+  async saveSettings(payload: SettingsUpdate) {
+    const response = await request<unknown>("/settings", {
       method: "POST",
       body: JSON.stringify(payload),
     });
+    return normalizeSettings(response);
   },
   async getRecentLogs(limit = 50) {
     const payload = await request<unknown>(`/logs/recent?limit=${limit}`);
@@ -138,6 +154,57 @@ export const api = {
   },
   getDebugInfo() {
     return request<DebugInfo>("/debug/info");
+  },
+  getProtectionStatus(gameId?: string) {
+    return request<Status | GameProtectionStatus>(`/protection/status${gameId ? `?gameId=${encodeURIComponent(gameId)}` : ""}`);
+  },
+  setProtectionControl(payload: { gameId?: string; protectionEnabled: boolean; pauseScope: ServiceControlState["pauseScope"]; duration?: "manual" | "one_hour" | "until_login"; reason?: string }) {
+    return request<Status | GameProtectionStatus>("/protection/control", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  retryProtection() {
+    return request<{ status: string }>("/protection/retry", { method: "POST" });
+  },
+  getRevisions(gameId: string) {
+    return request<Revision[]>(`/revisions?gameId=${encodeURIComponent(gameId)}`);
+  },
+  restoreRevision(gameId: string, revisionId: string) {
+    return request<{ status: string }>("/revisions/restore", {
+      method: "POST",
+      body: JSON.stringify({ gameId, revisionId, confirmed: true }),
+    });
+  },
+  getRecoveryPoints(gameId: string) {
+    return request<RecoveryPoint[]>(`/recovery-points?gameId=${encodeURIComponent(gameId)}`);
+  },
+  createRecoveryPoint(gameId: string, name: string) {
+    return request<{ status: string; jobId: string }>("/recovery-points", {
+      method: "POST",
+      body: JSON.stringify({ gameId, name }),
+    });
+  },
+  deleteRecoveryPoint(id: string) {
+    return request<void>(`/recovery-points?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  },
+  getRecoveryLibrary() {
+    return request<RecoveryLibraryEntry[]>("/recovery-library");
+  },
+  restoreRecoveryLibrary(syncId: string, destination: string) {
+    return request<{ status: string }>("/recovery-library/restore", {
+      method: "POST",
+      body: JSON.stringify({ syncId, destination, confirmed: true }),
+    });
+  },
+  getStorageUsage(gameId: string) {
+    return request<StorageUsage>(`/storage/usage?gameId=${encodeURIComponent(gameId)}`);
+  },
+  getActivity() {
+    return request<ActivityEvent[]>("/activity");
+  },
+  getDiagnostics() {
+    return request<Record<string, unknown>>("/diagnostics");
   },
   getLatestRelease() {
     return request<LatestReleaseInfo>("/updates/latest");
@@ -158,8 +225,8 @@ export const api = {
     const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
     return normalizeBackupHistory(payload);
   },
-  googleDriveStatus() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean }>("/providers/google-drive/status"); },
-  connectGoogleDrive() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean }>("/providers/google-drive/connect", { method: "POST" }); },
+  googleDriveStatus() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/status"); },
+  connectGoogleDrive() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/connect", { method: "POST" }); },
   disconnectGoogleDrive() { return request<void>("/providers/google-drive/disconnect", { method: "POST" }); },
   linkGameToCloud(payload: { gameId: string; syncId: string }) {
     return request<Game>("/games/pair", { method: "POST", body: JSON.stringify(payload) });

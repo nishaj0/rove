@@ -1,11 +1,12 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
-import { BACKUP_HISTORY_REFRESH_INTERVAL_MS, SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
+import { SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import { type AppUpdateInfo, checkForAppUpdate } from "./update";
-import type { BackupHistoryEntry, BackupPolicy, DebugInfo, Game, LogEntry, Settings, SnapshotSummary, Status, SyncConflict, SyncJob } from "./types";
+import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -21,10 +22,14 @@ type NavSnapshot = {
 
 type BackupOperationState = "idle" | "working" | "success" | "failed";
 
+const isAutostartEnabled = () => invoke<boolean>("is_autostart_enabled");
+const enableAutostart = () => invoke<boolean>("set_autostart", { enabled: true });
+const disableAutostart = () => invoke<boolean>("set_autostart", { enabled: false });
+
 const navItems: Array<{ id: View; label: string }> = [
   { id: "home", label: "Home" },
   { id: "games", label: "Games" },
-  { id: "activity", label: "Logs" },
+  { id: "activity", label: "Activity" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -93,8 +98,11 @@ export default function App() {
   const [syncConflicts, setSyncConflicts] = useState<SyncConflict[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [settings, setSettings] = useState<Settings>(() => newDefaultSettings());
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
+  const [activityEvents, setActivityEvents] = useState<ActivityEvent[]>([]);
+  const [revisions, setRevisions] = useState<Revision[]>([]);
+  const [recoveryPoints, setRecoveryPoints] = useState<RecoveryPoint[]>([]);
+  const [recoveryLibrary, setRecoveryLibrary] = useState<RecoveryLibraryEntry[]>([]);
+  const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
   const [availableUpdate, setAvailableUpdate] = useState<AppUpdateInfo | null>(null);
@@ -108,7 +116,6 @@ export default function App() {
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
   const [mergeOnImport, setMergeOnImport] = useState(true);
-  const [backupHistory, setBackupHistory] = useState<BackupHistoryEntry[]>([]);
   const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
   const [exportOperationState, setExportOperationState] = useState<BackupOperationState>("idle");
   const [exportOperationMessage, setExportOperationMessage] = useState("");
@@ -223,16 +230,25 @@ export default function App() {
     if (raw.toLowerCase().includes("failed to fetch")) {
       return `Cannot reach backend service. If running from source, start backend with 'go run ./cmd/daemon --no-tray --debug'. If using the installed app, restart Cloud Saver and allow security prompts for cloud-saver-daemon.exe. Then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
     }
+    if (raw.toLowerCase().includes("json: unknown field")) {
+      return "The desktop interface and background service are from different versions. Quit Cloud Saver completely, restart it, and try again. Your existing settings have not been deleted.";
+    }
     return raw;
   }
 
   async function refreshGamesData() {
     try {
       setError("");
-      const [nextGames, nextStatus, nextJobs] = await Promise.all([api.getGames(), api.getStatus(), api.getSyncJobs()]);
+      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary] = await Promise.all([
+        api.getGames(),
+        api.getStatus(),
+        api.getSyncJobs(),
+        api.getRecoveryLibrary().catch(() => recoveryLibrary),
+      ]);
       setGames(nextGames);
       setStatus(nextStatus);
       setSyncJobs(nextJobs);
+      setRecoveryLibrary(nextRecoveryLibrary);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -241,30 +257,35 @@ export default function App() {
   async function refreshActivityData() {
     try {
       setError("");
-      const [nextStatus, nextLogs, nextJobs] = await Promise.all([
+      const [nextStatus, nextEvents, nextJobs] = await Promise.all([
         api.getStatus(),
-        api.getRecentLogs(25),
+        api.getActivity(),
         api.getSyncJobs(),
       ]);
-      const nextDebugInfo = await api.getDebugInfo().catch(() => null);
       setStatus(nextStatus);
-      setLogs(nextLogs);
+      setActivityEvents(nextEvents);
       setSyncJobs(nextJobs);
-      setDebugInfo(nextDebugInfo);
     } catch (e) {
       setError(toFriendlyError(e));
-      setDebugInfo(null);
     }
   }
 
-  async function refreshBackupHistory(gameID: string) {
+  async function refreshRecoveryData(gameID: string) {
     if (!gameID) {
-      setBackupHistory([]);
+      setRevisions([]);
+      setRecoveryPoints([]);
+      setStorageUsage(null);
       return;
     }
     try {
-      const entries = await api.getBackupHistory(gameID, 20);
-      setBackupHistory(entries);
+      const [nextRevisions, nextPoints, nextUsage] = await Promise.all([
+        api.getRevisions(gameID),
+        api.getRecoveryPoints(gameID),
+        api.getStorageUsage(gameID),
+      ]);
+      setRevisions(nextRevisions);
+      setRecoveryPoints(nextPoints);
+      setStorageUsage(nextUsage);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -291,12 +312,22 @@ export default function App() {
   async function loadInitialData() {
     try {
       setError("");
-      const [nextGames, nextSettings] = await Promise.all([
+      const [nextGames, nextSettings, nextStatus, nextRecoveryLibrary, googleDriveStatus] = await Promise.all([
         api.getGames(),
         api.getSettings(),
+        api.getStatus(),
+        api.getRecoveryLibrary().catch(() => []),
+        api.googleDriveStatus().catch(() => null),
       ]);
+      const nativeAutostart = await isAutostartEnabled().catch(() => nextSettings.autostart);
       setGames(nextGames);
-      setSettings(nextSettings);
+      setSettings({
+        ...nextSettings,
+        autostart: nativeAutostart,
+        googleDrive: googleDriveStatus ? { ...nextSettings.googleDrive, ...googleDriveStatus } : nextSettings.googleDrive,
+      });
+      setStatus(nextStatus);
+      setRecoveryLibrary(nextRecoveryLibrary);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -348,25 +379,22 @@ export default function App() {
 
   useEffect(() => {
     if (activeView !== "game" || !selectedGameId) {
-      setBackupHistory([]);
-      setSnapshots([]);
+      setRevisions([]);
+      setRecoveryPoints([]);
       return;
     }
 
-    void refreshBackupHistory(selectedGameId);
-    void refreshSnapshots(selectedGameId);
+    void refreshRecoveryData(selectedGameId);
     void refreshSyncConflicts(selectedGameId);
-    const backupTimer = window.setInterval(() => {
-      void refreshBackupHistory(selectedGameId);
-    }, BACKUP_HISTORY_REFRESH_INTERVAL_MS);
-    const snapshotTimer = window.setInterval(() => {
-      void refreshSnapshots(selectedGameId);
+    void refreshSnapshots(selectedGameId);
+    const recoveryTimer = window.setInterval(() => {
+      void refreshRecoveryData(selectedGameId);
       void refreshSyncConflicts(selectedGameId);
+      void refreshSnapshots(selectedGameId);
     }, SNAPSHOT_REFRESH_INTERVAL_MS);
 
     return () => {
-      window.clearInterval(backupTimer);
-      window.clearInterval(snapshotTimer);
+      window.clearInterval(recoveryTimer);
     };
   }, [activeView, selectedGameId]);
 
@@ -407,17 +435,6 @@ export default function App() {
     return viewTitle[activeView];
   }, [activeView, selectedGame]);
 
-  const uptimeLabel = useMemo(() => {
-    if (!debugInfo) {
-      return "-";
-    }
-    const total = Math.max(0, debugInfo.uptimeSec);
-    const h = Math.floor(total / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
-    return `${h}h ${m}m ${s}s`;
-  }, [debugInfo]);
-
   async function onAddGame(e: FormEvent): Promise<boolean> {
     e.preventDefault();
     try {
@@ -456,8 +473,40 @@ export default function App() {
 
   async function onSaveSettings() {
     try {
-      const saved = await api.saveSettings({ ...settings, games });
-      setSettings(saved);
+      const update: SettingsUpdate = {
+        port: settings.port,
+        syncIntervalSeconds: settings.syncIntervalSeconds,
+        conflictPolicy: settings.conflictPolicy,
+        themeMode: settings.themeMode,
+        autostart: settings.autostart,
+        ignorePatterns: [...settings.ignorePatterns],
+        snapshotVaultPath: settings.snapshotVaultPath,
+        snapshotMaxPerGame: settings.snapshotMaxPerGame,
+        snapshotOnExit: settings.snapshotOnExit,
+        snapshotPeriodic: settings.snapshotPeriodic,
+        snapshotIntervalMinutes: settings.snapshotIntervalMinutes,
+        syncRoot: settings.syncRoot,
+        syncRetention: settings.syncRetention,
+        reviewConflicts: settings.reviewConflicts,
+        protectionTarget: settings.protectionTarget,
+        serviceControl: { ...settings.serviceControl },
+        automaticUpload: settings.automaticUpload,
+        uploadOnMetered: settings.uploadOnMetered,
+        remoteCheckBeforeLaunch: settings.remoteCheckBeforeLaunch,
+        importantNotifications: settings.importantNotifications,
+        debugLogging: settings.debugLogging,
+        autoRevisionRetention: settings.autoRevisionRetention,
+      };
+      const saved = await api.saveSettings(update);
+      const [googleDriveStatus, nextStatus] = await Promise.all([
+        api.googleDriveStatus().catch(() => null),
+        api.getStatus().catch(() => null),
+      ]);
+      setSettings({
+        ...saved,
+        googleDrive: googleDriveStatus ? { ...saved.googleDrive, ...googleDriveStatus } : saved.googleDrive,
+      });
+      if (nextStatus) setStatus(nextStatus);
       setToast("Settings saved");
     } catch (err) {
       setError(toFriendlyError(err));
@@ -480,7 +529,7 @@ export default function App() {
     }
     try {
       const result = await api.syncGame({ gameId: selectedGame.id });
-      setToast(`Game sync queued (${result.jobId.slice(0, 8)})`);
+      setToast(`Protection started (${result.jobId.slice(0, 8)})`);
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -496,7 +545,19 @@ export default function App() {
       setToast(result.status === "already_running" ? "Game is already running" : "Game launched");
       await refreshGamesData();
     } catch (err) {
-      setError(toFriendlyError(err));
+      const message = toFriendlyError(err);
+      if (/pre-launch check failed/i.test(message) && window.confirm(`${message}\n\nLaunch offline using the protected local save?`)) {
+        try {
+          await api.playGame({ gameId: selectedGame.id, allowOffline: true });
+          setToast("Game launched offline. Cloud changes will reconcile later.");
+          await refreshGamesData();
+          return;
+        } catch (offlineError) {
+          setError(toFriendlyError(offlineError));
+          return;
+        }
+      }
+      setError(message);
     }
   }
 
@@ -534,10 +595,18 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
+    if (!mergeOnImport && !window.confirm("Replace this save folder from the ZIP? Cloud Saver will create a Recovery Point first, and files absent from the ZIP will be removed.")) {
+      return;
+    }
     setImportOperationState("working");
     setImportOperationMessage("Import in progress...");
     try {
-      await api.importBackup({ gameId: selectedGame.id, sourcePath: importPath.trim(), merge: mergeOnImport });
+      await api.importBackup({
+        gameId: selectedGame.id,
+        sourcePath: importPath.trim(),
+        merge: mergeOnImport,
+        confirmed: !mergeOnImport,
+      });
       setImportOperationState("success");
       setImportOperationMessage("Import completed successfully.");
       setToast("Backup imported");
@@ -562,15 +631,12 @@ export default function App() {
     }
   }
 
-  async function onSaveSelectedGameBackupPolicy(policy: BackupPolicy): Promise<boolean> {
-    if (!selectedGame) {
-      return false;
-    }
+  async function onSaveProtectionPolicy(policy: SyncPolicy): Promise<boolean> {
+    if (!selectedGame) return false;
     try {
-      const updated = await api.updateGameBackupPolicy({ gameId: selectedGame.id, backupPolicy: policy });
-      setGames((existing) => existing.map((game) => (game.id === updated.id ? updated : game)));
-      setToast("Backup policy saved");
-      await refreshBackupHistory(updated.id);
+      const updated = await api.updateGameProtectionPolicy({ gameId: selectedGame.id, policy });
+      setGames((existing) => existing.map((game) => game.id === updated.id ? updated : game));
+      setToast("Protection policy saved");
       return true;
     } catch (err) {
       setError(toFriendlyError(err));
@@ -578,27 +644,121 @@ export default function App() {
     }
   }
 
-  async function onConnectGoogleDrive() {
-    try { const status = await api.connectGoogleDrive(); setSettings((s) => ({ ...s, cloudProvider: "google_drive", googleDrive: status })); setToast("Google Drive connected. Save Settings to use it for sync."); } catch (err) { setError("Google Drive could not be connected. Please try again."); }
-  }
-  async function onDisconnectGoogleDrive() {
-    try { await api.disconnectGoogleDrive(); setSettings((s) => ({ ...s, cloudProvider: "folder", googleDrive: { connected: false } })); setToast("Google Drive disconnected"); } catch (err) { setError("Google Drive could not be disconnected. Please try again."); }
-  }
-
-  async function onSaveSnapshotNow() {
-    if (!selectedGame) {
-      return;
-    }
+  async function onSetProtectionControl(
+    gameId: string | undefined,
+    pauseScope: PauseScope,
+    duration: "manual" | "one_hour" | "until_login" = "manual",
+    protectionEnabled = true,
+  ) {
     try {
-      const result = await api.createSnapshot(selectedGame.id);
-      if (result.status === "created") {
-        setToast("Snapshot saved");
-      } else {
-        setToast("Snapshot skipped");
+      await api.setProtectionControl({
+        gameId,
+        protectionEnabled,
+        pauseScope,
+        duration,
+        reason: !protectionEnabled ? "Protection disabled by user" : pauseScope === "uploads" ? "Cloud uploads paused by user" : pauseScope === "all" ? "Protection paused by user" : "",
+      });
+      if (!gameId) {
+        setSettings((current) => ({ ...current, serviceControl: { protectionEnabled, pauseScope } }));
       }
-      await refreshSnapshots(selectedGame.id);
+      setToast(!protectionEnabled ? "Protection disabled" : pauseScope === "none" ? "Protection resumed" : pauseScope === "uploads" ? "Cloud uploads paused; local protection continues" : "Protection paused");
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
+    }
+  }
+
+  async function onCreateRecoveryPoint() {
+    if (!selectedGame) return;
+    const name = window.prompt("Name this Recovery Point", `${selectedGame.name} — ${new Date().toLocaleString()}`);
+    if (!name?.trim()) return;
+    try {
+      await api.createRecoveryPoint(selectedGame.id, name.trim());
+      setToast("Recovery Point is being created");
+      await refreshRecoveryData(selectedGame.id);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onRestoreRevision(revisionId: string) {
+    if (!selectedGame) return;
+    if (!window.confirm("Restore this revision exactly? Files absent from it will be removed after a pre-restore Recovery Point is created.")) return;
+    try {
+      await api.restoreRevision(selectedGame.id, revisionId);
+      setToast("Revision restored");
+      await Promise.all([refreshGamesData(), refreshRecoveryData(selectedGame.id)]);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onDeleteRecoveryPoint(id: string) {
+    if (!selectedGame || !window.confirm("Delete this Recovery Point pin? Its data may later become reclaimable.")) return;
+    try {
+      await api.deleteRecoveryPoint(id);
+      setToast("Recovery Point pin deleted");
+      await refreshRecoveryData(selectedGame.id);
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onAutostartChange(value: boolean) {
+    try {
+      if (value) await enableAutostart(); else await disableAutostart();
+      const actual = await isAutostartEnabled();
+      setSettings((current) => ({ ...current, autostart: actual }));
+      setToast(actual ? "Cloud Saver will start silently with Windows" : "Windows startup disabled");
+    } catch (err) {
+      setError(`Windows startup could not be changed: ${toFriendlyError(err)}`);
+    }
+  }
+
+  async function onCopyDiagnostics() {
+    try {
+      const report = await api.getDiagnostics();
+      await navigator.clipboard.writeText(JSON.stringify(report, null, 2));
+      setToast("Sanitized diagnostics copied");
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onRestoreRecoveryEntry(entry: RecoveryLibraryEntry) {
+    try {
+      const destination = await pickFolder();
+      if (!destination) return;
+      if (!window.confirm(`Restore ${entry.name} into this empty folder?\n\n${destination}\n\nCloud Saver will verify the complete revision before publishing it.`)) return;
+      await api.restoreRecoveryLibrary(entry.syncId, destination);
+      setToast(`${entry.name} restored. Add the game to Cloud Saver to continue protecting it.`);
+      setRecoveryLibrary(await api.getRecoveryLibrary());
+    } catch (err) {
+      setError(toFriendlyError(err));
+    }
+  }
+
+  async function onConnectGoogleDrive() {
+    try {
+      const status = await api.connectGoogleDrive();
+      setSettings((s) => ({ ...s, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
+      setToast("Google Drive connected. Save Settings to use it for protection.");
+    } catch (err) {
+      setError(`Google Drive could not be connected: ${toFriendlyError(err)}`);
+    }
+  }
+  async function onDisconnectGoogleDrive() {
+    try {
+      await api.disconnectGoogleDrive();
+      const [nextSettings, nextStatus] = await Promise.all([
+        api.getSettings(),
+        api.getStatus().catch(() => null),
+      ]);
+      setSettings({ ...nextSettings, googleDrive: { connected: false } });
+      if (nextStatus) setStatus(nextStatus);
+      setToast("Google Drive disconnected; local protection remains active");
+    } catch (err) {
+      setError(`Google Drive could not be disconnected: ${toFriendlyError(err)}`);
     }
   }
 
@@ -658,7 +818,6 @@ export default function App() {
     setExportOperationMessage("");
     setImportOperationState("idle");
     setImportOperationMessage("");
-    setBackupHistory([]);
     setSnapshots([]);
     pushNavigation("game", gameId);
   }
@@ -714,13 +873,6 @@ export default function App() {
     return `${(value / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   }
 
-  function formatSnapshotTrigger(trigger: string): string {
-    if (trigger === "pre-restore") {
-      return "pre-restore";
-    }
-    return trigger || "manual";
-  }
-
   function onDownloadUpdate() {
     if (!availableUpdate) {
       return;
@@ -759,9 +911,9 @@ export default function App() {
           })}
         </nav>
         <div className="sidebar-status">
-          <span>Cloud link</span>
-          <strong>{status?.syncConfigured ? "armed" : "unconfigured"}</strong>
-          {status?.lastError ? <span>fault recorded</span> : <span>no current fault</span>}
+          <span>Protection</span>
+          <strong>{status?.protectionTarget === "google_drive" ? "Google Drive" : status?.protectionTarget === "folder" ? "Synced folder" : "Local only"}</strong>
+          <span>{status?.serviceControl.pauseScope !== "none" ? "paused" : (status?.provider.state ?? "starting").replace(/_/g, " ")} · {status?.pending ?? 0} pending · {status?.conflictCount ?? 0} conflicts</span>
         </div>
       </aside>
 
@@ -803,6 +955,8 @@ export default function App() {
             onOpenGame={openGame}
             initials={initials}
             status={status}
+            recoveryLibrary={recoveryLibrary}
+            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
           />
         ) : null}
 
@@ -831,7 +985,7 @@ export default function App() {
             mergeOnImport={mergeOnImport}
             onBack={() => pushNavigation("games")}
             onPlay={() => void onPlaySelectedGame()}
-            onSyncGame={() => void onSyncSelectedGame()}
+            onProtect={() => void onSyncSelectedGame()}
             onDelete={() => void onDeleteSelectedGame()}
             onBrowseExportPath={() => void onBrowseExportPath()}
             onBrowseImportPath={() => void onBrowseImportPath()}
@@ -842,33 +996,34 @@ export default function App() {
             exportOperationMessage={exportOperationMessage}
             importOperationState={importOperationState}
             importOperationMessage={importOperationMessage}
-            backupHistory={backupHistory}
-            snapshots={snapshots}
-            snapshotVaultConfigured={settings.snapshotVaultPath.trim() !== ""}
-            onSaveSnapshotNow={() => void onSaveSnapshotNow()}
-            onRestoreSnapshot={(snapshotId) => void onRestoreSnapshot(snapshotId)}
-            onDeleteSnapshot={(snapshotId) => void onDeleteSnapshot(snapshotId)}
-            onSaveBackupPolicy={onSaveSelectedGameBackupPolicy}
+            revisions={revisions}
+            recoveryPoints={recoveryPoints}
+            storageUsage={storageUsage}
+            legacySnapshots={snapshots}
+            onSavePolicy={onSaveProtectionPolicy}
+            onPause={(scope, duration) => onSetProtectionControl(selectedGameId, scope, duration)}
+            onResume={() => onSetProtectionControl(selectedGameId, "none")}
+            onCreateRecoveryPoint={() => void onCreateRecoveryPoint()}
+            onRestoreRevision={(revisionId) => void onRestoreRevision(revisionId)}
+            onDeleteRecoveryPoint={(id) => void onDeleteRecoveryPoint(id)}
+            onRestoreLegacySnapshot={(id) => void onRestoreSnapshot(id)}
+            onDeleteLegacySnapshot={(id) => void onDeleteSnapshot(id)}
             onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
             formatPlaytime={formatPlaytime}
             safeDateTime={safeDateTime}
             formatBytes={formatBytes}
-            formatSnapshotTrigger={formatSnapshotTrigger}
             syncJob={syncJobs.find((job) => job.gameId === selectedGameId) ?? null}
-            syncConfigured={status?.syncConfigured ?? settings.syncRoot.trim() !== ""}
             syncConflicts={syncConflicts}
             onResolveSyncConflict={(id, action) => void onResolveSyncConflict(id, action)}
-            onLinkCloudGame={() => void onLinkCloudGame()}
           />
         ) : null}
 
         {activeView === "activity" ? (
           <ActivityView
-            debugInfo={debugInfo}
-            uptimeLabel={uptimeLabel}
-            lastError={status?.lastError ?? ""}
-            logs={logs}
+            events={activityEvents}
+            status={status}
             onRefresh={() => void refreshActivityData()}
+            onCopyDiagnostics={() => void onCopyDiagnostics()}
             safeTime={safeTime}
           />
         ) : null}
@@ -876,21 +1031,18 @@ export default function App() {
         {activeView === "settings" ? (
           <SettingsView
             settings={settings}
+            activeProtectionTarget={status?.protectionTarget ?? "local"}
+            onChange={setSettings}
             onThemeModeChange={(value) => setSettings((s) => ({ ...s, themeMode: value }))}
-            onCloudProviderChange={(value) => setSettings((s) => ({ ...s, cloudProvider: value }))}
+            onTargetChange={(value) => setSettings((s) => ({ ...s, protectionTarget: value, cloudProvider: value === "google_drive" ? "google_drive" : "folder" }))}
             onConnectGoogleDrive={onConnectGoogleDrive}
             onDisconnectGoogleDrive={onDisconnectGoogleDrive}
-            onSyncIntervalChange={(value) => setSettings((s) => ({ ...s, syncIntervalSeconds: value }))}
-            onAutostartChange={(value) => setSettings((s) => ({ ...s, autostart: value }))}
-            onIgnorePatternsChange={(value) => setSettings((s) => ({ ...s, ignorePatterns: value }))}
-            onBrowseSnapshotVault={() => void onBrowseSnapshotVault()}
+            onAutostartChange={onAutostartChange}
             onBrowseSyncRoot={() => void onBrowseSyncRoot()}
-            onSyncRootChange={(value) => setSettings((s) => ({ ...s, syncRoot: value }))}
-            onSyncRetentionChange={(value) => setSettings((s) => ({ ...s, syncRetention: value }))}
-            onSnapshotMaxPerGameChange={(value) => setSettings((s) => ({ ...s, snapshotMaxPerGame: value }))}
-            onSnapshotOnExitChange={(value) => setSettings((s) => ({ ...s, snapshotOnExit: value }))}
-            onSnapshotPeriodicChange={(value) => setSettings((s) => ({ ...s, snapshotPeriodic: value }))}
-            onSnapshotIntervalChange={(value) => setSettings((s) => ({ ...s, snapshotIntervalMinutes: value }))}
+            onPause={(scope, duration) => onSetProtectionControl(undefined, scope, duration)}
+            onResume={() => onSetProtectionControl(undefined, "none")}
+            onProtectionEnabled={(enabled) => onSetProtectionControl(undefined, enabled ? "none" : "all", "manual", enabled)}
+            onRetry={async () => { await api.retryProtection(); setToast("Provider retry requested"); }}
             onSaveSettings={() => void onSaveSettings()}
           />
         ) : null}

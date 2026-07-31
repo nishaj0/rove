@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/syncer"
@@ -54,11 +56,35 @@ func (s *Server) handleBackupImport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
+	if s.monitor != nil && s.monitor.IsRunning(req.GameID) {
+		writeErr(w, http.StatusConflict, errors.New("cannot import a save while the game is running"))
+		return
+	}
+	if !req.Merge && !req.Confirmed {
+		writeErr(w, http.StatusPreconditionRequired, errors.New("replace import requires explicit confirmation"))
+		return
+	}
+	if !req.Merge {
+		recoveryJob := s.engine.CreateRecoveryPoint(game.ID, "Before ZIP import")
+		recoveryCtx, cancel := context.WithTimeout(r.Context(), 2*time.Minute)
+		defer cancel()
+		if _, err := s.engine.WaitForLocalProtection(recoveryCtx, recoveryJob); err != nil {
+			writeErr(w, http.StatusConflict, fmt.Errorf("could not create the required pre-import Recovery Point: %w", err))
+			return
+		}
+	}
 	if err := s.backup.ImportGame(game, req.SourcePath, req.Merge); err != nil {
 		writeErr(w, http.StatusInternalServerError, err)
 		return
 	}
-	s.engine.Trigger(syncer.TriggerReasonImport)
+	s.engine.TriggerGame(game.ID, syncer.TriggerReasonImport)
+	_ = s.logs.WriteActivity(models.ActivityEvent{
+		Category: "recovery",
+		Severity: "info",
+		GameID:   game.ID,
+		Title:    "ZIP import completed",
+		Detail:   "Imported save data is being protected as a new local revision.",
+	})
 	_ = s.logs.Write("info", "backup", fmt.Sprintf("imported backup for %s", game.Name))
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

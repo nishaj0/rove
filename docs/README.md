@@ -1,8 +1,18 @@
 # Cloud Saver documentation
 
-Choose the guide for your role:
+## For players
 
-- [User guide](USER_GUIDE.md): installation, game setup, cloud sync, backups, snapshots, conflict handling, and FAQ.
-- [Developer guide](DEVELOPER_GUIDE.md): architecture, data model, sync protocol, API, tests, and contribution workflow.
+- [Getting started](end-users/GETTING_STARTED.md)
+- [Recovery and safe restore](end-users/RECOVERY.md)
+- [FAQ and troubleshooting](end-users/FAQ.md)
+- [Complete user guide](USER_GUIDE.md)
 
-The project-level [README](../README.md) is the short introduction and development quick start.
+## For contributors
+
+- [Architecture and protection workflow](developers/ARCHITECTURE.md)
+- [Provider interface](developers/PROVIDER_INTERFACE.md)
+- [Google Drive development and release setup](developers/GOOGLE_DRIVE_DEVELOPMENT.md)
+- [Windows startup, daemon, and tray](developers/WINDOWS_LIFECYCLE.md)
+- [Complete developer guide](DEVELOPER_GUIDE.md)
+
+The [project README](../README.md) contains the short overview and build commands.

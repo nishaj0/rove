@@ -114,6 +114,119 @@ CREATE TABLE IF NOT EXISTS sync_conflicts (
   state TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_sync_conflicts_game_state ON sync_conflicts(game_id, state, created_at DESC);
+CREATE TABLE IF NOT EXISTS file_state (
+  game_id TEXT NOT NULL,
+  relative_path TEXT NOT NULL,
+  size INTEGER NOT NULL DEFAULT 0,
+  modified_ns INTEGER NOT NULL DEFAULT 0,
+  file_id TEXT NOT NULL DEFAULT '',
+  sha256 TEXT NOT NULL DEFAULT '',
+  dirty INTEGER NOT NULL DEFAULT 1,
+  last_revision_id TEXT NOT NULL DEFAULT '',
+  PRIMARY KEY(game_id, relative_path)
+);
+CREATE INDEX IF NOT EXISTS idx_file_state_game_dirty ON file_state(game_id, dirty);
+CREATE TABLE IF NOT EXISTS protection_jobs (
+  id TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL DEFAULT '',
+  reason TEXT NOT NULL,
+  state TEXT NOT NULL,
+  stage TEXT NOT NULL,
+  priority INTEGER NOT NULL DEFAULT 0,
+  revision_id TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  started_at TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL,
+  finished_at TEXT NOT NULL DEFAULT '',
+  changed_files INTEGER NOT NULL DEFAULT 0,
+  bytes INTEGER NOT NULL DEFAULT 0,
+  progress INTEGER NOT NULL DEFAULT 0,
+  retry_count INTEGER NOT NULL DEFAULT 0,
+  next_retry_at TEXT NOT NULL DEFAULT '',
+  error_code TEXT NOT NULL DEFAULT '',
+  error_message TEXT NOT NULL DEFAULT '',
+  conflict_ids_json TEXT NOT NULL DEFAULT '[]'
+);
+CREATE INDEX IF NOT EXISTS idx_protection_jobs_state_retry ON protection_jobs(state, next_retry_at, priority DESC);
+CREATE INDEX IF NOT EXISTS idx_protection_jobs_game_updated ON protection_jobs(game_id, updated_at DESC);
+CREATE TABLE IF NOT EXISTS protection_revisions (
+  id TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL,
+  sync_id TEXT NOT NULL,
+  parent_ids_json TEXT NOT NULL DEFAULT '[]',
+  kind TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  file_count INTEGER NOT NULL DEFAULT 0,
+  total_bytes INTEGER NOT NULL DEFAULT 0,
+  manifest_json TEXT NOT NULL,
+  pinned INTEGER NOT NULL DEFAULT 0,
+  uploaded INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_protection_revisions_game_created ON protection_revisions(game_id, created_at DESC);
+CREATE TABLE IF NOT EXISTS recovery_points (
+  id TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL,
+  revision_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(revision_id) REFERENCES protection_revisions(id)
+);
+CREATE INDEX IF NOT EXISTS idx_recovery_points_game_created ON recovery_points(game_id, created_at DESC);
+CREATE TABLE IF NOT EXISTS provider_health (
+  provider TEXT PRIMARY KEY,
+  state TEXT NOT NULL,
+  last_success_at TEXT NOT NULL DEFAULT '',
+  last_attempt_at TEXT NOT NULL DEFAULT '',
+  next_retry_at TEXT NOT NULL DEFAULT '',
+  error_code TEXT NOT NULL DEFAULT '',
+  message TEXT NOT NULL DEFAULT '',
+  action TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS provider_cursors (
+  provider TEXT PRIMARY KEY,
+  cursor TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS service_control (
+  scope_key TEXT PRIMARY KEY,
+  protection_enabled INTEGER NOT NULL DEFAULT 1,
+  pause_scope TEXT NOT NULL DEFAULT 'none',
+  pause_until TEXT NOT NULL DEFAULT '',
+  pause_until_login INTEGER NOT NULL DEFAULT 0,
+  reason TEXT NOT NULL DEFAULT '',
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS game_sessions (
+  game_id TEXT PRIMARY KEY,
+  running INTEGER NOT NULL DEFAULT 0,
+  dirty INTEGER NOT NULL DEFAULT 0,
+  started_at TEXT NOT NULL DEFAULT '',
+  ended_at TEXT NOT NULL DEFAULT '',
+  needs_reconciliation INTEGER NOT NULL DEFAULT 0,
+  last_audit_at TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS cleanup_quarantine (
+  object_key TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL,
+  marked_at TEXT NOT NULL,
+  verified_at TEXT NOT NULL DEFAULT '',
+  bytes INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS activity_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  game_id TEXT NOT NULL DEFAULT '',
+  title TEXT NOT NULL,
+  detail TEXT NOT NULL,
+  ts TEXT NOT NULL,
+  action_target TEXT NOT NULL DEFAULT '',
+  dedupe_key TEXT NOT NULL DEFAULT '',
+  resolved INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_activity_events_ts ON activity_events(ts DESC, id DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_events_open_dedupe ON activity_events(dedupe_key) WHERE dedupe_key <> '' AND resolved = 0;
 `
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("migrate schema: %w", err)

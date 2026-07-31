@@ -1,7 +1,57 @@
 export type ConflictPolicy = "latest_wins" | "keep_both";
 export type ThemeMode = "dark" | "light" | "system";
 export type CloudProvider = "folder" | "google_drive";
-export interface GoogleDriveConnection { connected: boolean; accountEmail?: string; reconnectRequired?: boolean; }
+export type ProtectionTarget = "local" | "folder" | "google_drive";
+export type ProtectionMode = "balanced" | "exit_only" | "continuous" | "manual";
+export type PauseScope = "none" | "uploads" | "all";
+export type ProviderState = "local_only" | "online" | "offline" | "reconnecting" | "authentication_required" | "rate_limited" | "quota_full" | "provider_unavailable" | "remote_data_problem";
+export interface GoogleDriveConnection {
+  connected: boolean;
+  accountEmail?: string;
+  reconnectRequired?: boolean;
+  oauthClientSource?: "built_in" | "environment" | "oauth_json";
+  oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing";
+}
+
+export interface SyncPolicy {
+  enabled: boolean;
+  mode: ProtectionMode;
+  checkpointIntervalMinutes: number;
+  exitProtection: boolean;
+}
+
+export interface ServiceControlState {
+  protectionEnabled: boolean;
+  pauseScope: PauseScope;
+  pauseUntil?: string;
+  pauseUntilLogin?: boolean;
+  reason?: string;
+}
+
+export interface ProviderHealth {
+  state: ProviderState;
+  lastSuccessAt?: string;
+  lastAttemptAt?: string;
+  nextRetryAt?: string;
+  errorCode?: string;
+  message?: string;
+  action?: string;
+  pendingCount: number;
+  pendingBytes: number;
+}
+
+export interface GameProtectionStatus {
+  gameId: string;
+  policy: SyncPolicy;
+  serviceControl: ServiceControlState;
+  dirtyFiles: number;
+  lastLocalProtection?: string;
+  lastCloudUpload?: string;
+  pendingCount: number;
+  pendingBytes: number;
+  conflictCount: number;
+  activeJob?: SyncJob;
+}
 
 export interface BackupPolicy {
   enabled: boolean;
@@ -40,6 +90,8 @@ export interface Game {
   lastPlayedAt?: string;
   running?: boolean;
   syncId?: string;
+  protectionPolicy: SyncPolicy;
+  protectionStatus: GameProtectionStatus;
 }
 
 export interface Settings {
@@ -60,28 +112,137 @@ export interface Settings {
   reviewConflicts: boolean;
   cloudProvider: CloudProvider;
   googleDrive: GoogleDriveConnection;
+  protectionTarget: ProtectionTarget;
+  serviceControl: ServiceControlState;
+  automaticUpload: boolean;
+  uploadOnMetered: boolean;
+  remoteCheckBeforeLaunch: boolean;
+  importantNotifications: boolean;
+  debugLogging: boolean;
+  autoRevisionRetention: number;
+  protectionDefaultsReady: boolean;
   games: Game[];
 }
 
+export type SettingsUpdate = Pick<Settings,
+  | "port"
+  | "syncIntervalSeconds"
+  | "conflictPolicy"
+  | "themeMode"
+  | "autostart"
+  | "ignorePatterns"
+  | "snapshotVaultPath"
+  | "snapshotMaxPerGame"
+  | "snapshotOnExit"
+  | "snapshotPeriodic"
+  | "snapshotIntervalMinutes"
+  | "syncRoot"
+  | "syncRetention"
+  | "reviewConflicts"
+  | "protectionTarget"
+  | "serviceControl"
+  | "automaticUpload"
+  | "uploadOnMetered"
+  | "remoteCheckBeforeLaunch"
+  | "importantNotifications"
+  | "debugLogging"
+  | "autoRevisionRetention"
+>;
+
 export interface Status {
   running: boolean;
+  protectionTarget: ProtectionTarget;
   lastSyncTime: string;
   lastError?: string;
   pending: number;
   syncConfigured: boolean;
+  provider: ProviderHealth;
+  serviceControl: ServiceControlState;
+  lastLocalProtection?: string;
+  lastCloudUpload?: string;
+  pendingBytes: number;
+  conflictCount: number;
+  activeJobId?: string;
 }
 
 export interface SyncJob {
   id: string;
   gameId?: string;
   reason: string;
-  state: "queued" | "running" | "completed" | "conflict" | "failed" | "skipped" | "coalesced";
+  state: "queued" | "waiting" | "waiting_for_network" | "running" | "paused" | "completed" | "conflict" | "failed" | "authentication_required" | "quota_blocked";
   startedAt?: string;
   finishedAt?: string;
   changedFiles: number;
   bytes: number;
   error?: string;
   conflictIds?: string[];
+  stage?: string;
+  progress: number;
+  retryCount: number;
+  nextRetryAt?: string;
+  errorCode?: string;
+  priority: number;
+  revisionId?: string;
+  updatedAt?: string;
+}
+
+export interface Revision {
+  id: string;
+  gameId: string;
+  syncId: string;
+  parentIds?: string[];
+  kind: string;
+  name?: string;
+  createdAt: string;
+  fileCount: number;
+  totalBytes: number;
+  pinned: boolean;
+  uploaded: boolean;
+}
+
+export interface RecoveryPoint {
+  id: string;
+  gameId: string;
+  revisionId: string;
+  name: string;
+  createdAt: string;
+  fileCount: number;
+  totalBytes: number;
+}
+
+export interface ActivityEvent {
+  id: number;
+  category: string;
+  severity: "info" | "warning" | "error";
+  gameId?: string;
+  title: string;
+  detail: string;
+  timestamp: string;
+  actionTarget?: string;
+  resolved: boolean;
+}
+
+export interface RecoveryLibraryEntry {
+  profileId: string;
+  gameId?: string;
+  name: string;
+  syncId: string;
+  executableName?: string;
+  pathHint?: string;
+  latestProtected: string;
+  fileCount: number;
+  totalBytes: number;
+  automaticCount: number;
+  recoveryPoints: RecoveryPoint[];
+}
+
+export interface StorageUsage {
+  gameId: string;
+  uniqueBytes: number;
+  automaticCount: number;
+  recoveryPoints: number;
+  pendingBytes: number;
+  reclaimableBytes: number;
 }
 
 export interface SyncConflict {
@@ -134,10 +295,12 @@ export interface BackupImportRequest {
   gameId: string;
   sourcePath: string;
   merge: boolean;
+  confirmed?: boolean;
 }
 
 export interface PlayGameRequest {
   gameId: string;
+  allowOffline?: boolean;
 }
 
 export interface SyncGameRequest {

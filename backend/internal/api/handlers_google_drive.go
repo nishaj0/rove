@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 )
@@ -16,7 +17,13 @@ func (s *Server) handleGoogleDriveStatus(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	status := s.googleDrive.Status()
-	writeJSON(w, http.StatusOK, map[string]any{"connected": status.Connected, "accountEmail": nullableEmail(status.AccountEmail), "reconnectRequired": status.ReconnectRequired})
+	writeJSON(w, http.StatusOK, map[string]any{
+		"connected":             status.Connected,
+		"accountEmail":          nullableEmail(status.AccountEmail),
+		"reconnectRequired":     status.ReconnectRequired,
+		"oauthClientSource":     s.googleDrive.ClientIDSource(),
+		"oauthCredentialSource": s.googleDrive.CredentialSource(),
+	})
 }
 
 func (s *Server) handleGoogleDriveConnect(w http.ResponseWriter, r *http.Request) {
@@ -32,11 +39,21 @@ func (s *Server) handleGoogleDriveConnect(w http.ResponseWriter, r *http.Request
 	defer cancel()
 	status, err := s.googleDrive.Connect(ctx)
 	if err != nil {
+		_ = s.logs.Write("error", "google_drive_oauth", "connect request failed: "+err.Error())
+		if s.debug {
+			log.Printf("[google-drive:connect_request_failed] %v", err)
+		}
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
-	_ = s.logs.Write("info", "google_drive", "Google Drive account connected")
-	writeJSON(w, http.StatusOK, map[string]any{"connected": status.Connected, "accountEmail": nullableEmail(status.AccountEmail), "reconnectRequired": false})
+	_ = s.logs.Write("info", "google_drive", "Google Drive account connected using "+s.googleDrive.ClientIDSource()+" OAuth client configuration")
+	writeJSON(w, http.StatusOK, map[string]any{
+		"connected":             status.Connected,
+		"accountEmail":          nullableEmail(status.AccountEmail),
+		"reconnectRequired":     false,
+		"oauthClientSource":     s.googleDrive.ClientIDSource(),
+		"oauthCredentialSource": s.googleDrive.CredentialSource(),
+	})
 }
 
 func (s *Server) handleGoogleDriveDisconnect(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +68,9 @@ func (s *Server) handleGoogleDriveDisconnect(w http.ResponseWriter, r *http.Requ
 	if err := s.googleDrive.Disconnect(r.Context()); err != nil {
 		writeErr(w, http.StatusInternalServerError, err)
 		return
+	}
+	if s.engine != nil {
+		s.engine.ConfigurationChanged()
 	}
 	_ = s.logs.Write("info", "google_drive", "Google Drive account disconnected")
 	w.WriteHeader(http.StatusNoContent)

@@ -45,19 +45,41 @@ func (m *Manager) AddGameWithPolicy(name, path, executablePath, coverImageData s
 	}
 
 	game := models.Game{
-		ID:             uuid.NewString(),
-		Name:           name,
-		Path:           path,
-		ExecutablePath: executablePath,
-		CoverImageData: coverImageData,
-		BackupPolicy:   backupPolicy,
-		SyncID:         uuid.NewString(),
+		ID:               uuid.NewString(),
+		Name:             name,
+		Path:             path,
+		ExecutablePath:   executablePath,
+		CoverImageData:   coverImageData,
+		BackupPolicy:     backupPolicy,
+		SyncID:           uuid.NewString(),
+		ProtectionPolicy: defaultSyncPolicy(),
 	}
 	m.settings.Games = append(m.settings.Games, game)
 	if err := m.saveLocked(); err != nil {
 		return models.Game{}, err
 	}
 	return game, nil
+}
+
+// UpdateGameSyncPolicy updates the unified protection policy without touching
+// legacy backup metadata, which remains available for read-only migration.
+func (m *Manager) UpdateGameSyncPolicy(id string, policy models.SyncPolicy) (models.Game, error) {
+	if err := validateSyncPolicy(policy); err != nil {
+		return models.Game{}, err
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for i := range m.settings.Games {
+		if m.settings.Games[i].ID != id {
+			continue
+		}
+		m.settings.Games[i].ProtectionPolicy = policy
+		if err := m.saveLocked(); err != nil {
+			return models.Game{}, err
+		}
+		return m.settings.Games[i], nil
+	}
+	return models.Game{}, errors.New("game not found")
 }
 
 func (m *Manager) UpdateGame(id string, name string, path string, executablePath string, coverImageData string) (models.Game, error) {

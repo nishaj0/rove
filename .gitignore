@@ -7,17 +7,20 @@ app/src-tauri/target/
 app/src-tauri/gen/
 app/src-tauri/resources/backend/*.exe
 app/src-tauri/resources/backend/cloud-saver-daemon
+app/src-tauri/resources/backend/icon.ico
 !app/src-tauri/resources/backend/.gitkeep
 
 # Go
 backend/*.exe
 backend/*.test
 backend/coverage.out
+.cache/
 
 # IDE
 .vscode/
 
-# OAuth credential downloads contain private client secrets. Cloud Saver only
-# uses the public installed-app client ID and PKCE; never commit these files.
+# OAuth downloads and local developer configuration never belong in Git.
+# Desktop credentials are extractable from release binaries, but committing
+# the source JSON would make accidental quota/brand reuse much easier.
 client_secret_*.json
 google-oauth-client*.json

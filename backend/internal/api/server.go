@@ -29,13 +29,11 @@ type Server struct {
 	configPath     string
 	sqlitePath     string
 	onGamesChanged func([]models.Game)
-	exePath        string
-	startupCommand string
 	updater        *updater.Client
 	googleDrive    *googledriveauth.Service
 }
 
-func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, googleDrive *googledriveauth.Service, exePath string, startupCommand string, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
+func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backupSvc *backup.Service, monitor *gamemon.Monitor, snapshotSvc *snapshots.Service, googleDrive *googledriveauth.Service, updaterClient *updater.Client, debug bool, onGamesChanged func([]models.Game)) *Server {
 	return &Server{
 		cfg:            cfg,
 		engine:         engine,
@@ -48,8 +46,6 @@ func New(cfg *config.Manager, engine *syncer.Engine, logs *logstore.Store, backu
 		configPath:     cfg.Path(),
 		sqlitePath:     logs.Path(),
 		onGamesChanged: onGamesChanged,
-		exePath:        exePath,
-		startupCommand: startupCommand,
 		updater:        updaterClient,
 		googleDrive:    googleDrive,
 	}
@@ -63,11 +59,23 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/games/play", s.handleGamePlay)
 	mux.HandleFunc("/games/cover", s.handleGameCover)
 	mux.HandleFunc("/games/backup-policy", s.handleGameBackupPolicy)
+	mux.HandleFunc("/games/protection-policy", s.handleGameProtectionPolicy)
 	mux.HandleFunc("/games/pair", s.handleGamePair)
 	mux.HandleFunc("/games/", s.handleGameByID)
 	mux.HandleFunc("/sync", s.handleSync)
 	mux.HandleFunc("/sync/jobs", s.handleSyncJobs)
 	mux.HandleFunc("/sync/conflicts", s.handleSyncConflicts)
+	mux.HandleFunc("/protection/status", s.handleProtectionStatus)
+	mux.HandleFunc("/protection/control", s.handleProtectionControl)
+	mux.HandleFunc("/protection/retry", s.handleProtectionRetry)
+	mux.HandleFunc("/revisions", s.handleRevisions)
+	mux.HandleFunc("/revisions/restore", s.handleRevisionRestore)
+	mux.HandleFunc("/recovery-points", s.handleRecoveryPoints)
+	mux.HandleFunc("/recovery-library", s.handleRecoveryLibrary)
+	mux.HandleFunc("/recovery-library/restore", s.handleRecoveryLibraryRestore)
+	mux.HandleFunc("/storage/usage", s.handleStorageUsage)
+	mux.HandleFunc("/activity", s.handleActivity)
+	mux.HandleFunc("/diagnostics", s.handleDiagnostics)
 	mux.HandleFunc("/status", s.handleStatus)
 	mux.HandleFunc("/settings", s.handleSettings)
 	mux.HandleFunc("/providers/google-drive/connect", s.handleGoogleDriveConnect)

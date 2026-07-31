@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"cloud-saver/backend/internal/app"
+	"cloud-saver/backend/internal/singleinstance"
 )
 
 func main() {
@@ -23,6 +24,14 @@ func main() {
 	if !debug {
 		debug = os.Getenv("CLOUD_SAVER_DEBUG") == "1"
 	}
+	release, acquired, err := singleinstance.AcquireDaemon()
+	if err != nil {
+		log.Fatalf("acquire daemon instance: %v", err)
+	}
+	if !acquired {
+		return
+	}
+	defer release()
 
 	application, err := app.New(app.Options{ConfigPath: configPath, NoTray: noTray, Debug: debug})
 	if err != nil {

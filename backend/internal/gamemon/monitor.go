@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	defaultPollInterval  = 3 * time.Second
+	idlePollInterval     = 10 * time.Second
+	activePollInterval   = 2 * time.Second
 	defaultFlushInterval = 15 * time.Second
 	// guard against unrealistic jumps to avoid overcounting playtime on clock skew/sleep.
 	maxClockGap = 60 * time.Second
@@ -62,7 +63,7 @@ func New(cfg *config.Manager, logs *logstore.Store, onRunningChanged func([]stri
 		logs:             logs,
 		onRunningChanged: onRunningChanged,
 		onError:          onError,
-		pollInterval:     defaultPollInterval,
+		pollInterval:     idlePollInterval,
 		flushInterval:    defaultFlushInterval,
 		sessions:         make(map[string]*session),
 		runningIDs:       make(map[string]struct{}),
@@ -76,15 +77,21 @@ func (m *Monitor) Start(ctx context.Context) {
 	}
 	m.pollOnce(time.Now())
 
-	ticker := time.NewTicker(m.pollInterval)
 	go func() {
-		defer ticker.Stop()
 		for {
+			m.mu.RLock()
+			interval := idlePollInterval
+			if len(m.runningIDs) > 0 {
+				interval = activePollInterval
+			}
+			m.mu.RUnlock()
+			timer := time.NewTimer(interval)
 			select {
 			case <-ctx.Done():
+				timer.Stop()
 				m.flushAll(time.Now())
 				return
-			case now := <-ticker.C:
+			case now := <-timer.C:
 				m.pollOnce(now)
 			}
 		}
@@ -255,6 +262,16 @@ func (m *Monitor) flushOps(flushes []flushOp) {
 // returns normalized executable paths for active processes.
 func (m *Monitor) snapshotRunningExecutables() map[string]bool {
 	running := make(map[string]bool)
+	targetNames := make(map[string]struct{})
+	for _, game := range m.cfg.Get().Games {
+		name := strings.ToLower(filepath.Base(strings.TrimSpace(game.ExecutablePath)))
+		if name != "" {
+			targetNames[name] = struct{}{}
+		}
+	}
+	if len(targetNames) == 0 {
+		return running
+	}
 	procs, err := process.Processes()
 	if err != nil {
 		if m.onError != nil {
@@ -263,6 +280,13 @@ func (m *Monitor) snapshotRunningExecutables() map[string]bool {
 		return running
 	}
 	for _, proc := range procs {
+		name, err := proc.Name()
+		if err != nil {
+			continue
+		}
+		if _, tracked := targetNames[strings.ToLower(name)]; !tracked {
+			continue
+		}
 		exe, err := proc.Exe()
 		if err != nil || exe == "" {
 			continue

@@ -1,70 +1,53 @@
-import type { DebugInfo, LogEntry } from "../types";
+import type { ActivityEvent, Status } from "../types";
 
 type ActivityViewProps = {
-  debugInfo: DebugInfo | null;
-  uptimeLabel: string;
-  lastError: string;
-  logs: LogEntry[];
+  events: ActivityEvent[];
+  status: Status | null;
   onRefresh: () => void;
+  onCopyDiagnostics: () => void;
   safeTime: (input: string) => string;
 };
 
-export function ActivityView(props: ActivityViewProps) {
-  const { debugInfo, uptimeLabel, lastError, logs, onRefresh, safeTime } = props;
-
+export function ActivityView({ events, status, onRefresh, onCopyDiagnostics, safeTime }: ActivityViewProps) {
   return (
-    <section className="panel activity-shell" data-window-title="ACTIVITY.LOG">
-      <div className="activity-header">
-        <div>
-          <h1>Activity</h1>
-          <p>Service diagnostics and recent sync events.</p>
+    <>
+      <section className="panel activity-shell" data-window-title="ACTIVITY.LOG">
+        <div className="activity-header">
+          <div>
+            <h1>Activity</h1>
+            <p>Protection, recovery, provider, and conflict history.</p>
+          </div>
+          <div className="detail-actions">
+            <button className="btn" type="button" onClick={onCopyDiagnostics}>Copy diagnostics</button>
+            <button className="btn" type="button" onClick={onRefresh}>Refresh</button>
+          </div>
         </div>
-        <button className="btn" type="button" onClick={onRefresh}>Refresh</button>
-      </div>
+        <div className="activity-summary">
+          <div className="summary-card"><span>Provider</span><strong>{(status?.provider.state ?? "starting").replace(/_/g, " ")}</strong></div>
+          <div className="summary-card"><span>Pending uploads</span><strong>{status?.pending ?? 0}</strong></div>
+          <div className="summary-card"><span>Conflicts</span><strong>{status?.conflictCount ?? 0}</strong></div>
+        </div>
+      </section>
 
-      <div className="activity-summary">
-        <div className="summary-card">
-          <span>Backend mode</span>
-          <strong>{debugInfo ? (debugInfo.debug ? "Debug" : "Normal") : "Offline"}</strong>
-        </div>
-        <div className="summary-card">
-          <span>PID</span>
-          <strong>{debugInfo?.pid ?? "-"}</strong>
-        </div>
-        <div className="summary-card">
-          <span>Uptime</span>
-          <strong>{uptimeLabel}</strong>
-        </div>
-        <div className="summary-card full">
-          <span>Config file</span>
-          <strong>{debugInfo?.configPath ?? "-"}</strong>
-        </div>
-        <div className="summary-card full">
-          <span>Log database</span>
-          <strong>{debugInfo?.sqlitePath ?? "-"}</strong>
-        </div>
-      </div>
-
-      {lastError ? (
-        <div className="banner error">Last backend error: {lastError}</div>
-      ) : null}
-
-      {logs.length === 0 ? (
-        <p className="empty-state">No logs yet.</p>
-      ) : (
-        <ul className="log-feed">
-          {logs.map((entry) => (
-            <li className="log-row" key={entry.id}>
-              <div className="log-meta">
-                <span>{safeTime(entry.timestamp)}</span>
-                <strong className={`log-level ${entry.level.toLowerCase()}`}>{entry.level.toUpperCase()}</strong>
-                <em>{entry.event}</em>
-              </div>
-              <p>{entry.message}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+      <section className="panel" data-window-title="USEFUL.HISTORY">
+        {events.length === 0 ? (
+          <p className="empty-state">No protection activity yet. Routine scans and technical request logs are intentionally hidden.</p>
+        ) : (
+          <ul className="log-feed">
+            {events.map((entry) => (
+              <li className="log-row" key={entry.id}>
+                <div className="log-meta">
+                  <span>{safeTime(entry.timestamp)}</span>
+                  <strong className={`log-level ${entry.severity}`}>{entry.severity.toUpperCase()}</strong>
+                  <em>{entry.category}</em>
+                </div>
+                <p><strong>{entry.title}</strong></p>
+                <p>{entry.detail}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
   );
 }

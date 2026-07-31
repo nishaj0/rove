@@ -1,4 +1,4 @@
-import type { BackupPolicy, Settings } from "../types";
+import type { BackupPolicy, GameProtectionStatus, Settings, SyncPolicy } from "../types";
 
 export const DEFAULT_BACKUP_POLICY: BackupPolicy = {
   enabled: true,
@@ -25,7 +25,23 @@ export const DEFAULT_SETTINGS: Settings = {
   reviewConflicts: true,
   cloudProvider: "folder",
   googleDrive: { connected: false },
+  protectionTarget: "local",
+  serviceControl: { protectionEnabled: true, pauseScope: "none" },
+  automaticUpload: true,
+  uploadOnMetered: false,
+  remoteCheckBeforeLaunch: true,
+  importantNotifications: true,
+  debugLogging: false,
+  autoRevisionRetention: 3,
+  protectionDefaultsReady: true,
   games: [],
+};
+
+export const DEFAULT_SYNC_POLICY: SyncPolicy = {
+  enabled: true,
+  mode: "balanced",
+  checkpointIntervalMinutes: 10,
+  exitProtection: true,
 };
 
 export function newDefaultBackupPolicy(): BackupPolicy {
@@ -37,5 +53,21 @@ export function newDefaultSettings(): Settings {
     ...DEFAULT_SETTINGS,
     ignorePatterns: [...DEFAULT_SETTINGS.ignorePatterns],
     games: [],
+  };
+}
+
+export function newDefaultSyncPolicy(): SyncPolicy {
+  return { ...DEFAULT_SYNC_POLICY };
+}
+
+export function newDefaultProtectionStatus(gameId = ""): GameProtectionStatus {
+  return {
+    gameId,
+    policy: newDefaultSyncPolicy(),
+    serviceControl: { protectionEnabled: true, pauseScope: "none" },
+    dirtyFiles: 0,
+    pendingCount: 0,
+    pendingBytes: 0,
+    conflictCount: 0,
   };
 }

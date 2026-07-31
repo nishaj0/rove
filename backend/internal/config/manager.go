@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
+	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -33,6 +36,10 @@ const (
 	maxSnapshotMaxPerGame         = 50
 	minSnapshotIntervalMins       = 1
 	maxSnapshotIntervalMins       = 1440
+	defaultCheckpointMinutes      = 10
+	minCheckpointMinutes          = 2
+	maxCheckpointMinutes          = 1440
+	currentSettingsSchemaVersion  = 1
 )
 
 func defaultBackupPolicy() models.BackupPolicy {
@@ -42,6 +49,46 @@ func defaultBackupPolicy() models.BackupPolicy {
 		ExitDelaySeconds: defaultBackupExitDelaySeconds,
 		RetentionCount:   defaultBackupRetentionCount,
 	}
+}
+
+func defaultSyncPolicy() models.SyncPolicy {
+	return models.SyncPolicy{
+		Enabled:                   true,
+		Mode:                      models.ProtectionBalanced,
+		CheckpointIntervalMinutes: defaultCheckpointMinutes,
+		ExitProtection:            true,
+	}
+}
+
+func normalizeSyncPolicy(policy *models.SyncPolicy) bool {
+	if policy == nil {
+		return false
+	}
+	changed := false
+	defaults := defaultSyncPolicy()
+	switch policy.Mode {
+	case models.ProtectionBalanced, models.ProtectionExitOnly, models.ProtectionContinuous, models.ProtectionManual:
+	default:
+		*policy = defaults
+		return true
+	}
+	if policy.CheckpointIntervalMinutes < minCheckpointMinutes || policy.CheckpointIntervalMinutes > maxCheckpointMinutes {
+		policy.CheckpointIntervalMinutes = defaults.CheckpointIntervalMinutes
+		changed = true
+	}
+	return changed
+}
+
+func validateSyncPolicy(policy models.SyncPolicy) error {
+	switch policy.Mode {
+	case models.ProtectionBalanced, models.ProtectionExitOnly, models.ProtectionContinuous, models.ProtectionManual:
+	default:
+		return errors.New("invalid protection mode")
+	}
+	if policy.CheckpointIntervalMinutes < minCheckpointMinutes || policy.CheckpointIntervalMinutes > maxCheckpointMinutes {
+		return fmt.Errorf("checkpoint interval must be between %d and %d minutes", minCheckpointMinutes, maxCheckpointMinutes)
+	}
+	return nil
 }
 
 func normalizeBackupPolicy(policy *models.BackupPolicy) bool {
@@ -82,9 +129,10 @@ func validateBackupPolicy(policy models.BackupPolicy) error {
 
 // coordinates in-memory settings state with on-disk persistence.
 type Manager struct {
-	mu       sync.RWMutex
-	path     string
-	settings models.Settings
+	mu             sync.RWMutex
+	path           string
+	settings       models.Settings
+	recoveryNotice string
 }
 
 // creates a manager and loads settings from disk, creating defaults when missing.
@@ -116,6 +164,7 @@ func defaultPath() (string, error) {
 // returns baseline values used for first run and normalization fallback.
 func DefaultSettings() models.Settings {
 	return models.Settings{
+		SchemaVersion:           currentSettingsSchemaVersion,
 		Port:                    runtimecfg.DefaultAPIPort,
 		SyncIntervalSeconds:     30,
 		ConflictPolicy:          models.ConflictLatestWins,
@@ -131,8 +180,29 @@ func DefaultSettings() models.Settings {
 		SyncRetention:           10,
 		ReviewConflicts:         true,
 		CloudProvider:           models.CloudProviderFolder,
+		ProtectionTarget:        models.ProtectionTargetLocal,
+		ServiceControl: models.ServiceControlState{
+			ProtectionEnabled: true,
+			PauseScope:        models.PauseNone,
+		},
+		AutomaticUpload:         true,
+		UploadOnMetered:         false,
+		RemoteCheckBeforeLaunch: true,
+		ImportantNotifications:  true,
+		DebugLogging:            false,
+		AutoRevisionRetention:   3,
+		ProtectionDefaultsReady: true,
 		Games:                   []models.Game{},
 	}
+}
+
+// RecoveryNotice reports a safe startup message when incompatible or damaged
+// settings were repaired. It contains field/base names only, never full paths
+// or credential values.
+func (m *Manager) RecoveryNotice() string {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return m.recoveryNotice
 }
 
 // returns the active settings file path.
@@ -166,10 +236,12 @@ func (m *Manager) Update(next models.Settings) error {
 	if next.ThemeMode != models.ThemeDark && next.ThemeMode != models.ThemeLight && next.ThemeMode != models.ThemeSystem {
 		return errors.New("invalid theme mode")
 	}
-	if next.CloudProvider != models.CloudProviderFolder && next.CloudProvider != models.CloudProviderGoogleDrive {
-		return errors.New("invalid cloud provider")
+	switch next.ProtectionTarget {
+	case models.ProtectionTargetLocal, models.ProtectionTargetFolder, models.ProtectionTargetDrive:
+	default:
+		return errors.New("invalid protection target")
 	}
-	if next.CloudProvider == models.CloudProviderGoogleDrive && !next.GoogleDrive.Connected {
+	if next.ProtectionTarget == models.ProtectionTargetDrive && !next.GoogleDrive.Connected {
 		return errors.New("connect Google Drive before selecting it as the cloud provider")
 	}
 	if next.SnapshotMaxPerGame < minSnapshotMaxPerGame || next.SnapshotMaxPerGame > maxSnapshotMaxPerGame {
@@ -183,6 +255,12 @@ func (m *Manager) Update(next models.Settings) error {
 	}
 	if next.SyncRetention < 1 || next.SyncRetention > 50 {
 		return errors.New("sync retention must be between 1 and 50")
+	}
+	if next.AutoRevisionRetention < 1 || next.AutoRevisionRetention > 50 {
+		return errors.New("automatic revision retention must be between 1 and 50")
+	}
+	if next.ServiceControl.PauseScope != models.PauseNone && next.ServiceControl.PauseScope != models.PauseUploads && next.ServiceControl.PauseScope != models.PauseAll {
+		return errors.New("invalid protection pause scope")
 	}
 
 	m.mu.Lock()
@@ -202,7 +280,21 @@ func (m *Manager) Update(next models.Settings) error {
 	m.settings.DeviceID = next.DeviceID
 	m.settings.SyncRetention = next.SyncRetention
 	m.settings.ReviewConflicts = next.ReviewConflicts
-	m.settings.CloudProvider = next.CloudProvider
+	m.settings.ProtectionTarget = next.ProtectionTarget
+	m.settings.ServiceControl = next.ServiceControl
+	m.settings.AutomaticUpload = next.AutomaticUpload
+	m.settings.UploadOnMetered = next.UploadOnMetered
+	m.settings.RemoteCheckBeforeLaunch = next.RemoteCheckBeforeLaunch
+	m.settings.ImportantNotifications = next.ImportantNotifications
+	m.settings.DebugLogging = next.DebugLogging
+	m.settings.AutoRevisionRetention = next.AutoRevisionRetention
+	m.settings.ProtectionDefaultsReady = true
+	switch next.ProtectionTarget {
+	case models.ProtectionTargetDrive:
+		m.settings.CloudProvider = models.CloudProviderGoogleDrive
+	default:
+		m.settings.CloudProvider = models.CloudProviderFolder
+	}
 	// The UI never receives the encrypted token. Preserve the existing value on
 	// ordinary settings saves; connect/disconnect use dedicated methods below.
 	m.settings.GoogleDrive.Connected = next.GoogleDrive.Connected
@@ -229,6 +321,9 @@ func (m *Manager) ClearGoogleDriveConnection() error {
 	m.settings.GoogleDrive = models.GoogleDriveSettings{}
 	if m.settings.CloudProvider == models.CloudProviderGoogleDrive {
 		m.settings.CloudProvider = models.CloudProviderFolder
+	}
+	if m.settings.ProtectionTarget == models.ProtectionTargetDrive {
+		m.settings.ProtectionTarget = models.ProtectionTargetLocal
 	}
 	return m.saveLocked()
 }
@@ -271,10 +366,18 @@ func (m *Manager) load() error {
 		payload = payload[3:]
 	}
 
-	if err := json.Unmarshal(payload, &m.settings); err != nil {
-		return fmt.Errorf("decode settings: %w", err)
+	settings, incompatible, err := decodeSettingsFields(payload)
+	if err != nil {
+		return m.recoverUnreadableSettingsLocked(payload, err)
 	}
-	if normalizeSettings(&m.settings) {
+	if settings.SchemaVersion > currentSettingsSchemaVersion {
+		return fmt.Errorf("settings schema %d is newer than this application supports (%d)", settings.SchemaVersion, currentSettingsSchemaVersion)
+	}
+	m.settings = settings
+	if len(incompatible) > 0 {
+		m.recoveryNotice = "Reset incompatible settings fields to safe defaults: " + strings.Join(incompatible, ", ")
+	}
+	if normalizeSettings(&m.settings) || len(incompatible) > 0 {
 		return m.saveLocked()
 	}
 	return nil
@@ -287,6 +390,10 @@ func normalizeSettings(settings *models.Settings) bool {
 	}
 	changed := false
 	defaults := DefaultSettings()
+	if settings.SchemaVersion != currentSettingsSchemaVersion {
+		settings.SchemaVersion = currentSettingsSchemaVersion
+		changed = true
+	}
 
 	if settings.Port == 0 {
 		settings.Port = defaults.Port
@@ -338,6 +445,39 @@ func normalizeSettings(settings *models.Settings) bool {
 		settings.CloudProvider = models.CloudProviderFolder
 		changed = true
 	}
+	if !settings.ProtectionDefaultsReady {
+		settings.ServiceControl = defaults.ServiceControl
+		settings.AutomaticUpload = defaults.AutomaticUpload
+		settings.UploadOnMetered = defaults.UploadOnMetered
+		settings.RemoteCheckBeforeLaunch = defaults.RemoteCheckBeforeLaunch
+		settings.ImportantNotifications = defaults.ImportantNotifications
+		settings.DebugLogging = defaults.DebugLogging
+		settings.AutoRevisionRetention = defaults.AutoRevisionRetention
+		settings.ProtectionDefaultsReady = true
+		switch settings.CloudProvider {
+		case models.CloudProviderGoogleDrive:
+			settings.ProtectionTarget = models.ProtectionTargetDrive
+		default:
+			if strings.TrimSpace(settings.SyncRoot) != "" {
+				settings.ProtectionTarget = models.ProtectionTargetFolder
+			} else {
+				settings.ProtectionTarget = models.ProtectionTargetLocal
+			}
+		}
+		changed = true
+	}
+	if settings.ProtectionTarget != models.ProtectionTargetLocal && settings.ProtectionTarget != models.ProtectionTargetFolder && settings.ProtectionTarget != models.ProtectionTargetDrive {
+		settings.ProtectionTarget = defaults.ProtectionTarget
+		changed = true
+	}
+	if settings.ServiceControl.PauseScope != models.PauseNone && settings.ServiceControl.PauseScope != models.PauseUploads && settings.ServiceControl.PauseScope != models.PauseAll {
+		settings.ServiceControl.PauseScope = models.PauseNone
+		changed = true
+	}
+	if settings.AutoRevisionRetention < 1 || settings.AutoRevisionRetention > 50 {
+		settings.AutoRevisionRetention = defaults.AutoRevisionRetention
+		changed = true
+	}
 	if settings.CloudProvider != models.CloudProviderFolder && settings.CloudProvider != models.CloudProviderGoogleDrive {
 		settings.CloudProvider = models.CloudProviderFolder
 		changed = true
@@ -348,6 +488,9 @@ func normalizeSettings(settings *models.Settings) bool {
 		}
 		if strings.TrimSpace(settings.Games[i].SyncID) == "" {
 			settings.Games[i].SyncID = uuid.NewString()
+			changed = true
+		}
+		if normalizeSyncPolicy(&settings.Games[i].ProtectionPolicy) {
 			changed = true
 		}
 	}
@@ -361,8 +504,118 @@ func (m *Manager) saveLocked() error {
 	if err != nil {
 		return fmt.Errorf("encode settings: %w", err)
 	}
-	if err := os.WriteFile(m.path, payload, 0o644); err != nil {
+
+	// Preserve the last syntactically valid file before replacing it. A corrupt
+	// current file never overwrites the recovery copy.
+	if current, readErr := os.ReadFile(m.path); readErr == nil && json.Valid(current) && !bytes.Equal(current, payload) {
+		if err := writeFileAtomically(m.path+".bak", current, 0o600); err != nil {
+			return fmt.Errorf("write settings backup: %w", err)
+		}
+	}
+	if err := writeFileAtomically(m.path, payload, 0o600); err != nil {
 		return fmt.Errorf("write settings: %w", err)
+	}
+	return nil
+}
+
+// decodeSettingsFields migrates valid JSON one known field at a time. Unknown
+// fields are ignored for forward compatibility, while a type-changed field is
+// reset without discarding unrelated games, provider credentials, or settings.
+func decodeSettingsFields(payload []byte) (models.Settings, []string, error) {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(payload, &raw); err != nil {
+		return models.Settings{}, nil, fmt.Errorf("decode settings JSON: %w", err)
+	}
+
+	var settings models.Settings
+	value := reflect.ValueOf(&settings).Elem()
+	typeInfo := value.Type()
+	incompatible := make([]string, 0)
+	for i := 0; i < typeInfo.NumField(); i++ {
+		fieldInfo := typeInfo.Field(i)
+		name := strings.Split(fieldInfo.Tag.Get("json"), ",")[0]
+		if name == "" || name == "-" {
+			continue
+		}
+		encoded, ok := raw[name]
+		if !ok {
+			continue
+		}
+		field := value.Field(i)
+		if !field.CanAddr() {
+			continue
+		}
+		if err := json.Unmarshal(encoded, field.Addr().Interface()); err != nil {
+			incompatible = append(incompatible, name)
+		}
+	}
+	sort.Strings(incompatible)
+	return settings, incompatible, nil
+}
+
+func (m *Manager) recoverUnreadableSettingsLocked(payload []byte, decodeErr error) error {
+	quarantineName, quarantineErr := preserveInvalidSettings(m.path, payload)
+	if quarantineErr != nil {
+		return fmt.Errorf("decode settings: %w; preserve invalid settings: %v", decodeErr, quarantineErr)
+	}
+
+	backupPayload, backupErr := os.ReadFile(m.path + ".bak")
+	if backupErr == nil {
+		backup, incompatible, err := decodeSettingsFields(backupPayload)
+		if err == nil && backup.SchemaVersion <= currentSettingsSchemaVersion {
+			m.settings = backup
+			normalizeSettings(&m.settings)
+			m.recoveryNotice = "Recovered settings from settings.json.bak; unreadable original preserved as " + quarantineName
+			if len(incompatible) > 0 {
+				m.recoveryNotice += "; reset fields: " + strings.Join(incompatible, ", ")
+			}
+			return m.saveLocked()
+		}
+	}
+
+	m.settings = DefaultSettings()
+	m.recoveryNotice = "Created safe default settings; unreadable original preserved as " + quarantineName
+	return m.saveLocked()
+}
+
+func preserveInvalidSettings(path string, payload []byte) (string, error) {
+	name := filepath.Base(path) + ".invalid-" + time.Now().UTC().Format("20060102T150405.000000000Z")
+	target := filepath.Join(filepath.Dir(path), name)
+	if err := writeFileAtomically(target, payload, 0o600); err != nil {
+		return "", err
+	}
+	return name, nil
+}
+
+func writeFileAtomically(path string, payload []byte, mode os.FileMode) error {
+	dir := filepath.Dir(path)
+	temp, err := os.CreateTemp(dir, ".cloud-saver-settings-*.tmp")
+	if err != nil {
+		return err
+	}
+	tempPath := temp.Name()
+	closed := false
+	defer func() {
+		if !closed {
+			_ = temp.Close()
+		}
+		_ = os.Remove(tempPath)
+	}()
+	if err := temp.Chmod(mode); err != nil {
+		return err
+	}
+	if _, err := temp.Write(payload); err != nil {
+		return err
+	}
+	if err := temp.Sync(); err != nil {
+		return err
+	}
+	if err := temp.Close(); err != nil {
+		return err
+	}
+	closed = true
+	if err := os.Rename(tempPath, path); err != nil {
+		return err
 	}
 	return nil
 }

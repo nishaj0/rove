@@ -1,9 +1,11 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"cloud-saver/backend/internal/models"
 )
@@ -32,26 +34,7 @@ func (s *Server) handleSnapshots(w http.ResponseWriter, r *http.Request) {
 		}
 		writeJSON(w, http.StatusOK, snapshots)
 	case http.MethodPost:
-		var req models.SnapshotCreateRequest
-		if err := decodeJSON(r, &req); err != nil {
-			writeErr(w, http.StatusBadRequest, err)
-			return
-		}
-		result, err := s.snapshots.CreateManual(req.GameID)
-		if err != nil {
-			status := http.StatusInternalServerError
-			if err.Error() == "game not found" {
-				status = http.StatusNotFound
-			} else if err.Error() == "gameId is required" {
-				status = http.StatusBadRequest
-			}
-			writeErr(w, status, err)
-			return
-		}
-		writeJSON(w, http.StatusAccepted, map[string]any{
-			"status":   result.Status,
-			"snapshot": result.Snapshot,
-		})
+		writeErr(w, http.StatusGone, errors.New("legacy snapshot creation is retired; create a Recovery Point instead"))
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -74,6 +57,13 @@ func (s *Server) handleSnapshotRestore(w http.ResponseWriter, r *http.Request) {
 	}
 	if s.monitor != nil && s.monitor.IsRunning(req.GameID) {
 		writeErr(w, http.StatusConflict, errors.New("cannot restore while the game is running"))
+		return
+	}
+	recoveryJob := s.engine.CreateRecoveryPoint(req.GameID, "Before legacy snapshot restore")
+	recoveryCtx, cancel := context.WithTimeout(r.Context(), 2*time.Minute)
+	defer cancel()
+	if _, err := s.engine.WaitForLocalProtection(recoveryCtx, recoveryJob); err != nil {
+		writeErr(w, http.StatusConflict, errors.New("could not create the required pre-restore Recovery Point"))
 		return
 	}
 	if err := s.snapshots.Restore(req.GameID, req.SnapshotID); err != nil {

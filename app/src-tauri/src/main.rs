@@ -7,6 +7,7 @@ use std::{
     time::Duration,
 };
 use tauri::Manager;
+use tauri_plugin_autostart::ManagerExt;
 
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
@@ -22,13 +23,33 @@ const BACKEND_BINARY_NAME: &str = "cloud-saver-daemon";
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
+#[tauri::command]
+fn set_autostart(app: tauri::AppHandle, enabled: bool) -> Result<bool, String> {
+    let manager = app.autolaunch();
+    if enabled {
+        manager.enable().map_err(|err| err.to_string())?;
+    } else {
+        manager.disable().map_err(|err| err.to_string())?;
+    }
+    manager.is_enabled().map_err(|err| err.to_string())
+}
+
+#[tauri::command]
+fn is_autostart_enabled(app: tauri::AppHandle) -> Result<bool, String> {
+    app.autolaunch().is_enabled().map_err(|err| err.to_string())
+}
+
 fn main() {
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![set_autostart, is_autostart_enabled])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_single_instance::Builder::new()
-                .callback(|app, _argv, _cwd| {
+                .callback(|app, argv, _cwd| {
+                    if argv.iter().any(|arg| arg == "--background") {
+                        return;
+                    }
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.show();
                         let _ = window.unminimize();
@@ -38,8 +59,20 @@ fn main() {
                 .build(),
         )
         .setup(|app| {
+            app.handle()
+                .plugin(tauri_plugin_autostart::init(
+                    tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+                    Some(vec!["--background"]),
+                ))
+                .map_err(|err| Box::<dyn std::error::Error>::from(err))?;
             if let Err(err) = ensure_backend_running(app) {
                 eprintln!("failed to ensure backend daemon is running: {err}");
+            }
+            if std::env::args().any(|arg| arg == "--background") {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.hide();
+                }
+                app.handle().exit(0);
             }
             Ok(())
         })

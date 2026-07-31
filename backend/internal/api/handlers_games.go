@@ -16,16 +16,18 @@ import (
 const maxCoverImagePayload = 2_500_000
 
 type gameResponse struct {
-	ID              string              `json:"id"`
-	Name            string              `json:"name"`
-	Path            string              `json:"path"`
-	ExecutablePath  string              `json:"executablePath"`
-	CoverImageData  string              `json:"coverImageData,omitempty"`
-	BackupPolicy    models.BackupPolicy `json:"backupPolicy"`
-	SyncID          string              `json:"syncId,omitempty"`
-	PlaytimeSeconds int64               `json:"playtimeSeconds"`
-	LastPlayedAt    string              `json:"lastPlayedAt,omitempty"`
-	Running         bool                `json:"running"`
+	ID               string                      `json:"id"`
+	Name             string                      `json:"name"`
+	Path             string                      `json:"path"`
+	ExecutablePath   string                      `json:"executablePath"`
+	CoverImageData   string                      `json:"coverImageData,omitempty"`
+	BackupPolicy     models.BackupPolicy         `json:"backupPolicy"`
+	ProtectionPolicy models.SyncPolicy           `json:"protectionPolicy"`
+	ProtectionStatus models.GameProtectionStatus `json:"protectionStatus"`
+	SyncID           string                      `json:"syncId,omitempty"`
+	PlaytimeSeconds  int64                       `json:"playtimeSeconds"`
+	LastPlayedAt     string                      `json:"lastPlayedAt,omitempty"`
+	Running          bool                        `json:"running"`
 }
 
 func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +146,8 @@ func (s *Server) handleGamePlay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		GameID string `json:"gameId"`
+		GameID       string `json:"gameId"`
+		AllowOffline bool   `json:"allowOffline"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
@@ -167,6 +170,12 @@ func (s *Server) handleGamePlay(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"status": "already_running"})
 		return
 	}
+	if !req.AllowOffline {
+		if err := s.engine.PrepareLaunch(r.Context(), game); err != nil {
+			writeErr(w, http.StatusConflict, fmt.Errorf("cloud pre-launch check failed: %w", err))
+			return
+		}
+	}
 
 	cmd := exec.Command("cmd", "/c", "start", "", game.ExecutablePath)
 	cmd.Dir = filepath.Dir(game.ExecutablePath)
@@ -182,6 +191,28 @@ func (s *Server) handleGamePlay(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = s.logs.Write("info", "games", "launched game: "+game.Name)
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "launched"})
+}
+
+func (s *Server) handleGameProtectionPolicy(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		GameID string            `json:"gameId"`
+		Policy models.SyncPolicy `json:"policy"`
+	}
+	if err := decodeJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	updated, err := s.cfg.UpdateGameSyncPolicy(req.GameID, req.Policy)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	_ = s.logs.WriteActivity(models.ActivityEvent{Category: "protection", Severity: "info", GameID: updated.ID, Title: "Protection policy updated", Detail: "Mode set to " + string(updated.ProtectionPolicy.Mode) + "."})
+	writeJSON(w, http.StatusOK, s.toGameResponse(updated, 0, time.Time{}, s.monitor != nil && s.monitor.IsRunning(updated.ID)))
 }
 
 func (s *Server) handleGameSync(w http.ResponseWriter, r *http.Request) {
@@ -343,15 +374,17 @@ func (s *Server) toGameResponses(games []models.Game) []gameResponse {
 
 func (s *Server) toGameResponse(game models.Game, playtimeSeconds int64, lastPlayedAt time.Time, running bool) gameResponse {
 	resp := gameResponse{
-		ID:              game.ID,
-		Name:            game.Name,
-		Path:            game.Path,
-		ExecutablePath:  game.ExecutablePath,
-		CoverImageData:  game.CoverImageData,
-		BackupPolicy:    game.BackupPolicy,
-		SyncID:          game.SyncID,
-		PlaytimeSeconds: playtimeSeconds,
-		Running:         running,
+		ID:               game.ID,
+		Name:             game.Name,
+		Path:             game.Path,
+		ExecutablePath:   game.ExecutablePath,
+		CoverImageData:   game.CoverImageData,
+		BackupPolicy:     game.BackupPolicy,
+		ProtectionPolicy: game.ProtectionPolicy,
+		ProtectionStatus: s.engine.ProtectionStatus(game.ID),
+		SyncID:           game.SyncID,
+		PlaytimeSeconds:  playtimeSeconds,
+		Running:          running,
 	}
 	if !lastPlayedAt.IsZero() {
 		resp.LastPlayedAt = lastPlayedAt.UTC().Format(time.RFC3339)

@@ -1,8 +1,7 @@
 package branding
 
 const (
-	DisplayName      = "Cloud Saver"
-	InternalName     = "CloudSaver"
-	AutostartKeyName = "CloudSaver"
-	BackupsDirName   = "backups"
+	DisplayName    = "Cloud Saver"
+	InternalName   = "CloudSaver"
+	BackupsDirName = "backups"
 )

@@ -1,11 +1,8 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 
-	"cloud-saver/backend/internal/autostart"
-	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/models"
 )
 
@@ -14,59 +11,28 @@ func (s *Server) handleSettings(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		settings := s.cfg.Get()
 		settings.GoogleDrive.EncryptedRefreshToken = ""
-		enabled, err := autostart.IsEnabled(branding.AutostartKeyName)
-		if err != nil {
-			_ = s.logs.Write("error", "autostart", err.Error())
-		} else {
-			settings.Autostart = enabled
-		}
+		settings.ServiceControl = s.engine.GlobalControl()
 		writeJSON(w, http.StatusOK, settings)
 	case http.MethodPost:
-		var req models.Settings
+		var req models.SettingsUpdate
 		if err := decodeJSON(r, &req); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		// Credentials are only written by the OAuth flow, never accepted from the
-		// loopback UI settings endpoint.
-		req.GoogleDrive.EncryptedRefreshToken = ""
-
-		previousAutostart := s.cfg.Get().Autostart
-		enabled, err := autostart.IsEnabled(branding.AutostartKeyName)
-		if err != nil {
-			_ = s.logs.Write("error", "autostart", err.Error())
-		} else {
-			previousAutostart = enabled
-		}
-
-		if req.Autostart && s.startupCommand == "" {
-			err := errors.New("startup target not found")
-			_ = s.logs.Write("error", "autostart", err.Error())
-			writeErr(w, http.StatusInternalServerError, err)
-			return
-		}
-		if err := autostart.SetEnabled(branding.AutostartKeyName, s.startupCommand, req.Autostart); err != nil {
-			_ = s.logs.Write("error", "autostart", err.Error())
-			writeErr(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		if err := s.cfg.Update(req); err != nil {
-			if rollbackErr := autostart.SetEnabled(branding.AutostartKeyName, s.startupCommand, previousAutostart); rollbackErr != nil {
-				_ = s.logs.Write("error", "autostart", rollbackErr.Error())
-			}
+		// Provider status, credentials, games, and device identity come from the
+		// daemon. Legacy clients may still send them, but SettingsUpdate ignores
+		// those fields so version skew cannot overwrite trusted state.
+		next := req.Apply(s.cfg.Get())
+		if err := s.cfg.Update(next); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
+		}
+		if s.engine != nil {
+			s.engine.ConfigurationChanged()
 		}
 
 		settings := s.cfg.Get()
 		settings.GoogleDrive.EncryptedRefreshToken = ""
-		enabled, err = autostart.IsEnabled(branding.AutostartKeyName)
-		if err != nil {
-			_ = s.logs.Write("error", "autostart", err.Error())
-		} else {
-			settings.Autostart = enabled
-		}
 		writeJSON(w, http.StatusOK, settings)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)

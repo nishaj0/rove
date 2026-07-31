@@ -16,8 +16,10 @@ import (
 	"time"
 
 	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/option"
 
+	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/syncer"
 )
 
@@ -63,6 +65,68 @@ func (s *Store) WriteHead(ctx context.Context, syncID, revisionID string) error 
 	}{revisionID})
 	return s.writeNamedFile(ctx, syncID, "head.json", payload, false)
 }
+func (s *Store) WriteDeviceHead(ctx context.Context, syncID, deviceID, revisionID string) error {
+	payload, _ := json.Marshal(struct {
+		RevisionID string `json:"revisionId"`
+	}{revisionID})
+	return s.writeNamedFile(ctx, syncID, "heads/"+deviceID+".json", payload, false)
+}
+func (s *Store) WriteGameProfile(ctx context.Context, profile models.GameProfile) error {
+	payload, err := json.Marshal(profile)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, profile.SyncID, "game.json", payload, false)
+}
+func (s *Store) ListGameProfiles(ctx context.Context) ([]models.GameProfile, error) {
+	query := "appProperties has { key='cloudSaverType' and value='game_profile' } and trashed = false"
+	pageToken := ""
+	result := []models.GameProfile{}
+	for {
+		call := s.service.Files.List().Q(query).Spaces("drive").Fields("nextPageToken,files(id)").PageSize(100).Context(ctx)
+		if pageToken != "" {
+			call = call.PageToken(pageToken)
+		}
+		page, err := call.Do()
+		if err != nil {
+			return nil, err
+		}
+		for _, file := range page.Files {
+			response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
+			if err != nil {
+				continue
+			}
+			var profile models.GameProfile
+			decodeErr := json.NewDecoder(io.LimitReader(response.Body, 1024*1024)).Decode(&profile)
+			_ = response.Body.Close()
+			if decodeErr == nil && profile.SyncID != "" {
+				result = append(result, profile)
+			}
+		}
+		if page.NextPageToken == "" {
+			break
+		}
+		pageToken = page.NextPageToken
+	}
+	return result, nil
+}
+func (s *Store) WriteRecoveryPoint(ctx context.Context, syncID string, point models.RecoveryPoint) error {
+	payload, err := json.Marshal(point)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, syncID, "recovery-points/"+point.ID+".json", payload, false)
+}
+func (s *Store) DeleteRecoveryPoint(ctx context.Context, syncID, pointID string) error {
+	file, err := s.findNamedFile(ctx, syncID, "recovery-points/"+pointID+".json")
+	if errors.Is(err, errNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return s.service.Files.Delete(file.Id).Context(ctx).Do()
+}
 func (s *Store) ReadManifest(ctx context.Context, syncID, revisionID string) (*syncer.Manifest, error) {
 	payload, err := s.readFile(ctx, syncID, "revisions/"+revisionID+".json")
 	if err != nil {
@@ -90,19 +154,11 @@ func (s *Store) WriteObject(ctx context.Context, syncID, sha string, r io.Reader
 	} else if !errors.Is(err, errNotFound) {
 		return err
 	}
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return err
-	}
-	return s.writeNamedFile(ctx, syncID, "objects/"+sha, data, true)
+	return s.writeNamedReader(ctx, syncID, "objects/"+sha, r, true)
 }
 func (s *Store) ArchiveDisplaced(ctx context.Context, syncID, deviceID, relPath string, r io.Reader) error {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return err
-	}
 	name := fmt.Sprintf("versions/%s/%s-%s", deviceID, time.Now().UTC().Format("20060102T150405.000000000Z"), strings.ReplaceAll(filepath.ToSlash(relPath), "/", "__"))
-	return s.writeNamedFile(ctx, syncID, name, data, true)
+	return s.writeNamedReader(ctx, syncID, name, r, true)
 }
 
 var errNotFound = errors.New("Google Drive file not found")
@@ -128,6 +184,10 @@ func (s *Store) downloadNamedFile(ctx context.Context, syncID, name string) (io.
 }
 
 func (s *Store) writeNamedFile(ctx context.Context, syncID, logicalName string, data []byte, immutable bool) error {
+	return s.writeNamedReader(ctx, syncID, logicalName, bytes.NewReader(data), immutable)
+}
+
+func (s *Store) writeNamedReader(ctx context.Context, syncID, logicalName string, data io.Reader, immutable bool) error {
 	parent, name, err := s.parentAndName(ctx, syncID, logicalName)
 	if err != nil {
 		return err
@@ -137,14 +197,39 @@ func (s *Store) writeNamedFile(ctx context.Context, syncID, logicalName string, 
 		if immutable {
 			return nil
 		}
-		_, err = s.service.Files.Update(existing.Id, nil).Media(bytes.NewReader(data)).Context(ctx).Do()
+		_, err = s.service.Files.Update(existing.Id, &drive.File{
+			AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
+		}).Media(data, googleapi.ChunkSize(8*1024*1024)).Context(ctx).Do()
 		return err
 	}
 	if !errors.Is(findErr, errNotFound) {
 		return findErr
 	}
-	_, err = s.service.Files.Create(&drive.File{Name: name, Parents: []string{parent}}).Media(bytes.NewReader(data)).Context(ctx).Do()
+	_, err = s.service.Files.Create(&drive.File{
+		Name:          name,
+		Parents:       []string{parent},
+		AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
+	}).Media(data, googleapi.ChunkSize(8*1024*1024)).Context(ctx).Do()
 	return err
+}
+
+func logicalType(name string) string {
+	switch {
+	case name == "game.json":
+		return "game_profile"
+	case name == "head.json":
+		return "head"
+	case strings.HasPrefix(name, "revisions/"):
+		return "revision"
+	case strings.HasPrefix(name, "objects/"):
+		return "object"
+	case strings.HasPrefix(name, "versions/"):
+		return "archive"
+	case strings.HasPrefix(name, "recovery-points/"):
+		return "recovery_point"
+	default:
+		return "metadata"
+	}
 }
 
 func (s *Store) findNamedFile(ctx context.Context, syncID, logicalName string) (*drive.File, error) {

@@ -1,4 +1,4 @@
-import type { Game, Status } from "../types";
+import type { Game, RecoveryLibraryEntry, Status } from "../types";
 import { HOME_KICKER_LABEL } from "../constants/branding";
 
 type HomeViewProps = {
@@ -8,10 +8,12 @@ type HomeViewProps = {
   onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
   status: Status | null;
+  recoveryLibrary: RecoveryLibraryEntry[];
+  onRestoreRecovery: (entry: RecoveryLibraryEntry) => void;
 };
 
 export function HomeView(props: HomeViewProps) {
-  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials, status } = props;
+  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials, status, recoveryLibrary, onRestoreRecovery } = props;
 
   return (
     <>
@@ -25,9 +27,48 @@ export function HomeView(props: HomeViewProps) {
         </div>
       </section>
 
-      <section className="panel" data-window-title="SYNC.STATUS">
-        <div className="panel-head"><h2>Cloud Sync</h2><span className={`state-text ${status?.syncConfigured ? "success" : "warning"}`}>{status?.syncConfigured ? "Ready" : "Setup needed"}</span></div>
-        <p className="empty-state">{status?.syncConfigured ? `Last completed: ${status.lastSyncTime ? new Date(status.lastSyncTime).toLocaleString() : "Not yet"}. ${status.pending} request${status.pending === 1 ? "" : "s"} pending.` : "Choose a synced folder in Settings. Your existing local backups remain unchanged."}</p>
+      <section className="panel" data-window-title="PROTECTION.STATUS">
+        <div className="panel-head">
+          <h2>Protection health</h2>
+          <span className={`state-text ${status?.provider.state === "online" || status?.provider.state === "local_only" ? "success" : status?.provider.state === "offline" || status?.serviceControl.pauseScope !== "none" ? "warning" : "error"}`}>
+            {status?.serviceControl.pauseScope !== "none" ? "Paused" : (status?.provider.state ?? "Starting").replace(/_/g, " ")}
+          </span>
+        </div>
+        <div className="health-grid">
+          <div><span>Last local protection</span><strong>{status?.lastLocalProtection ? new Date(status.lastLocalProtection).toLocaleString() : "Not yet"}</strong></div>
+          <div><span>Last cloud upload</span><strong>{status?.lastCloudUpload ? new Date(status.lastCloudUpload).toLocaleString() : status?.provider.state === "local_only" ? "Local only" : "Not yet"}</strong></div>
+          <div><span>Pending uploads</span><strong>{status?.pending ?? 0} · {formatBytes(status?.pendingBytes ?? 0)}</strong></div>
+          <div><span>Conflicts</span><strong>{status?.conflictCount ?? 0} need review</strong></div>
+        </div>
+        {status?.provider.message ? <p className="empty-state">{status.provider.message}</p> : null}
+        {status?.lastError ? <p className="banner error">{status.lastError}</p> : null}
+      </section>
+
+      <section className="panel" data-window-title="RECOVERY.LIBRARY">
+        <div className="panel-head">
+          <h2>Recovery Library</h2>
+          <span className="state-text">{recoveryLibrary.length} protected</span>
+        </div>
+        {recoveryLibrary.length === 0 ? (
+          <p className="empty-state">Protected games will appear here after the first local revision or provider connection.</p>
+        ) : (
+          <div className="recovery-library-list">
+            {recoveryLibrary.map((entry) => (
+              <article className="recovery-library-row" key={entry.profileId}>
+                <div>
+                  <strong>{entry.name}</strong>
+                  <span>{entry.fileCount} files · {formatBytes(entry.totalBytes)} · {entry.latestProtected ? new Date(entry.latestProtected).toLocaleString() : "Protection time unavailable"}</span>
+                  {entry.pathHint ? <span>Suggested location: {entry.pathHint}</span> : null}
+                </div>
+                {entry.gameId ? (
+                  <button className="btn" type="button" onClick={() => onOpenGame(entry.gameId!)}>Open game</button>
+                ) : (
+                  <button className="btn primary" type="button" onClick={() => onRestoreRecovery(entry)}>Restore to folder</button>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="panel" data-window-title="RECENT.GAMES">
@@ -50,4 +91,10 @@ export function HomeView(props: HomeViewProps) {
       </section>
     </>
   );
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

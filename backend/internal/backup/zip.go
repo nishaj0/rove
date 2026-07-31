@@ -149,11 +149,11 @@ func writeZipAtomic(game models.Game, finalPath string) error {
 		if err != nil {
 			return err
 		}
-		
+
 		_, _ = io.Copy(wf, sf)
 		// ignore read/copy errors like "Incorrect function" on reparse points,
 		// partial zip entries are acceptable
-		
+
 		return nil
 	})
 	closeZipErr := zw.Close()
@@ -185,20 +185,57 @@ func (s *Service) ImportGame(game models.Game, sourceZip string, merge bool) err
 	}
 	defer r.Close()
 
-	if !merge {
-		if err := os.RemoveAll(game.Path); err != nil {
-			return fmt.Errorf("clear target folder: %w", err)
+	if merge {
+		if err := os.MkdirAll(game.Path, 0o755); err != nil {
+			return fmt.Errorf("create target folder: %w", err)
 		}
-	}
-	if err := os.MkdirAll(game.Path, 0o755); err != nil {
-		return fmt.Errorf("create target folder: %w", err)
+		return extractArchive(r.File, game.Path)
 	}
 
-	root := filepath.Clean(game.Path) + string(filepath.Separator)
-	for _, f := range r.File {
-		target := filepath.Join(game.Path, f.Name)
+	target := filepath.Clean(game.Path)
+	parent := filepath.Dir(target)
+	if err := os.MkdirAll(parent, 0o755); err != nil {
+		return fmt.Errorf("create target parent: %w", err)
+	}
+	staging, err := os.MkdirTemp(parent, "."+filepath.Base(target)+"-import-")
+	if err != nil {
+		return fmt.Errorf("create import staging folder: %w", err)
+	}
+	defer os.RemoveAll(staging)
+	if err := extractArchive(r.File, staging); err != nil {
+		return err
+	}
+
+	previous := filepath.Join(parent, "."+filepath.Base(target)+"-previous-"+fmt.Sprintf("%d", time.Now().UnixNano()))
+	hadTarget := false
+	if _, err := os.Stat(target); err == nil {
+		hadTarget = true
+		if err := os.Rename(target, previous); err != nil {
+			return fmt.Errorf("stage existing save folder: %w", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("inspect target folder: %w", err)
+	}
+	if err := os.Rename(staging, target); err != nil {
+		if hadTarget {
+			_ = os.Rename(previous, target)
+		}
+		return fmt.Errorf("publish imported save folder: %w", err)
+	}
+	if hadTarget {
+		if err := os.RemoveAll(previous); err != nil {
+			return fmt.Errorf("import succeeded but the previous temporary folder could not be removed: %w", err)
+		}
+	}
+	return nil
+}
+
+func extractArchive(files []*zip.File, destination string) error {
+	root := filepath.Clean(destination) + string(filepath.Separator)
+	for _, f := range files {
+		target := filepath.Join(destination, f.Name)
 		cleanTarget := filepath.Clean(target)
-		if !strings.HasPrefix(cleanTarget+string(filepath.Separator), root) && cleanTarget != filepath.Clean(game.Path) {
+		if !strings.HasPrefix(cleanTarget+string(filepath.Separator), root) && cleanTarget != filepath.Clean(destination) {
 			return fmt.Errorf("zip contains invalid path: %s", f.Name)
 		}
 

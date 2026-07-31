@@ -22,6 +22,11 @@ func publishToStore(ctx context.Context, store RevisionStore, next, base *Manife
 	}
 	published := cloneManifest(next)
 	published.ID, published.ParentID, published.GameSyncID, published.DeviceID = uuid.NewString(), parentID, syncID, deviceID
+	if parentID != "" {
+		published.ParentIDs = []string{parentID}
+	} else {
+		published.ParentIDs = nil
+	}
 	published.CreatedAt, published.Tombstones = time.Now().UTC(), deletedPaths(base, next)
 	result := Result{}
 	for path, entry := range published.Files {
@@ -91,7 +96,7 @@ func applyFromStore(ctx context.Context, store RevisionStore, gamePath string, c
 		if err != nil {
 			return Result{}, fmt.Errorf("read remote object: %w", err)
 		}
-		err = copyReaderAtomic(in, filepath.Join(gamePath, filepath.FromSlash(path)))
+		err = copyReaderAtomicVerified(in, filepath.Join(gamePath, filepath.FromSlash(path)), remote.Hash)
 		closeErr := in.Close()
 		if err == nil {
 			err = closeErr
@@ -114,6 +119,10 @@ func applyFromStore(ctx context.Context, store RevisionStore, gamePath string, c
 }
 
 func copyReaderAtomic(in io.Reader, target string) error {
+	return copyReaderAtomicVerified(in, target, "")
+}
+
+func copyReaderAtomicVerified(in io.Reader, target, expectedHash string) error {
 	tmp := target + ".cloud-saver-" + uuid.NewString() + ".tmp"
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 		return err
@@ -131,6 +140,17 @@ func copyReaderAtomic(in io.Reader, target string) error {
 	if closeErr != nil {
 		_ = os.Remove(tmp)
 		return closeErr
+	}
+	if expectedHash != "" {
+		actual, _, err := hashFile(tmp)
+		if err != nil {
+			_ = os.Remove(tmp)
+			return fmt.Errorf("verify restored object: %w", err)
+		}
+		if actual != expectedHash {
+			_ = os.Remove(tmp)
+			return errors.New("restored object failed SHA-256 verification")
+		}
 	}
 	if err := os.Remove(target); err != nil && !errors.Is(err, os.ErrNotExist) {
 		_ = os.Remove(tmp)
@@ -193,7 +213,7 @@ func ResolveConflictWithStore(ctx context.Context, store RevisionStore, gamePath
 		if err != nil {
 			return err
 		}
-		err = copyReaderAtomic(in, target)
+		err = copyReaderAtomicVerified(in, target, remoteFile.Hash)
 		closeErr := in.Close()
 		if err == nil {
 			err = closeErr
@@ -213,7 +233,7 @@ func ResolveConflictWithStore(ctx context.Context, store RevisionStore, gamePath
 		if err != nil {
 			return err
 		}
-		err = copyReaderAtomic(in, copyTarget)
+		err = copyReaderAtomicVerified(in, copyTarget, remoteFile.Hash)
 		closeErr := in.Close()
 		if err == nil {
 			err = closeErr

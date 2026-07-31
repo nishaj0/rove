@@ -117,6 +117,14 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 .state-text.warning, .home-service-state.warning { color: var(--rust); }
 .state-text.error { color: var(--danger); }
 .state-text.syncing { color: var(--brand-strong); }
+.health-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.health-grid > div { display: grid; min-height: 82px; align-content: start; gap: 8px; padding: 13px; border: 1px solid var(--border); border-radius: 3px; background: var(--window); box-shadow: 2px 2px 0 rgba(56, 28, 0, .14); }
+.health-grid span { color: var(--muted); font: 11px/1.2 Consolas, "Courier New", monospace; letter-spacing: .04em; text-transform: uppercase; }
+.health-grid strong { overflow-wrap: anywhere; color: var(--heading); font: 600 14px/1.35 Consolas, "Courier New", monospace; }
+.recovery-library-list { display: grid; gap: 10px; }
+.recovery-library-row { align-items: center; background: var(--window); border: 1px solid var(--border); display: flex; gap: 16px; justify-content: space-between; padding: 12px; box-shadow: 2px 2px 0 rgba(56, 28, 0, .12); }
+.recovery-library-row div { display: grid; gap: 3px; min-width: 0; }
+.recovery-library-row span { color: var(--muted); font-size: .82rem; overflow-wrap: anywhere; }
 
 .library-shell { position: relative; display: grid; gap: 18px; padding: 60px 24px 24px; border: 1px solid var(--border); border-radius: 3px; background: var(--window); box-shadow: var(--window-shadow); }
 .library-shell::before { position: absolute; top: 0; right: 0; left: 0; display: flex; align-items: center; height: 37px; padding: 0 12px 0 52px; border-bottom: 1px solid var(--border); border-radius: 3px 3px 0 0; color: var(--heading); background: color-mix(in srgb, var(--window) 82%, var(--surface)); content: attr(data-window-title); font-size: 12px; font-weight: 700; letter-spacing: .025em; }
@@ -144,6 +152,7 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 label { display: grid; gap: 6px; color: var(--body); font-size: 13px; font-weight: 700; }
 .settings-help { color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.35; }
 .provider-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.provider-picker-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .provider-card, .provider-status { display: grid; gap: 7px; padding: 16px; border: 1px solid var(--border); border-radius: 3px; background: var(--window); color: var(--body); text-align: left; }
 .provider-card { cursor: pointer; }
 .provider-card strong { color: var(--heading); font-size: 16px; }
@@ -203,8 +212,8 @@ input::placeholder { color: var(--muted); }
   .side-label { font-size: 11px; }
   .nav-count { display: none; }
   .main-panel { height: auto; min-height: 0; overflow: visible; padding: 18px; }
-  .settings-grid, .add-game-form, .backup-policy-grid, .split, .activity-summary, .game-detail-hero { grid-template-columns: 1fr; }
-  .provider-picker { grid-template-columns: 1fr; }
+  .settings-grid, .add-game-form, .backup-policy-grid, .split, .activity-summary, .game-detail-hero, .health-grid { grid-template-columns: 1fr; }
+  .provider-picker, .provider-picker-three { grid-template-columns: 1fr; }
   .split .backup-pane + .backup-pane { padding-top: 20px; padding-left: 0; border-top: 1px solid var(--border); border-left: 0; }
   .library-toolbar { grid-template-columns: 1fr; }
 }

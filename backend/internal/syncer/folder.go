@@ -37,6 +37,7 @@ type manifestFile struct {
 type manifest struct {
 	ID         string                  `json:"id"`
 	ParentID   string                  `json:"parentId,omitempty"`
+	ParentIDs  []string                `json:"parentIds,omitempty"`
 	GameSyncID string                  `json:"gameSyncId"`
 	DeviceID   string                  `json:"deviceId"`
 	CreatedAt  time.Time               `json:"createdAt"`
@@ -267,6 +268,153 @@ func scanManifest(root string, ignorePatterns []string) (*manifest, error) {
 		return nil, fmt.Errorf("scan save folder: %w", err)
 	}
 	return m, nil
+}
+
+// scanManifestCached walks metadata but only opens files whose stable metadata
+// changed or which the watcher marked dirty. All candidates share one stability
+// delay, avoiding a one-second delay per file.
+func scanManifestCached(ctx context.Context, root string, ignorePatterns []string, logs *logstore.Store, gameID string) (*manifest, error) {
+	if logs == nil || strings.TrimSpace(gameID) == "" {
+		return scanManifest(root, ignorePatterns)
+	}
+	cache, err := logs.FileStates(gameID)
+	if err != nil {
+		return nil, err
+	}
+	type candidate struct {
+		path string
+		rel  string
+		info fs.FileInfo
+	}
+	result := &manifest{Files: map[string]manifestFile{}}
+	candidates := []candidate{}
+	seen := map[string]struct{}{}
+	err = filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() {
+			if path != root && shouldIgnore(path, ignorePatterns) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !entry.Type().IsRegular() || shouldIgnore(path, ignorePatterns) {
+			return nil
+		}
+		rel, relErr := filepath.Rel(root, path)
+		if relErr != nil || !safeRelativePath(filepath.ToSlash(rel)) {
+			return relErr
+		}
+		rel = filepath.ToSlash(rel)
+		info, infoErr := entry.Info()
+		if infoErr != nil {
+			return infoErr
+		}
+		seen[rel] = struct{}{}
+		cached, ok := cache[rel]
+		if ok && !cached.Dirty && cached.SHA256 != "" && cached.Size == info.Size() && cached.ModifiedNS == info.ModTime().UnixNano() {
+			result.Files[rel] = manifestFile{Hash: cached.SHA256, Size: cached.Size}
+			return nil
+		}
+		candidates = append(candidates, candidate{path: path, rel: rel, info: info})
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(candidates) > 0 {
+		time.Sleep(time.Second)
+	}
+	for _, item := range candidates {
+		stable, statErr := os.Stat(item.path)
+		if statErr != nil {
+			if errors.Is(statErr, os.ErrNotExist) {
+				_ = logs.DeleteFileState(gameID, item.rel)
+				continue
+			}
+			return nil, statErr
+		}
+		if stable.Size() != item.info.Size() || stable.ModTime().UnixNano() != item.info.ModTime().UnixNano() {
+			return nil, fmt.Errorf("save file %q is still changing; protection will retry", item.rel)
+		}
+		hash, size, hashErr := hashFileWithContext(ctx, item.path)
+		if hashErr != nil {
+			return nil, hashErr
+		}
+		after, statErr := os.Stat(item.path)
+		if statErr != nil || after.Size() != stable.Size() || after.ModTime().UnixNano() != stable.ModTime().UnixNano() {
+			return nil, fmt.Errorf("save file %q changed during capture; protection will retry", item.rel)
+		}
+		result.Files[item.rel] = manifestFile{Hash: hash, Size: size}
+		if err := logs.UpsertFileState(logstore.FileState{
+			GameID:       gameID,
+			RelativePath: item.rel,
+			Size:         size,
+			ModifiedNS:   after.ModTime().UnixNano(),
+			SHA256:       hash,
+			Dirty:        false,
+		}); err != nil {
+			return nil, err
+		}
+	}
+	for rel := range cache {
+		if _, ok := seen[rel]; !ok {
+			if err := logs.DeleteFileState(gameID, rel); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return result, nil
+}
+
+type captureLimitKey struct{}
+
+// WithCaptureLimit applies a best-effort read ceiling to changed-file hashing.
+func WithCaptureLimit(ctx context.Context, bytesPerSecond int64) context.Context {
+	return context.WithValue(ctx, captureLimitKey{}, bytesPerSecond)
+}
+
+func hashFileWithContext(ctx context.Context, path string) (string, int64, error) {
+	limit, _ := ctx.Value(captureLimitKey{}).(int64)
+	if limit <= 0 {
+		return hashFile(path)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return "", 0, err
+	}
+	defer file.Close()
+	hash := sha256.New()
+	buffer := make([]byte, 64*1024)
+	started := time.Now()
+	var total int64
+	for {
+		count, readErr := file.Read(buffer)
+		if count > 0 {
+			if _, err := hash.Write(buffer[:count]); err != nil {
+				return "", 0, err
+			}
+			total += int64(count)
+			expected := time.Duration(float64(total) / float64(limit) * float64(time.Second))
+			if delay := expected - time.Since(started); delay > 0 {
+				timer := time.NewTimer(delay)
+				select {
+				case <-ctx.Done():
+					timer.Stop()
+					return "", 0, ctx.Err()
+				case <-timer.C:
+				}
+			}
+		}
+		if errors.Is(readErr, io.EOF) {
+			break
+		}
+		if readErr != nil {
+			return "", 0, readErr
+		}
+	}
+	return hex.EncodeToString(hash.Sum(nil)), total, nil
 }
 
 func shouldIgnore(path string, patterns []string) bool {
@@ -502,6 +650,7 @@ func manifestsEqual(a, b *manifest) bool {
 func cloneManifest(value *manifest) *manifest {
 	copy := &manifest{Files: make(map[string]manifestFile, len(value.Files))}
 	*copy = *value
+	copy.ParentIDs = append([]string{}, value.ParentIDs...)
 	for path, entry := range value.Files {
 		copy.Files[path] = entry
 	}

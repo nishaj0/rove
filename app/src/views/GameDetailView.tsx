@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { newDefaultBackupPolicy } from "../constants/defaults";
-import type { BackupHistoryEntry, BackupPolicy, Game, SnapshotSummary, SyncConflict, SyncJob } from "../types";
+import { newDefaultSyncPolicy } from "../constants/defaults";
+import type { Game, PauseScope, RecoveryPoint, Revision, SnapshotSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "../types";
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -11,371 +11,235 @@ type GameDetailViewProps = {
   exportOperationMessage: string;
   importOperationState: "idle" | "working" | "success" | "failed";
   importOperationMessage: string;
-  backupHistory: BackupHistoryEntry[];
-  snapshots: SnapshotSummary[];
-  snapshotVaultConfigured: boolean;
+  revisions: Revision[];
+  recoveryPoints: RecoveryPoint[];
+  storageUsage: StorageUsage | null;
+  legacySnapshots: SnapshotSummary[];
   onBack: () => void;
   onPlay: () => void;
-  onSyncGame: () => void;
+  onProtect: () => void;
   onDelete: () => void;
   onBrowseExportPath: () => void;
   onBrowseImportPath: () => void;
   onMergeChange: (value: boolean) => void;
   onExportBackup: () => void;
   onImportBackup: () => void;
-  onSaveSnapshotNow: () => void;
-  onRestoreSnapshot: (snapshotId: string) => void;
-  onDeleteSnapshot: (snapshotId: string) => void;
-  onSaveBackupPolicy: (value: BackupPolicy) => Promise<boolean>;
+  onSavePolicy: (value: SyncPolicy) => Promise<boolean>;
+  onPause: (scope: PauseScope, duration: "manual" | "one_hour" | "until_login") => Promise<void>;
+  onResume: () => Promise<void>;
+  onCreateRecoveryPoint: () => void;
+  onRestoreRevision: (revisionId: string) => void;
+  onDeleteRecoveryPoint: (id: string) => void;
+  onRestoreLegacySnapshot: (id: string) => void;
+  onDeleteLegacySnapshot: (id: string) => void;
   onUpdateCover: (coverImageData: string) => void;
   formatPlaytime: (seconds: number) => string;
   safeDateTime: (value: string) => string;
   formatBytes: (bytes: number) => string;
-  formatSnapshotTrigger: (trigger: string) => string;
   syncJob: SyncJob | null;
-  syncConfigured: boolean;
   syncConflicts: SyncConflict[];
   onResolveSyncConflict: (id: string, action: "local" | "remote" | "both") => void;
-  onLinkCloudGame: () => void;
 };
 
 export function GameDetailView(props: GameDetailViewProps) {
   const {
-    game,
-    exportPath,
-    importPath,
-    mergeOnImport,
-    exportOperationState,
-    exportOperationMessage,
-    importOperationState,
-    importOperationMessage,
-    backupHistory,
-    snapshots,
-    snapshotVaultConfigured,
-    onBack,
-    onPlay,
-    onSyncGame,
-    onDelete,
-    onBrowseExportPath,
-    onBrowseImportPath,
-    onMergeChange,
-    onExportBackup,
-    onImportBackup,
-    onSaveSnapshotNow,
-    onRestoreSnapshot,
-    onDeleteSnapshot,
-    onSaveBackupPolicy,
-    onUpdateCover,
-    formatPlaytime,
-    safeDateTime,
-    formatBytes,
-    formatSnapshotTrigger,
-    syncJob,
-    syncConfigured,
-    syncConflicts,
-    onResolveSyncConflict,
-    onLinkCloudGame,
+    game, exportPath, importPath, mergeOnImport, exportOperationState,
+    exportOperationMessage, importOperationState, importOperationMessage,
+    revisions, recoveryPoints, storageUsage, legacySnapshots, onBack, onPlay, onProtect, onDelete,
+    onBrowseExportPath, onBrowseImportPath, onMergeChange, onExportBackup,
+    onImportBackup, onSavePolicy, onPause, onResume, onCreateRecoveryPoint,
+    onRestoreRevision, onDeleteRecoveryPoint, onRestoreLegacySnapshot,
+    onDeleteLegacySnapshot, onUpdateCover, formatPlaytime,
+    safeDateTime, formatBytes, syncJob, syncConflicts, onResolveSyncConflict,
   } = props;
-
-  const [backupPolicyDraft, setBackupPolicyDraft] = useState<BackupPolicy>(game?.backupPolicy ?? newDefaultBackupPolicy());
-  const [backupPolicyState, setBackupPolicyState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
+  const [policy, setPolicy] = useState<SyncPolicy>(game?.protectionPolicy ?? newDefaultSyncPolicy());
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!game) {
-      return;
-    }
-    setBackupPolicyDraft(game.backupPolicy);
-    setBackupPolicyState("idle");
-  }, [
-    game?.id,
-    game?.backupPolicy.enabled,
-    game?.backupPolicy.intervalMinutes,
-    game?.backupPolicy.exitDelaySeconds,
-    game?.backupPolicy.retentionCount,
-  ]);
-
-  async function onSavePolicy() {
-    setBackupPolicyState("saving");
-    const saved = await onSaveBackupPolicy(backupPolicyDraft);
-    setBackupPolicyState(saved ? "saved" : "failed");
-  }
-
-  const exportStateClass = exportOperationState === "working"
-    ? "syncing"
-    : exportOperationState === "success"
-      ? "success"
-      : "error";
-
-  const importStateClass = importOperationState === "working"
-    ? "syncing"
-    : importOperationState === "success"
-      ? "success"
-      : "error";
-
-  const policyStateClass = backupPolicyState === "saving"
-    ? "syncing"
-    : backupPolicyState === "saved"
-      ? "success"
-      : "error";
+    setPolicy(game?.protectionPolicy ?? newDefaultSyncPolicy());
+  }, [game?.id, game?.protectionPolicy]);
 
   if (!game) {
     return (
       <section className="panel" data-window-title="MISSING.GAME">
-        <h2>Game Not Found</h2>
-        <p className="empty-state">This game no longer exists. Return to Games to pick another one.</p>
-        <button className="btn nav-back" onClick={onBack} type="button"><span aria-hidden="true">&#8592;</span> Back to Games</button>
+        <h2>Game not found</h2>
+        <button className="btn" onClick={onBack} type="button">Back to Games</button>
       </section>
     );
   }
 
+  const health = game.protectionStatus;
+  const active = syncJob && ["queued", "waiting", "running"].includes(syncJob.state);
+  const paused = health.serviceControl.pauseScope !== "none";
+
   return (
     <>
       <section className="panel game-detail-head" data-window-title="GAME.PROFILE">
-        <div className="game-detail-nav">
-          <button className="btn nav-back" onClick={onBack} type="button"><span aria-hidden="true">&#8592;</span> Back to Games</button>
-        </div>
+        <button className="btn nav-back" onClick={onBack} type="button">← Back to Games</button>
         <div className="game-detail-hero">
           <div className="game-detail-cover">
             {game.coverImageData ? <img src={game.coverImageData} alt={`${game.name} cover`} /> : <span>{game.name.slice(0, 2).toUpperCase()}</span>}
           </div>
           <div className="game-detail-meta">
-            <h2>{game.name}</h2>
+            <h1>{game.name}</h1>
             <p title={game.path}>Save folder: {game.path}</p>
-            <p title={game.executablePath}>Executable: {game.executablePath}</p>
             <p>Play time: {formatPlaytime(game.playtimeSeconds ?? 0)}</p>
-            <p>Last played: {game.lastPlayedAt ? safeDateTime(game.lastPlayedAt) : "Never"}</p>
-            <p>Status: <strong className={`state-text ${game.running ? "success" : "warning"}`}>{game.running ? "Running" : "Idle"}</strong></p>
+            <p>Status: <strong className={`state-text ${game.running ? "success" : "warning"}`}>{game.running ? "Playing" : "Idle"}</strong></p>
           </div>
         </div>
         <div className="detail-actions">
-          <button className="btn primary" onClick={onPlay} type="button">Play</button>
-          <button className="btn" onClick={onSyncGame} type="button" disabled={!syncConfigured || syncJob?.state === "queued" || syncJob?.state === "running"}>{syncJob?.state === "running" ? "Syncing..." : "Sync This Game"}</button>
+          <button className="btn primary" onClick={onPlay} type="button">Play with pre-check</button>
+          <button className="btn" onClick={onProtect} disabled={Boolean(active)} type="button">{active ? `${syncJob?.stage?.replace(/_/g, " ")} ${syncJob?.progress ?? 0}%` : "Protect now"}</button>
+          <button className="btn" onClick={onCreateRecoveryPoint} disabled={Boolean(active)} type="button">Create Recovery Point</button>
           <button className="btn danger" onClick={onDelete} type="button">Remove Game</button>
         </div>
       </section>
 
-      <section className="panel split" data-window-title="TRANSFER.UTILITY">
-        <div className="backup-pane">
-          <h2>Export Save</h2>
-          <label>
-            Destination folder
-            <input
-              className="picker-input"
-              placeholder="D:\\Backups"
-              value={exportPath}
-              readOnly
-              disabled={exportOperationState === "working"}
-              onClick={onBrowseExportPath}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onBrowseExportPath();
-                }
-              }}
-            />
-          </label>
-          <button className="btn primary backup-action" onClick={onExportBackup} type="button" disabled={exportOperationState === "working"}>
-            {exportOperationState === "working" ? "Exporting..." : "Export Backup"}
-          </button>
-          {exportOperationState !== "idle" ? <p className={`backup-status state-text ${exportStateClass}`}>{exportOperationMessage}</p> : null}
+      <section className="panel" data-window-title="PROTECTION.HEALTH">
+        <div className="panel-head">
+          <h2>Protection health</h2>
+          <span className={`state-text ${paused ? "warning" : health.conflictCount ? "error" : "success"}`}>{paused ? `Paused: ${health.serviceControl.pauseScope}` : health.conflictCount ? "Needs review" : "Active"}</span>
         </div>
-
-        <div className="backup-pane">
-          <h2>Import Save</h2>
-          <label>
-            ZIP source path
-            <input
-              className="picker-input"
-              placeholder="D:\\Backups\\my-game.zip"
-              value={importPath}
-              readOnly
-              disabled={importOperationState === "working"}
-              onClick={onBrowseImportPath}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onBrowseImportPath();
-                }
-              }}
-            />
-          </label>
-          <label className="inline-check">
-            <input type="checkbox" checked={mergeOnImport} disabled={importOperationState === "working"} onChange={(e) => onMergeChange(e.target.checked)} />
-            Merge into existing folder
-          </label>
-          <button className="btn primary backup-action" onClick={onImportBackup} type="button" disabled={importOperationState === "working"}>
-            {importOperationState === "working" ? "Importing..." : "Import Backup"}
-          </button>
-          {importOperationState !== "idle" ? <p className={`backup-status state-text ${importStateClass}`}>{importOperationMessage}</p> : null}
+        <div className="health-grid">
+          <div><span>Local protection</span><strong>{health.lastLocalProtection ? safeDateTime(health.lastLocalProtection) : "Not yet"}</strong></div>
+          <div><span>Cloud upload</span><strong>{health.lastCloudUpload ? safeDateTime(health.lastCloudUpload) : "Not yet"}</strong></div>
+          <div><span>Dirty files</span><strong>{health.dirtyFiles}</strong></div>
+          <div><span>Pending uploads</span><strong>{health.pendingCount} · {formatBytes(health.pendingBytes)}</strong></div>
         </div>
+        {syncJob?.error ? <p className="banner error">{syncJob.error}</p> : null}
       </section>
 
-      <section className="panel" data-window-title="BACKUP.POLICY">
-        <h2>Auto Backup Policy</h2>
-        <div className="backup-policy-grid">
+      <section className="panel" data-window-title="PROTECTION.POLICY">
+        <h2>Protection policy</h2>
+        <div className="settings-grid">
           <label className="inline-check">
-            <input
-              type="checkbox"
-              checked={backupPolicyDraft.enabled}
-              onChange={(e) => {
-                setBackupPolicyState("idle");
-                setBackupPolicyDraft((current) => ({ ...current, enabled: e.target.checked }));
-              }}
-            />
-            Enable automatic local backups
+            <input type="checkbox" checked={policy.enabled} onChange={(event) => setPolicy({ ...policy, enabled: event.target.checked })} />
+            Protection enabled for this game
           </label>
           <label>
-            Interval minutes
-            <input
-              type="number"
-              min={3}
-              max={120}
-              value={backupPolicyDraft.intervalMinutes}
-              onChange={(e) => {
-                setBackupPolicyState("idle");
-                const value = Number.parseInt(e.target.value, 10);
-                setBackupPolicyDraft((current) => ({
-                  ...current,
-                  intervalMinutes: Number.isFinite(value) ? value : current.intervalMinutes,
-                }));
-              }}
-            />
+            Mode
+            <select value={policy.mode} onChange={(event) => setPolicy({ ...policy, mode: event.target.value as SyncPolicy["mode"] })}>
+              <option value="balanced">Balanced — every 10 minutes and exit</option>
+              <option value="exit_only">Exit only — no reads during gameplay</option>
+              <option value="continuous">Continuous — after quiet writes, at least 2 minutes</option>
+              <option value="manual">Manual only</option>
+            </select>
           </label>
           <label>
-            Exit delay seconds
-            <input
-              type="number"
-              min={3}
-              max={120}
-              value={backupPolicyDraft.exitDelaySeconds}
-              onChange={(e) => {
-                setBackupPolicyState("idle");
-                const value = Number.parseInt(e.target.value, 10);
-                setBackupPolicyDraft((current) => ({
-                  ...current,
-                  exitDelaySeconds: Number.isFinite(value) ? value : current.exitDelaySeconds,
-                }));
-              }}
-            />
+            Checkpoint interval (minutes)
+            <input type="number" min={2} max={1440} disabled={policy.mode === "exit_only" || policy.mode === "manual"} value={policy.checkpointIntervalMinutes} onChange={(event) => setPolicy({ ...policy, checkpointIntervalMinutes: Number(event.target.value) })} />
           </label>
-          <label>
-            Keep latest backups
-            <input
-              type="number"
-              min={1}
-              max={30}
-              value={backupPolicyDraft.retentionCount}
-              onChange={(e) => {
-                setBackupPolicyState("idle");
-                const value = Number.parseInt(e.target.value, 10);
-                setBackupPolicyDraft((current) => ({
-                  ...current,
-                  retentionCount: Number.isFinite(value) ? value : current.retentionCount,
-                }));
-              }}
-            />
+          <label className="inline-check">
+            <input type="checkbox" checked={policy.exitProtection} onChange={(event) => setPolicy({ ...policy, exitProtection: event.target.checked })} />
+            Protect after game exit
           </label>
         </div>
         <div className="detail-actions">
-          <button className="btn primary" onClick={() => void onSavePolicy()} type="button" disabled={backupPolicyState === "saving"}>
-            {backupPolicyState === "saving" ? "Saving..." : "Save Backup Policy"}
-          </button>
+          <button className="btn primary" disabled={saving} onClick={async () => { setSaving(true); await onSavePolicy(policy); setSaving(false); }} type="button">{saving ? "Saving…" : "Save policy"}</button>
+          <button className="btn" onClick={() => void onPause("uploads", "manual")} type="button">Pause uploads</button>
+          <button className="btn" onClick={() => void onPause("all", "one_hour")} type="button">Pause all for one hour</button>
+          <button className="btn" onClick={() => void onPause("all", "until_login")} type="button">Pause until next login</button>
+          <button className="btn" disabled={!paused} onClick={() => void onResume()} type="button">Resume</button>
         </div>
-        {backupPolicyState !== "idle" ? (
-          <p className={`backup-status state-text ${policyStateClass}`}>
-            {backupPolicyState === "saving" ? "Saving backup policy..." : backupPolicyState === "saved" ? "Backup policy saved." : "Backup policy save failed."}
-          </p>
-        ) : null}
       </section>
 
-      <section className="panel" data-window-title="SNAPSHOT.ARCHIVE">
+      <section className="panel" data-window-title="RECOVERY.POINTS">
+        <div className="panel-head"><h2>Recovery Points</h2><span className="state-text success">{recoveryPoints.length} pinned</span></div>
+        {recoveryPoints.length === 0 ? <p className="empty-state">No pinned Recovery Points yet. Pinned points are never removed automatically.</p> : (
+          <ul className="snapshot-list">{recoveryPoints.map((point) => (
+            <li className="snapshot-row" key={point.id}>
+              <div className="snapshot-main"><p><strong>{point.name}</strong></p><p className="snapshot-meta">{safeDateTime(point.createdAt)} · {point.fileCount} files · {formatBytes(point.totalBytes)}</p></div>
+              <div className="snapshot-actions">
+                <button className="btn" onClick={() => onRestoreRevision(point.revisionId)} type="button">Restore</button>
+                <button className="btn danger" onClick={() => onDeleteRecoveryPoint(point.id)} type="button">Delete pin</button>
+              </div>
+            </li>
+          ))}</ul>
+        )}
+      </section>
+
+      <section className="panel" data-window-title="REVISION.HISTORY">
         <div className="panel-head">
-          <h2>Snapshots</h2>
-          <button className="btn primary" onClick={onSaveSnapshotNow} type="button" disabled={!snapshotVaultConfigured}>Save Now</button>
+          <h2>Automatic history</h2>
+          <span className="state-text">{storageUsage ? `${formatBytes(storageUsage.uniqueBytes)} unique` : "Calculating"}</span>
         </div>
-        <p className={`backup-status state-text ${syncJob?.state === "failed" || syncJob?.state === "conflict" ? "warning" : "success"}`}>
-          {!syncConfigured ? "Cloud sync is not configured. Choose a synced folder in Settings." : syncJob ? `Sync ${syncJob.state}: ${syncJob.changedFiles} file${syncJob.changedFiles === 1 ? "" : "s"}${syncJob.error ? ` — ${syncJob.error}` : ""}${syncJob.conflictIds?.length ? " — review conflicts before applying changes" : ""}` : "Ready to sync this game."}
-        </p>
-        <p className="snapshot-meta">Cloud game ID: {game.syncId || "Not paired"}</p>
-        <button className="btn" onClick={onLinkCloudGame} type="button">Link Existing Cloud Game</button>
-        {!snapshotVaultConfigured ? (
-          <p className="empty-state">Choose a snapshot vault folder in Settings to enable versioned snapshots.</p>
-        ) : snapshots.length === 0 ? (
-          <p className="empty-state">No snapshots yet.</p>
-        ) : (
+        {storageUsage ? <p className="snapshot-meta">{storageUsage.automaticCount} automatic · {storageUsage.recoveryPoints} pinned · {formatBytes(storageUsage.pendingBytes)} pending upload</p> : null}
+        {revisions.length === 0 ? <p className="empty-state">No unified revisions yet.</p> : (
+          <ul className="snapshot-list">{revisions.slice(0, 20).map((revision) => (
+            <li className="snapshot-row" key={revision.id}>
+              <div className="snapshot-main"><p><strong>{revision.name || revision.kind.replace(/_/g, " ")}</strong></p><p className="snapshot-meta">{safeDateTime(revision.createdAt)} · {revision.fileCount} files · {formatBytes(revision.totalBytes)} · {revision.uploaded ? "cloud uploaded" : "local"}</p></div>
+              <button className="btn" onClick={() => onRestoreRevision(revision.id)} type="button">Restore</button>
+            </li>
+          ))}</ul>
+        )}
+      </section>
+
+      {legacySnapshots.length > 0 ? (
+        <section className="panel" data-window-title="LEGACY.LOCAL.BACKUPS">
+          <div className="panel-head">
+            <h2>Legacy local backups</h2>
+            <span className="state-text warning">Read-only format</span>
+          </div>
+          <p className="empty-state">These older snapshot-vault entries are preserved. New snapshots cannot be created; use Recovery Points instead.</p>
           <ul className="snapshot-list">
-            {snapshots.map((snapshot) => (
+            {legacySnapshots.map((snapshot) => (
               <li className="snapshot-row" key={snapshot.id}>
                 <div className="snapshot-main">
-                  <p>
-                    <strong>#{snapshot.seq}</strong>
-                    {" · "}
-                    {safeDateTime(snapshot.createdAt)}
-                    {" · "}
-                    {formatSnapshotTrigger(snapshot.trigger)}
-                  </p>
-                  <p className="snapshot-meta">
-                    {snapshot.changedFiles} changed file{snapshot.changedFiles === 1 ? "" : "s"} · {formatBytes(snapshot.totalSize)}
-                  </p>
+                  <p><strong>{safeDateTime(snapshot.createdAt)}</strong></p>
+                  <p className="snapshot-meta">{snapshot.changedFiles} changed files · {formatBytes(snapshot.totalSize)} · {snapshot.trigger}</p>
                 </div>
                 <div className="snapshot-actions">
-                  <button className="btn" onClick={() => onRestoreSnapshot(snapshot.id)} type="button">Restore</button>
-                  <button className="btn danger" onClick={() => onDeleteSnapshot(snapshot.id)} type="button">Delete</button>
+                  <button className="btn" type="button" onClick={() => onRestoreLegacySnapshot(snapshot.id)}>Restore</button>
+                  <button className="btn danger" type="button" onClick={() => onDeleteLegacySnapshot(snapshot.id)}>Remove</button>
                 </div>
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      {syncConflicts.length > 0 ? <section className="panel" data-window-title="CONFLICT.REVIEW">
-        <h2>Sync conflicts need review</h2>
-        <p className="empty-state">No save is overwritten until you choose a resolution.</p>
-        <ul className="snapshot-list">{syncConflicts.map((conflict) => <li className="snapshot-row" key={conflict.id}><div className="snapshot-main"><p><strong>{conflict.path}</strong></p><p className="snapshot-meta">Local {conflict.localHash.slice(0, 8)} · Remote {conflict.remoteHash.slice(0, 8)}</p></div><div className="snapshot-actions"><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "local")} type="button">Keep local</button><button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "remote")} type="button">Use remote</button><button className="btn primary" onClick={() => onResolveSyncConflict(conflict.id, "both")} type="button">Keep both</button></div></li>)}</ul>
-      </section> : null}
+      {syncConflicts.length > 0 ? (
+        <section className="panel" data-window-title="CONFLICT.REVIEW">
+          <h2>Conflicts need review</h2>
+          <p className="empty-state">Neither copy is overwritten until you choose.</p>
+          <ul className="snapshot-list">{syncConflicts.map((conflict) => (
+            <li className="snapshot-row" key={conflict.id}>
+              <div className="snapshot-main"><p><strong>{conflict.path}</strong></p><p className="snapshot-meta">{safeDateTime(conflict.createdAt)} · local {conflict.localHash.slice(0, 8)} · remote {conflict.remoteHash.slice(0, 8)}</p></div>
+              <div className="snapshot-actions">
+                <button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "local")} type="button">Use local</button>
+                <button className="btn" onClick={() => onResolveSyncConflict(conflict.id, "remote")} type="button">Use remote</button>
+                <button className="btn primary" onClick={() => onResolveSyncConflict(conflict.id, "both")} type="button">Keep both</button>
+              </div>
+            </li>
+          ))}</ul>
+        </section>
+      ) : null}
 
-      <section className="panel" data-window-title="BACKUP.HISTORY">
-        <h2>Local Backup History</h2>
-        {backupHistory.length === 0 ? (
-          <p className="empty-state">No automatic backups yet.</p>
-        ) : (
-          <ul className="backup-history-list">
-            {backupHistory.map((entry) => (
-              <li className="backup-history-row" key={entry.id}>
-                <p>
-                  <strong>{entry.reason === "final" ? "Final" : "Periodic"}</strong>
-                  {" backup at "}
-                  {safeDateTime(entry.createdAt)}
-                </p>
-                <p className="backup-history-path" title={entry.path}>{entry.path}</p>
-              </li>
-            ))}
-          </ul>
-        )}
+      <section className="panel split" data-window-title="MANUAL.ZIP.UTILITY">
+        <div className="backup-pane">
+          <h2>Export ZIP</h2>
+          <input className="picker-input" value={exportPath} readOnly onClick={onBrowseExportPath} placeholder="Choose destination folder" />
+          <button className="btn primary" onClick={onExportBackup} disabled={exportOperationState === "working"} type="button">{exportOperationState === "working" ? "Exporting…" : "Export"}</button>
+          {exportOperationState !== "idle" ? <p className="snapshot-meta">{exportOperationMessage}</p> : null}
+        </div>
+        <div className="backup-pane">
+          <h2>Import ZIP</h2>
+          <input className="picker-input" value={importPath} readOnly onClick={onBrowseImportPath} placeholder="Choose ZIP file" />
+          <label className="inline-check"><input type="checkbox" checked={mergeOnImport} onChange={(event) => onMergeChange(event.target.checked)} />Merge into existing folder</label>
+          <button className="btn primary" onClick={onImportBackup} disabled={importOperationState === "working"} type="button">{importOperationState === "working" ? "Importing…" : "Import"}</button>
+          {importOperationState !== "idle" ? <p className="snapshot-meta">{importOperationMessage}</p> : null}
+        </div>
       </section>
 
       <section className="panel" data-window-title="COVER.ART">
-        <h2>Cover Image</h2>
-        <label className="file-input-wrap">
-          <span>Upload image</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) {
-                return;
-              }
-              const reader = new FileReader();
-              reader.onload = () => {
-                if (typeof reader.result === "string") {
-                  onUpdateCover(reader.result);
-                }
-              };
-              reader.readAsDataURL(file);
-            }}
-          />
-        </label>
+        <h2>Cover image</h2>
+        <label className="file-input-wrap"><span>Upload image</span><input type="file" accept="image/*" onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => { if (typeof reader.result === "string") onUpdateCover(reader.result); };
+          reader.readAsDataURL(file);
+        }} /></label>
       </section>
     </>
   );

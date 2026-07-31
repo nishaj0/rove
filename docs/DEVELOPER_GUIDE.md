@@ -1,314 +1,153 @@
 # Cloud Saver developer guide
 
-This guide describes the current Windows-focused implementation for contributors working on the Go daemon or Tauri/React desktop UI.
+This guide covers the implemented Windows-focused, offline-first protection engine. Detailed references:
+
+- [Architecture and workflow](developers/ARCHITECTURE.md)
+- [Provider interface](developers/PROVIDER_INTERFACE.md)
+- [Google Drive development and release setup](developers/GOOGLE_DRIVE_DEVELOPMENT.md)
+- [Windows lifecycle and tray](developers/WINDOWS_LIFECYCLE.md)
 
 ## Repository map
 
 ```text
-app/                         Tauri shell and React UI
-  src/api.ts                 Typed local HTTP client
-  src/api/parsers.ts         Defensive API response normalization
-  src/views/                 Home, games, game detail, settings, activity
-  src-tauri/                 Native desktop wrapper
-backend/
-  cmd/daemon/                Daemon entry point
-  internal/app/              Service composition and lifecycle
-  internal/api/              Loopback HTTP API and handlers
-  internal/config/           JSON settings and game configuration
-  internal/syncer/           Job engine and synced-folder protocol
-  internal/snapshots/        Local incremental snapshot vault
-  internal/backup/           ZIP export/import and auto-backup services
-  internal/logstore/         SQLite logs, playtime, sync state, conflicts
-  internal/watcher/          fsnotify integration
+backend/internal/
+  api/              loopback HTTP handlers
+  app/              composition and lifecycle
+  config/           settings/game JSON and migration
+  gamemon/          adaptive process detection
+  logstore/         SQLite state, jobs, revisions, activity
+  networkwatch/     Windows connectivity-change signal
+  runtimepriority/  game-time process priority control
+  singleinstance/   per-user daemon mutex
+  syncer/           protection engine and local/folder protocol
+  syncer/drive/     Google Drive RevisionStore
+  tray/             event-driven Windows tray
+app/
+  src/              React UI and typed API client
+  src-tauri/        Tauri bootstrap and official autostart plugin
 ```
 
-## Runtime architecture
+## Invariants
 
-```mermaid
-flowchart LR
-  UI["Tauri + React UI"] -->|"HTTP 127.0.0.1:7331"| API["Go API server"]
-  API --> CFG["Settings JSON"]
-  API --> ENG["Sync engine"]
-  API --> DB["SQLite sync.db"]
-  ENG --> SAVE["Local save folder"]
-  ENG --> CLOUD["Provider-synced folder/.cloud-saver/v1"]
-  MON["Game monitor"] --> APP["Application coordinator"]
-  WATCH["Filesystem watcher"] --> ENG
-  APP --> ENG
-```
+1. Local publication completes before provider replication.
+2. Objects and manifests are immutable; heads are mutable pointers published last.
+3. A restore verifies SHA-256 before replacing an existing file.
+4. Provider failure cannot discard the local revision or pending job.
+5. Conflicting paths require review.
+6. One capture worker and one provider path run serially through the engine.
+7. Watch callbacks mark dirty metadata only.
+8. Legacy data is preserved until an explicit user action.
 
-`internal/app.Application` constructs and starts the config manager, SQLite store, sync engine, watcher, game monitor, backups, snapshots, local HTTP server, and optional tray. The HTTP server is loopback-only and permits only loopback origins for CORS.
+## Persistence
 
-## Configuration and persistence
+Settings JSON retains compatibility fields but the primary model is `ProtectionTarget`, `SyncPolicy`, and `ServiceControlState`. Migration supplies Balanced/10-minute defaults, a stable device ID, per-game cloud `syncId`, auto-revision retention of three, and enabled protection/reconnect defaults.
 
-### Settings JSON
+SQLite uses WAL and persists:
 
-The config manager stores settings under `%AppData%/CloudSaver/settings.json` by default. It normalizes old settings during load and assigns a device UUID plus a unique per-game `syncId` when missing.
+- file metadata/hash cache;
+- sessions and dirty state;
+- durable protection jobs and retry stages;
+- immutable revision metadata and Recovery Points;
+- provider health and cursor slots;
+- global/per-game pause state;
+- profiles, conflicts, quarantine metadata, and structured activity.
 
-Important sync fields:
+The old log, backup-history, sync-baseline, conflict, and snapshot data remain readable.
 
-| Field | Meaning |
+`settings.json` has an explicit schema version. Loading is field-tolerant: unknown fields are retained only by newer clients and ignored by older readers, missing fields receive migration defaults, and a field whose JSON type changed is reset without discarding unrelated games or encrypted provider credentials. Saves use a same-directory temporary file and atomic replacement, with the previous valid JSON retained as `settings.json.bak`. If the primary file is malformed, Cloud Saver preserves it as `settings.json.invalid-<timestamp>`, restores the backup when possible, and records a warning in Activity. Contributors must not fix migrations by deleting user settings.
+
+The `POST /settings` contract contains editable fields only. Provider connection details, OAuth diagnostic sources, device identity, games, and schema metadata remain daemon-owned. Known legacy envelope fields are accepted and ignored to tolerate a short UI/daemon version mismatch.
+
+## Job stages
+
+`waiting`, `waiting_for_network`, `stabilizing`, `capturing`, `locally_protected`, `uploading`, `publishing`, `paused`, `authentication_required`, `quota_blocked`, `conflict`, `failed`, and `completed` are represented in the API model. Jobs store revision ID, byte/file counts, progress, retry count, next attempt, and safe error code.
+
+Transient provider retry uses jittered 15s, 30s, 1m, 2m, 5m, then 15m delays. Auth and quota states are non-spinning. A network-change event calls `RetryNow`.
+
+## Performance
+
+For `F` known paths and `Δ` changed bytes:
+
+- watcher callback: path mapping and SQLite dirty mark, approximately `O(path roots)`;
+- scheduled capture metadata scan: `O(F)`;
+- hashing/staging: `O(Δ)`;
+- manifest comparison: `O(F)`;
+- memory: `O(F)` metadata plus bounded streaming buffers.
+
+Changed files are hashed and staged in a streaming pass, then metadata is checked again. While a game is running, capture reads are limited to 4 MiB/s and the daemon is moved to Below Normal priority. Process detection polls every 10 seconds while idle and every two seconds while launching/playing; full executable paths are resolved only after a basename match.
+
+The implementation does not yet contain benchmark enforcement for the stated `<1%` daemon CPU or `<1%` FPS acceptance targets. Treat those as release qualification goals, not guaranteed runtime telemetry.
+
+## APIs
+
+Important routes:
+
+| Route | Purpose |
 | --- | --- |
-| `syncRoot` | User-selected provider-synced folder; empty disables cloud sync. |
-| `deviceId` | Stable local device UUID written into new revisions. |
-| `syncRetention` | Configured cloud retention limit. |
-| `reviewConflicts` | Safety setting normalized to `true`. |
-| `games[].id` | Local game identity used by UI, SQLite, and local state. |
-| `games[].syncId` | Shared cloud-game identity used as the remote folder key. |
+| `GET /protection/status?gameId=` | global or per-game health |
+| `POST /protection/control` | global/per-game pause and duration |
+| `POST /protection/retry` | immediate provider retry |
+| `GET /sync/jobs` | durable job view |
+| `GET/POST /sync/conflicts` | review and explicit resolution |
+| `GET /revisions`, `POST /revisions/restore` | history and exact restore |
+| `GET/POST/DELETE /recovery-points` | pinned revisions |
+| `GET /recovery-library` | portable provider profiles |
+| `POST /recovery-library/restore` | verified restore to empty folder |
+| `GET /storage/usage?gameId=` | unique retained content and pending bytes |
+| `GET /activity` | structured user events |
+| `GET /diagnostics` | sanitized report |
+| `GET/POST /settings` | settings and target selection |
 
-### SQLite
+All endpoints bind to loopback and JSON decoding rejects unknown fields.
 
-`sync.db` is stored next to settings. Relevant tables are:
-
-| Table | Purpose |
-| --- | --- |
-| `logs` | Activity feed and debug events. |
-| `game_stats` | Playtime and last-played information. |
-| `backup_history` | Automatic local backup history. |
-| `sync_state` | Last reconciled manifest JSON and revision per local game. |
-| `sync_conflicts` | Open/resolved conflict records with file hashes. |
-| `conflicts` | Legacy/audit conflict log entries. |
-
-SQLite is configured for WAL and a single open connection to reduce lock churn.
-
-## Sync protocol
-
-The reconciliation logic is provider-independent. `syncer.RevisionStore` transports immutable heads, manifests, objects, and displaced-file archives; `FolderStore` implements the existing folder path and `syncer/drive` maps the same layout to Google Drive.
-
-### Layout
-
-```text
-<syncRoot>/
-  .cloud-saver/v1/games/<syncId>/
-    head.json                         points at the current revision ID
-    objects/<sha256>                  deduplicated file content
-    revisions/<uuid>.json             immutable full-state manifest
-    versions/<deviceId>/<syncId>/...  displaced local files archived on apply
-```
-
-A manifest contains a revision ID, parent ID, game sync ID, originating device, creation time, complete `files` map (`relative path -> SHA-256 + size`), and tombstones relative to its parent.
-
-### Reconciliation algorithm
-
-`syncer.Reconcile(game, settings, logs)`:
-
-1. Validates `syncRoot`, `deviceId`, `syncId`, and rejects a sync root nested inside the game save folder.
-2. Scans regular files, skips symlinks/special files and configured ignore patterns, then hashes the remaining contents.
-3. Loads the local baseline from `sync_state` and the remote head/manifest from the shared folder.
-4. Chooses one path:
-   - no remote revision: publish local state;
-   - no local baseline plus an empty local folder: apply remote state;
-   - only local changes: publish a child revision;
-   - only remote changes: archive displaced files and apply the remote state exactly;
-   - independent changed paths: merge then publish a new revision;
-   - overlapping changed paths with different hashes: create durable `sync_conflicts` records and stop without modifying saves.
-5. Writes the new local baseline only after reconciliation succeeds.
-
-Object writes and JSON writes use temporary paths followed by rename. A newly copied object is re-hashed before publication. Remote application archives each local file that will be changed or removed before writing/removing it.
-
-### Conflict resolution
-
-`syncer.ResolveConflict` requires an explicit action:
-
-- `local`: reset the baseline to the current remote revision, then publish the local copy as a new revision.
-- `remote`: replace/remove the local path with the current remote version and adopt the remote baseline.
-- `both`: save a copy of the remote version using `.cloud-conflict-<hash>` before publishing the local state.
-
-Resolution rejects stale conflicts whose remote hash no longer matches the current head.
-
-## Performance and resource model
-
-Cloud Saver is a local daemon. The desktop app talks to it over loopback
-(`127.0.0.1:7331`). Provider network activity is limited to the selected provider
-implementation: a folder provider performs local filesystem I/O and lets
-OneDrive/Dropbox/Syncthing transfer data, while the Google Drive provider makes
-Drive API calls during sync jobs.
-
-### Reconciliation complexity
-
-For one game, let `F` be the number of regular files, `B` the total bytes in those
-files, and `Δ` the bytes in files that changed since the previous baseline.
-
-| Operation | Current cost |
-| --- | --- |
-| Scheduled or watcher-triggered scan | `O(F + B)` time; every file is currently read and SHA-256 hashed. |
-| Manifest comparison | `O(F)` time and memory. |
-| Local publish | The scan reads `B`; changed files may be read again for verification and object publication, so local read I/O is approximately `B + 2Δ` or more. |
-| Remote apply | `O(F)` metadata work plus bytes archived and downloaded; writes use temporary files and rename. |
-| Conflict detection | `O(F)`; it compares manifest hashes rather than re-reading both versions. |
-
-Memory is proportional to manifest metadata (`O(F)`), not normally to the total
-save size. Local-folder object writes stream through temporary files. The current
-Google Drive implementation uses `io.ReadAll` for object uploads and displaced
-archives, so a large individual Drive object can temporarily consume memory close
-to that file's size.
-
-### Background work while running
-
-The default timers are:
-
-| Service | Cadence / behavior |
-| --- | --- |
-| Game monitor | Enumerates processes every 3 seconds. |
-| Sync engine | Reconciles on the configured interval, default 30 seconds; minimum 5 seconds. |
-| Auto-backup coordinator | Checks due backups every 30 seconds; a configured backup then reads/compresses the game folder. |
-| Snapshot coordinator | Checks due snapshots every 30 seconds; periodic snapshots default to 15 minutes. |
-| Filesystem watcher | Event-driven watches for currently running tracked games. Each watched directory consumes an OS watch/handle. |
-| Tray status | Polls running-game state every 2 seconds when the tray is enabled. |
-| UI | Polls local status/jobs every 5 seconds; game backup/snapshot/conflict data refreshes every 15 seconds. |
-
-Only one reconciliation runs at a time. The trigger channel has capacity one, so
-bursts are coalesced rather than creating an unbounded queue. This bounds memory
-and prevents concurrent writers, but a large game can delay other games. The
-watcher currently passes only an event trigger, not a game-specific path, and
-does not debounce until a file is stable; a burst can therefore cause a full
-multi-game scan.
-
-### Storage growth and provider traffic
-
-Content-addressed objects deduplicate identical file contents, but every
-published manifest is immutable. Remote replacements also create displaced-file
-archives under `versions/`. `syncRetention` is persisted and exposed in the UI,
-but automated reachability-based pruning of manifests and objects is not
-implemented. Cloud storage can therefore grow indefinitely until an explicit,
-carefully designed cleanup feature is added. Local snapshots and ZIP backups are
-separate stores.
-
-For folder sync, Cloud Saver performs local reads/writes and the user's provider
-handles Internet transfer. For Google Drive, unchanged objects are skipped when
-the provider already has the hash, but metadata lookups and manifest/head requests
-still occur. There is no persistent application-level network stream.
-
-### Safety/performance trade-offs and known limits
-
-- Full hashing on every reconciliation favors detection correctness over minimum I/O.
-- Atomic object/manifest/head publication avoids exposing incomplete revisions.
-- There is no provider-level distributed lock or compare-and-swap on `head.json`; simultaneous publishers can race, with the filesystem/provider deciding the final head.
-- A pending watcher count is reset after a successful cycle; failed cycles can leave pending work visible until a later success.
-- Google Drive buffering and absent revision garbage collection are the two largest current resource risks.
-
-Recommended future optimizations are metadata-based hash caching, per-game event
-mapping and debounce, per-game queues, periodic full verification instead of full
-hashing every interval, streaming Drive transfers, retention garbage collection,
-and an atomic head compare-and-swap/lock protocol. These are not part of the
-current implementation.
-
-### Current protocol limits
-
-- The current head pointer is last-writer-wins at the filesystem level. Immutable revisions make incomplete reads detectable, but there is no provider-level distributed lock.
-- Job history is intentionally in-memory and bounded to 100 jobs; conflict records and baselines are durable in SQLite.
-- `syncRetention` is persisted and exposed in the UI; automated compaction/pruning of revision objects is not implemented yet. Do not claim retention pruning exists until it is implemented and tested.
-- The watcher currently coalesces events into engine work; per-game debounce/mapping is future work. The interval loop remains the reconciliation fallback.
-
-## Sync job engine
-
-`syncer.Engine` has one bounded trigger channel and serializes reconciliation cycles. `Trigger` and `TriggerGame` create a `SyncJob` with states `queued`, `running`, `completed`, `conflict`, `failed`, `skipped`, or `coalesced`.
-
-Without a configured sync root, automatic/manual work is reported as `skipped` with setup guidance rather than pretending files were synchronized.
-
-The status endpoint returns engine running state, last sync time/error, pending event count, and whether sync is configured.
-
-## HTTP API
-
-All payloads are JSON. `decodeJSON` rejects unknown fields. The daemon binds to `127.0.0.1` only.
-
-| Route | Methods | Notes |
-| --- | --- | --- |
-| `/games` | GET, POST | List/add local games. |
-| `/games/:id` | GET, PUT, DELETE | Read/update/remove a local game. |
-| `/games/sync` | POST | Queue a game sync; rejects when the game is running. |
-| `/sync` | POST | Queue a global sync. |
-| `/sync/jobs` | GET | Optional `gameId` query; returns newest-first in-memory jobs. |
-| `/sync/conflicts` | GET, POST | List open conflicts or resolve `{id, action}`. |
-| `/games/pair` | POST | Assign `{gameId, syncId}` to link a local game to an existing shared game. |
-| `/status` | GET | Engine status and sync configuration state. |
-| `/settings` | GET, POST | Read/update persisted settings. |
-| `/providers/google-drive/connect` | POST | Starts PKCE browser sign-in on a temporary loopback callback. |
-| `/providers/google-drive/disconnect` | POST | Revokes and removes the locally protected connection. |
-| `/providers/google-drive/status` | GET | Returns connection state and account email, never credentials. |
-| `/snapshots` | GET, POST | List or create snapshots. |
-| `/snapshots/restore` | POST | Restore snapshot; API rejects a running game. |
-| `/backup/export`, `/backup/import` | POST | ZIP operations. |
-| `/logs/recent`, `/backup/history`, `/debug/info` | GET | Diagnostics/history. |
-
-When adding an API route, update the server route registry, frontend `api.ts`, response parsers, types, and the appropriate user/developer documentation.
-
-## Snapshot behavior
-
-Snapshots are independent from cloud revisions. `snapshots.Service` supports manual, exit, periodic, and pre-restore triggers. Restore materializes the requested state to a temporary directory, creates a pre-restore snapshot, removes live files absent from the selected snapshot, then copies the selected files back. This is deliberately an exact restore rather than an overlay.
-
-## Frontend workflow
-
-`app/src/App.tsx` is the stateful coordinator. It owns navigation, refresh timers, toast/error handling, dialogs, and calls to `api.ts`. Views are mostly presentational and receive callbacks/typed state.
-
-The UI uses the Nostalgia visual system. Light mode is the default: toasted-cream desktop `#FFEEDD`, warm window bodies `#F6E6D6`, espresso headings `#381C00`, taupe `#C7AE8E` hairlines, and orange `#D94A00` primary actions. Every major content block is a bordered desktop-style window with a labeled title bar, decorative control dots, a 3px radius, and a directional warm shadow. Use serif faces only for page headings and mono for system data. The Settings view persists the explicit Light desktop or opt-in CRT desktop palette (`#1E140C` / `#2A1C12`) through `Settings.ThemeMode`; the selected palette previews immediately and is stored when the settings form is saved. Do not add pills, glass, blur-heavy shadows, or gradients outside chart area fills.
-
-Google Drive uses the public installed-app client ID compiled into the desktop build, so end users never enter credentials or environment variables. The downloaded OAuth JSON's client secret is intentionally ignored: installed desktop apps cannot keep it confidential, and the flow uses PKCE with only `drive.file`. `CLOUD_SAVER_GOOGLE_CLIENT_ID` remains an optional override for maintainers building a fork with their own Google Cloud project; never commit the downloaded JSON or a client secret.
-
-Key UI flows:
-
-- Settings chooses `syncRoot` and saves all settings through `POST /settings`.
-- The Home view shows configured/ready status.
-- The game detail view displays the latest job, Cloud game ID, conflict list, snapshots, ZIP actions, and backup history.
-- Conflict resolution requires a browser confirmation before calling the local API.
-
-Keep API parsing defensive: backend JSON is normalized in `app/src/api/parsers.ts` before it reaches views. When extending a type, update its default, parser, API method, and UI states together.
-
-## Local development
-
-### Prerequisites
-
-- Go 1.23+
-- Node.js 20+
-- Rust/Cargo
-- Visual Studio 2022 Build Tools with C++ workload
-
-### Run
-
-```powershell
-# terminal 1
-cd backend
-go run ./cmd/daemon --no-tray --debug
-
-# terminal 2
-cd app
-npm install
-.\dev-tauri.cmd
-```
-
-The UI expects the daemon at `http://127.0.0.1:7331`. For a repeatable local sync test, use two temporary save folders and a third temporary synced folder; configure two daemon instances with separate settings paths and unique device IDs.
-
-## Testing and quality gates
+## Verification
 
 ```powershell
 cd backend
+$env:GOCACHE="$PWD\.cache\go-build"
 go test ./...
 
 cd ..\app
 npm run type-check
 npm run build
+
+cd src-tauri
+cargo check
 ```
 
-`backend/internal/syncer/folder_test.go` is the primary sync integration test. It covers:
+## Google Drive OAuth diagnostics
 
-- initial two-device transfer;
-- file update propagation;
-- deletion propagation;
-- simultaneous same-file conflict detection; and
-- explicit local conflict resolution followed by propagation.
+OAuth configuration loading is in `backend/internal/auth/googledrive/service.go`. Google requires the Desktop client credential at token exchange even when PKCE is used. For local development, reference the downloaded file without copying it into the repository:
 
-Before submitting a change:
+```powershell
+$env:CLOUD_SAVER_GOOGLE_OAUTH_JSON="C:\path\to\downloaded-desktop-oauth.json"
+cd backend
+go run ./cmd/daemon --no-tray --debug
+```
 
-1. Preserve unrelated user changes in a dirty worktree.
-2. Add tests for data-loss, conflict, or migration behavior.
-3. Run Go tests, TypeScript checking, and the Vite build.
-4. Update both relevant documents in `docs/` and the root README when user behavior changes.
-5. Review `git diff --check`; do not silently fix unrelated whitespace or legacy changes.
+Set the variable in the same PowerShell process that launches the daemon. When changing it, stop the existing daemon and restart it; configuration is loaded only at startup. Confirm the active sources before connecting:
 
-## Extension guidelines
+```powershell
+Invoke-RestMethod http://127.0.0.1:7331/providers/google-drive/status
+```
 
-- **Direct cloud providers:** implement a provider interface outside `syncer/folder.go`; keep conflict and manifest semantics provider-independent.
-- **Revision compaction:** only prune an object after proving no retained manifest references it. Add crash-recovery and retention tests first.
-- **Watcher improvements:** map paths to game IDs, debounce stable writes, and retain interval reconciliation for missed events.
-- **Security:** preserve loopback-only API handling and never expose the daemon to the LAN without authentication, threat modeling, and explicit product approval.
-- **Schema changes:** use additive `CREATE TABLE IF NOT EXISTS` migrations or explicit versioned migrations; maintain compatibility with existing settings JSON.
+JSON-based development should report `oauthClientSource: oauth_json` and `oauthCredentialSource: oauth_json`. The complete contributor walkthrough and error guide is in [Google Drive development](developers/GOOGLE_DRIVE_DEVELOPMENT.md).
+
+The JSON is read in memory and never copied into settings or SQLite. `CLOUD_SAVER_GOOGLE_CLIENT_ID` and `CLOUD_SAVER_GOOGLE_CLIENT_SECRET` are lower-level overrides for CI or unusual developer environments.
+
+Official releases set the GitHub Actions secret `GOOGLE_OAUTH_CLIENT_SECRET`. Fork maintainers also set the Actions variable `GOOGLE_OAUTH_CLIENT_ID` so it matches their secret; the upstream project can retain its built-in official ID. The staging script injects these into the daemon using Go linker variables, and the release workflow refuses to publish without the credential. The value remains extractable from the installed executable—as with every public desktop OAuth client—but is absent from Git history and build logs.
+
+`--debug` or `CLOUD_SAVER_DEBUG=1` writes sanitized stages to the terminal and SQLite log: callback listener, browser launch, verified callback, PKCE exchange, refresh-token presence, optional account metadata, DPAPI protection, and settings persistence. It never logs authorization codes, PKCE verifiers, tokens, client IDs, or client credentials. `GET /providers/google-drive/status` reports both configuration sources without returning either value.
+
+The sync tests cover two-device updates/deletions/conflicts, local-first offline behavior, Recovery Points, exact restore, and verified staged Recovery Library restore. Add crash-injection, metered-network, Drive cursor-expiration, resumable-session, cleanup, API contract, frontend component, and Windows integration coverage before treating those paths as release-complete.
+
+## Current implementation boundaries
+
+- The schema includes provider cursor and cleanup/quarantine records, but Drive change-cursor consumption and physical mark-and-sweep deletion are not active yet.
+- Per-device heads are published, while full multi-head graph convergence is still incomplete; the legacy compatibility head remains part of reads.
+- The metered-network preference is persisted and shown, but Windows cost-aware transfer blocking still requires native integration.
+- The important-notification preference is persisted, but native toast delivery is not wired yet.
+- The tray currently exposes global pause controls; timed and per-game pauses are available in the desktop UI.
+- Normal quit persists jobs, but the three-choice pending-work tray confirmation is not implemented.
+
+These boundaries are documented so contributors do not mistake a type, table, or setting for completed behavior.

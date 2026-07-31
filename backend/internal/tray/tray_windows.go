@@ -28,7 +28,7 @@ func (m *Manager) SetRunning(v bool) {
 	m.running.Store(v)
 }
 
-func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyncNow, onExit func()) {
+func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 	systray.Run(func() {
 		systray.SetTitle(branding.DisplayName)
 		if iconBytes := loadTrayIcon(); len(iconBytes) > 0 {
@@ -36,14 +36,25 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 		}
 		systray.SetTooltip(branding.DisplayName)
 
-		openItem := systray.AddMenuItem("Open App", "Open desktop app")
-		toggleItem := systray.AddMenuItem("Stop Sync", "Start or stop syncing")
-		syncNowItem := systray.AddMenuItem("Sync Now", "Trigger manual sync")
+		openItem := systray.AddMenuItem("Open Cloud Saver", "Open desktop app")
+		stateItem := systray.AddMenuItem("State: starting", "Current protection state")
+		stateItem.Disable()
+		providerItem := systray.AddMenuItem("Provider: checking", "Cloud provider and pending uploads")
+		providerItem.Disable()
+		protectNowItem := systray.AddMenuItem("Protect now", "Protect pending save changes")
+		recoveryPointItem := systray.AddMenuItem("Create Recovery Point", "Pin the current save for a running game")
+		retryItem := systray.AddMenuItem("Retry connection", "Retry pending provider work")
+		reviewItem := systray.AddMenuItem("Review conflicts", "Open conflicts that need a decision")
 		systray.AddSeparator()
 		playingItem := systray.AddMenuItem("Playing: none", "Tracked games currently running")
 		playingItem.Disable()
 		systray.AddSeparator()
-		exitItem := systray.AddMenuItem("Exit", fmt.Sprintf("Exit %s", branding.DisplayName))
+		pauseUploadsItem := systray.AddMenuItem("Pause cloud uploads", "Keep local protection active")
+		pauseAllItem := systray.AddMenuItem("Pause all protection", "Suspend capture and provider work")
+		pauseGameItem := systray.AddMenuItem("Pause this game", "Pause the only tracked game currently running")
+		resumeItem := systray.AddMenuItem("Resume protection", "Resume paused protection work")
+		systray.AddSeparator()
+		exitItem := systray.AddMenuItem("Quit Cloud Saver", fmt.Sprintf("Exit %s", branding.DisplayName))
 
 		currentStatus := Status{PlayingGames: nil}
 		renderStatus := func(s Status) {
@@ -57,7 +68,53 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 			}
 
 			playingItem.SetTitle(fmt.Sprintf("Playing: %s", playingSummary))
-			systray.SetTooltip(fmt.Sprintf("%s | playing: %s", branding.DisplayName, playingSummary))
+			if len(s.PlayingGames) == 0 {
+				recoveryPointItem.Disable()
+				pauseGameItem.Disable()
+			} else {
+				recoveryPointItem.Enable()
+				if len(s.PlayingGames) == 1 {
+					pauseGameItem.Enable()
+				} else {
+					pauseGameItem.Disable()
+				}
+			}
+			state := s.State
+			if state == "" {
+				state = "Protected"
+			}
+			stateItem.SetTitle("State: " + state)
+			provider := s.Provider
+			if provider == "" {
+				provider = "Local only"
+			}
+			providerItem.SetTitle(fmt.Sprintf("Provider: %s | pending: %d", provider, s.PendingCount))
+			if s.Offline {
+				retryItem.Enable()
+			} else {
+				retryItem.Disable()
+			}
+			if s.HasConflicts {
+				reviewItem.Enable()
+			} else {
+				reviewItem.Disable()
+			}
+			if s.Paused {
+				resumeItem.Enable()
+				pauseUploadsItem.Disable()
+				pauseAllItem.Disable()
+			} else {
+				resumeItem.Disable()
+				pauseUploadsItem.Enable()
+				pauseAllItem.Enable()
+			}
+			protected := "never"
+			if !s.LastCloud.IsZero() {
+				protected = s.LastCloud.Local().Format("15:04")
+			} else if !s.LastLocal.IsZero() {
+				protected = s.LastLocal.Local().Format("15:04") + " local"
+			}
+			systray.SetTooltip(fmt.Sprintf("%s | %s | playing: %s | last protected: %s | pending: %d", branding.DisplayName, state, playingSummary, protected, s.PendingCount))
 		}
 		renderStatus(currentStatus)
 
@@ -65,19 +122,25 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 			for {
 				select {
 				case <-openItem.ClickedCh:
-					onOpenUI()
+					actions.OpenUI()
 				case <-systray.TrayDoubleClickedCh:
-					onOpenUI()
-				case <-toggleItem.ClickedCh:
-					onToggleSync()
-					if m.running.Load() {
-						toggleItem.SetTitle("Stop Sync")
-					} else {
-						toggleItem.SetTitle("Start Sync")
-					}
-					renderStatus(currentStatus)
-				case <-syncNowItem.ClickedCh:
-					onSyncNow()
+					actions.OpenUI()
+				case <-protectNowItem.ClickedCh:
+					actions.ProtectNow()
+				case <-recoveryPointItem.ClickedCh:
+					actions.RecoveryPoint()
+				case <-retryItem.ClickedCh:
+					actions.Retry()
+				case <-reviewItem.ClickedCh:
+					actions.Review()
+				case <-pauseUploadsItem.ClickedCh:
+					actions.PauseUploads()
+				case <-pauseAllItem.ClickedCh:
+					actions.PauseAll()
+				case <-pauseGameItem.ClickedCh:
+					actions.PauseGame()
+				case <-resumeItem.ClickedCh:
+					actions.Resume()
 				case update, ok := <-statusUpdates:
 					if !ok {
 						continue
@@ -85,7 +148,7 @@ func (m *Manager) Run(statusUpdates <-chan Status, onOpenUI, onToggleSync, onSyn
 					currentStatus = update
 					renderStatus(currentStatus)
 				case <-exitItem.ClickedCh:
-					onExit()
+					actions.Exit()
 					systray.Quit()
 					return
 				}

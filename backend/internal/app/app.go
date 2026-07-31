@@ -10,19 +10,17 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"cloud-saver/backend/internal/api"
 	googledriveauth "cloud-saver/backend/internal/auth/googledrive"
-	"cloud-saver/backend/internal/autobackup"
-	"cloud-saver/backend/internal/autostart"
 	"cloud-saver/backend/internal/backup"
-	"cloud-saver/backend/internal/branding"
 	"cloud-saver/backend/internal/config"
 	"cloud-saver/backend/internal/gamemon"
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
+	"cloud-saver/backend/internal/networkwatch"
 	runtimecfg "cloud-saver/backend/internal/runtime"
+	"cloud-saver/backend/internal/runtimepriority"
 	"cloud-saver/backend/internal/snapshots"
 	"cloud-saver/backend/internal/syncer"
 	googledrivestore "cloud-saver/backend/internal/syncer/drive"
@@ -40,7 +38,6 @@ type Application struct {
 	monitor         *gamemon.Monitor
 	tray            *tray.Manager
 	backup          *backup.Service
-	autoBackup      *autobackup.Service
 	snapshots       *snapshots.Service
 	googleDriveAuth *googledriveauth.Service
 	debug           bool
@@ -68,9 +65,21 @@ func New(opts Options) (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
+	if notice := cfg.RecoveryNotice(); notice != "" {
+		_ = logs.Write("warning", "settings_recovered", notice)
+		_ = logs.WriteActivity(models.ActivityEvent{
+			Category: "settings",
+			Severity: "warning",
+			Title:    "Settings repaired after update",
+			Detail:   notice,
+		})
+		if opts.Debug {
+			log.Printf("[settings:recovered] %s", notice)
+		}
+	}
 
 	engine := syncer.New(cfg, logs, opts.Debug)
-	googleDriveAuth := googledriveauth.New(cfg)
+	googleDriveAuth := googledriveauth.New(cfg, logs, opts.Debug)
 	engine.SetStoreFactory(func(ctx context.Context, settings models.Settings) (syncer.RevisionStore, error) {
 		if settings.CloudProvider == models.CloudProviderGoogleDrive {
 			client, err := googleDriveAuth.HTTPClient(ctx)
@@ -99,7 +108,6 @@ func New(opts Options) (*Application, error) {
 	})
 	trayMgr := tray.New()
 	backupSvc := backup.New()
-	autoBackupSvc := autobackup.New(cfg, logs, backupSvc, opts.Debug)
 	snapshotSvc := snapshots.New(cfg, logs)
 
 	a := &Application{
@@ -110,14 +118,15 @@ func New(opts Options) (*Application, error) {
 		monitor:         monitor,
 		tray:            trayMgr,
 		backup:          backupSvc,
-		autoBackup:      autoBackupSvc,
 		snapshots:       snapshotSvc,
 		googleDriveAuth: googleDriveAuth,
 		debug:           opts.Debug,
 	}
 	a.monitor.SetOnRunningChanged(func(runningIDs []string) {
-		a.autoBackup.UpdateRunning(runningIDs)
-		a.snapshots.UpdateRunning(runningIDs)
+		if err := runtimepriority.SetGameplayMode(len(runningIDs) > 0); err != nil {
+			a.logEvent("warning", "performance", err.Error())
+		}
+		a.engine.UpdateRunning(runningIDs)
 		if err := a.reloadWatcherForRunningGames(runningIDs); err != nil {
 			a.logEvent("error", "watcher", err.Error())
 		}
@@ -133,24 +142,22 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 
 	a.engine.Start(ctx)
 	a.monitor.Start(ctx)
-	a.autoBackup.Start(ctx)
-	a.snapshots.Start(ctx)
+	a.wg.Add(1)
+	go func() {
+		defer a.wg.Done()
+		if err := networkwatch.Watch(ctx, a.engine.RetryNow); err != nil {
+			a.logEvent("warning", "network", err.Error())
+		}
+	}()
 	a.logEvent("info", "app", fmt.Sprintf("application starting (noTray=%t)", noTray))
 
 	runningIDs := a.monitor.RunningIDs()
-	a.autoBackup.UpdateRunning(runningIDs)
-	a.snapshots.UpdateRunning(runningIDs)
+	_ = runtimepriority.SetGameplayMode(len(runningIDs) > 0)
+	a.engine.UpdateRunning(runningIDs)
 	if err := a.reloadWatcherForRunningGames(runningIDs); err != nil {
 		a.logEvent("error", "watcher", err.Error())
 	}
 
-	daemonExePath, _ := os.Executable()
-	startupCommand := startupCommandTarget(daemonExePath)
-	if a.cfg.Get().Autostart && startupCommand == "" {
-		a.logEvent("error", "autostart", "startup target not found; autostart cannot be enabled")
-	} else if err := autostart.SetEnabled(branding.AutostartKeyName, startupCommand, a.cfg.Get().Autostart); err != nil {
-		a.logEvent("error", "autostart", err.Error())
-	}
 	updaterClient := updater.New()
 	// keep watcher roots in sync when game list changes via api.
 	apiSvc := api.New(
@@ -161,15 +168,12 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 		a.monitor,
 		a.snapshots,
 		a.googleDriveAuth,
-		daemonExePath,
-		startupCommand,
 		updaterClient,
 		a.debug,
 		func(_ []models.Game) {
 			a.monitor.ForcePoll()
 			running := a.monitor.RunningIDs()
-			a.autoBackup.UpdateRunning(running)
-			a.snapshots.UpdateRunning(running)
+			a.engine.UpdateRunning(running)
 			if err := a.reloadWatcherForRunningGames(running); err != nil {
 				a.logEvent("error", "watcher", err.Error())
 			}
@@ -196,49 +200,101 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 	}
 
 	statusUpdates := make(chan tray.Status, 1)
+	sendTrayStatus := func() {
+		engineStatus := a.engine.Status()
+		state := "Protected"
+		if !engineStatus.ServiceControl.ProtectionEnabled || engineStatus.ServiceControl.PauseScope != models.PauseNone {
+			state = "Paused"
+		} else if engineStatus.Provider.State == models.ProviderOffline {
+			state = "Offline"
+		} else if engineStatus.Provider.State == models.ProviderReconnecting {
+			state = "Reconnecting"
+		} else if engineStatus.ConflictCount > 0 || engineStatus.LastError != "" {
+			state = "Needs attention"
+		} else if engineStatus.ActiveJobID != "" {
+			state = "Protecting"
+		} else if len(a.monitor.RunningIDs()) > 0 {
+			state = "Playing"
+		}
+		update := tray.Status{
+			PlayingGames: a.runningGameNames(a.monitor.RunningIDs()),
+			State:        state,
+			Provider:     string(engineStatus.Provider.State),
+			PendingCount: engineStatus.Pending,
+			LastLocal:    engineStatus.LastLocalProtection,
+			LastCloud:    engineStatus.LastCloudUpload,
+			Paused:       state == "Paused",
+			Offline:      engineStatus.Provider.State == models.ProviderOffline || engineStatus.Provider.State == models.ProviderUnavailable,
+			HasConflicts: engineStatus.ConflictCount > 0,
+		}
+		select {
+		case statusUpdates <- update:
+		default:
+		}
+	}
+	sendTrayStatus()
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
-		ticker := time.NewTicker(2 * time.Second)
-		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case <-ticker.C:
-				runningIDs := a.monitor.RunningIDs()
-				update := tray.Status{
-					PlayingGames: a.runningGameNames(runningIDs),
-				}
-				select {
-				case statusUpdates <- update:
-				default:
-				}
+			case <-a.engine.StatusUpdates():
+				sendTrayStatus()
 			}
 		}
 	}()
 
 	a.tray.Run(
 		statusUpdates,
-		func() {
-			if err := openUI(); err != nil {
-				a.logEvent("error", "tray", fmt.Sprintf("open app failed: %v", err))
-			}
-		},
-		func() {
-			if a.engine.Status().Running {
+		tray.Actions{
+			OpenUI: func() {
+				if err := openUI(); err != nil {
+					a.logEvent("error", "tray", fmt.Sprintf("open app failed: %v", err))
+				}
+			},
+			ProtectNow: func() {
+				a.engine.Trigger(syncer.TriggerReasonManual)
+			},
+			RecoveryPoint: func() {
+				for _, id := range a.monitor.RunningIDs() {
+					if game, ok := a.cfg.FindGame(id); ok {
+						a.engine.CreateRecoveryPoint(id, game.Name+" tray Recovery Point")
+					}
+				}
+			},
+			Retry: func() {
+				a.engine.RetryNow()
+			},
+			PauseUploads: func() {
+				control := a.engine.GlobalControl()
+				control.PauseScope = models.PauseUploads
+				control.Reason = "Cloud uploads paused from the tray"
+				_ = a.engine.SetServiceControl("", control)
+			},
+			PauseAll: func() {
 				a.engine.Stop()
-				a.tray.SetRunning(false)
-			} else {
+			},
+			PauseGame: func() {
+				ids := a.monitor.RunningIDs()
+				if len(ids) != 1 {
+					return
+				}
+				control := a.engine.GameControl(ids[0])
+				control.PauseScope = models.PauseAll
+				control.Reason = "Game protection paused from the tray"
+				_ = a.engine.SetServiceControl(ids[0], control)
+			},
+			Resume: func() {
 				a.engine.Resume()
-				a.tray.SetRunning(true)
-			}
-		},
-		func() {
-			a.engine.Trigger(syncer.TriggerReasonManual)
-		},
-		func() {
-			_ = a.Stop()
+			},
+			Review: func() {
+				_ = openUI()
+			},
+			Exit: func() {
+				_ = a.Stop()
+			},
 		},
 	)
 	return nil
@@ -252,12 +308,6 @@ func (a *Application) Stop() error {
 	a.logEvent("info", "app", "application stopping")
 	if a.watcher != nil {
 		_ = a.watcher.Close()
-	}
-	if a.autoBackup != nil {
-		a.autoBackup.Stop()
-	}
-	if a.snapshots != nil {
-		a.snapshots.Stop()
 	}
 	if a.httpSrv != nil {
 		// stop accepting api traffic before waiting on goroutines.
@@ -387,17 +437,6 @@ func desktopAppExecutable() (string, bool) {
 		}
 	}
 	return "", false
-}
-
-// prefers desktop app startup target and falls back to daemon executable path.
-func startupCommandTarget(daemonExePath string) string {
-	if uiPath, ok := desktopAppExecutable(); ok {
-		return uiPath
-	}
-	if resolved, ok := resolveExecutableCandidate(daemonExePath); ok {
-		return resolved
-	}
-	return ""
 }
 
 // returns an absolute executable path when the candidate exists on disk.
