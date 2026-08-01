@@ -638,5 +638,650 @@
     "mtime": 1785503203.1487532,
     "ast_hash": "e398cd3ad2ac6827c995079704c47ad5",
     "semantic_hash": ""
+  },
+  "D:\\MyProjects\\cloud-saver\\.claude\\settings.json": {
+    "mtime": 1785501555.4465911,
+    "ast_hash": "af5683cedca023035194f9ad92eb0eef",
+    "semantic_hash": "af5683cedca023035194f9ad92eb0eef"
+  },
+  "D:\\MyProjects\\cloud-saver\\.codex\\hooks.json": {
+    "mtime": 1785501546.5541317,
+    "ast_hash": "75e80774b175818c64f38c22a704439b",
+    "semantic_hash": "75e80774b175818c64f38c22a704439b"
+  },
+  "D:\\MyProjects\\cloud-saver\\.opencode\\opencode.json": {
+    "mtime": 1785503918.856941,
+    "ast_hash": "1efe24ecf938911d4f23e4b1c6ec91f7",
+    "semantic_hash": "1efe24ecf938911d4f23e4b1c6ec91f7"
+  },
+  "D:\\MyProjects\\cloud-saver\\.opencode\\plugins\\graphify.js": {
+    "mtime": 1785501580.4083395,
+    "ast_hash": "32b67963417a30cb80544e0b2a56a98d",
+    "semantic_hash": "32b67963417a30cb80544e0b2a56a98d"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\package.json": {
+    "mtime": 1785502342.2644682,
+    "ast_hash": "ab0b77483ff58559132102bfc4106693",
+    "semantic_hash": "ab0b77483ff58559132102bfc4106693"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\build.rs": {
+    "mtime": 1785495356.596246,
+    "ast_hash": "e214f6b2962eb57d94ca512eee607f7d",
+    "semantic_hash": "e214f6b2962eb57d94ca512eee607f7d"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\capabilities\\default.json": {
+    "mtime": 1785483444.460211,
+    "ast_hash": "805f161ddc3586c698ea3c2f16d6adcd",
+    "semantic_hash": "805f161ddc3586c698ea3c2f16d6adcd"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\src\\main.rs": {
+    "mtime": 1785497112.2289977,
+    "ast_hash": "a1de478b7f2c4d11a0ef8ef528da60a0",
+    "semantic_hash": "a1de478b7f2c4d11a0ef8ef528da60a0"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\src\\updater.rs": {
+    "mtime": 1785499239.4608998,
+    "ast_hash": "08264ad9a083396808fc3deed9ce0b02",
+    "semantic_hash": "08264ad9a083396808fc3deed9ce0b02"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\tauri.conf.json": {
+    "mtime": 1785499238.211454,
+    "ast_hash": "7b2f6a0714fd99a53b9e5e6f2ec08dd2",
+    "semantic_hash": "7b2f6a0714fd99a53b9e5e6f2ec08dd2"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\App.tsx": {
+    "mtime": 1785497841.5875654,
+    "ast_hash": "ef2e8b6e78eba73261235d4afc0c978d",
+    "semantic_hash": "ef2e8b6e78eba73261235d4afc0c978d"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\api.test.ts": {
+    "mtime": 1785502554.4976468,
+    "ast_hash": "4a999ccd1916d34348c9e2138fc8557b",
+    "semantic_hash": "4a999ccd1916d34348c9e2138fc8557b"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\api.ts": {
+    "mtime": 1785496011.9888391,
+    "ast_hash": "1c9cded8b54469db2a806cadf826a48c",
+    "semantic_hash": "1c9cded8b54469db2a806cadf826a48c"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\api\\parsers.test.ts": {
+    "mtime": 1785502553.2515795,
+    "ast_hash": "264c18ed10560e9751c619d0da4b7b5c",
+    "semantic_hash": "264c18ed10560e9751c619d0da4b7b5c"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\api\\parsers.ts": {
+    "mtime": 1785492458.2969687,
+    "ast_hash": "ef1216147278a728463ada0bae57f742",
+    "semantic_hash": "ef1216147278a728463ada0bae57f742"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\constants\\branding.ts": {
+    "mtime": 1775414152.396681,
+    "ast_hash": "49eccad2f16fdfedcd807ae587264d2e",
+    "semantic_hash": "49eccad2f16fdfedcd807ae587264d2e"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\constants\\defaults.ts": {
+    "mtime": 1785483521.218262,
+    "ast_hash": "5e2685a7b99088b395c879f2239a52a3",
+    "semantic_hash": "5e2685a7b99088b395c879f2239a52a3"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\constants\\network.ts": {
+    "mtime": 1775414152.396681,
+    "ast_hash": "44342e5d66516e5a1e520d9764e334e5",
+    "semantic_hash": "44342e5d66516e5a1e520d9764e334e5"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\constants\\timing.ts": {
+    "mtime": 1779628285.319654,
+    "ast_hash": "3fb139ae006523408052db99bdcfbf0a",
+    "semantic_hash": "3fb139ae006523408052db99bdcfbf0a"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\constants\\updates.ts": {
+    "mtime": 1775596033.9086888,
+    "ast_hash": "9607fbe4951433364de271003cbbc3ea",
+    "semantic_hash": "9607fbe4951433364de271003cbbc3ea"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\main.tsx": {
+    "mtime": 1775414152.396681,
+    "ast_hash": "91088ecb3ca77e5945f8147f87a610a4",
+    "semantic_hash": "91088ecb3ca77e5945f8147f87a610a4"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\nativeDialog.ts": {
+    "mtime": 1774960775.918611,
+    "ast_hash": "8879be98bf5075703e1b9bfdfbca355e",
+    "semantic_hash": "8879be98bf5075703e1b9bfdfbca355e"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\types.ts": {
+    "mtime": 1785496013.1032696,
+    "ast_hash": "413b07bd314426f020f7f5ff51483b35",
+    "semantic_hash": "413b07bd314426f020f7f5ff51483b35"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\update.test.ts": {
+    "mtime": 1785502871.0202563,
+    "ast_hash": "bfdfa70ec14b9b77e4619c449f6cf1a0",
+    "semantic_hash": "bfdfa70ec14b9b77e4619c449f6cf1a0"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\update.ts": {
+    "mtime": 1785494993.8995216,
+    "ast_hash": "2024731b09449479c7e0c5d788638e7a",
+    "semantic_hash": "2024731b09449479c7e0c5d788638e7a"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\ActivityView.tsx": {
+    "mtime": 1785484435.2459922,
+    "ast_hash": "fe0949d1aac59f168a6f092cecbd363c",
+    "semantic_hash": "fe0949d1aac59f168a6f092cecbd363c"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\BackupView.tsx": {
+    "mtime": 1784322867.6059465,
+    "ast_hash": "87678637e9be425de6b0fa3dee1e06be",
+    "semantic_hash": "87678637e9be425de6b0fa3dee1e06be"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\GameDetailView.tsx": {
+    "mtime": 1785486088.5531774,
+    "ast_hash": "f5b5e35402cd04d96e088bea03c148d7",
+    "semantic_hash": "f5b5e35402cd04d96e088bea03c148d7"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\GamesView.test.tsx": {
+    "mtime": 1785502557.4602191,
+    "ast_hash": "d98c8ae5948f02d67e6dedefcc73b26d",
+    "semantic_hash": "d98c8ae5948f02d67e6dedefcc73b26d"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\GamesView.tsx": {
+    "mtime": 1784322866.6414895,
+    "ast_hash": "d5d938b3312dc4e99eeef7c35c68f47e",
+    "semantic_hash": "d5d938b3312dc4e99eeef7c35c68f47e"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\HomeView.test.tsx": {
+    "mtime": 1785503350.1192536,
+    "ast_hash": "53afbea9a3d1c66b60801c5786cf4bb3",
+    "semantic_hash": "53afbea9a3d1c66b60801c5786cf4bb3"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\HomeView.tsx": {
+    "mtime": 1785485263.713434,
+    "ast_hash": "08a66b2f4dfba203e408f1469027e4eb",
+    "semantic_hash": "08a66b2f4dfba203e408f1469027e4eb"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\views\\SettingsView.tsx": {
+    "mtime": 1785497843.646086,
+    "ast_hash": "3116efa6770f4359c7236c6e80169703",
+    "semantic_hash": "3116efa6770f4359c7236c6e80169703"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src\\vite-env.d.ts": {
+    "mtime": 1775414152.3973486,
+    "ast_hash": "e12c8e7487d817e3be37a2e7d345a983",
+    "semantic_hash": "e12c8e7487d817e3be37a2e7d345a983"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\tsconfig.json": {
+    "mtime": 1785503325.3947432,
+    "ast_hash": "a0e80fc3da396896b42e5d4cd1d8cc23",
+    "semantic_hash": "a0e80fc3da396896b42e5d4cd1d8cc23"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\tsconfig.node.json": {
+    "mtime": 1774471179.6764917,
+    "ast_hash": "281e378713152cccc7860c818db55849",
+    "semantic_hash": "281e378713152cccc7860c818db55849"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\vite.config.ts": {
+    "mtime": 1785502343.9293087,
+    "ast_hash": "c36690be7a44f0045ebcdfc411f190c0",
+    "semantic_hash": "c36690be7a44f0045ebcdfc411f190c0"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\vitest.setup.ts": {
+    "mtime": 1785502551.9494283,
+    "ast_hash": "522e3714e0d342c9b24b23367d8a85b2",
+    "semantic_hash": "522e3714e0d342c9b24b23367d8a85b2"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\cmd\\daemon\\main.go": {
+    "mtime": 1785483472.3008673,
+    "ast_hash": "9e4e4bc2aa9c522e6ff03f3d251f92b5",
+    "semantic_hash": "9e4e4bc2aa9c522e6ff03f3d251f92b5"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\go.mod": {
+    "mtime": 1784324418.5199924,
+    "ast_hash": "92ac225b00504cd2b282a6e8c7fb48bb",
+    "semantic_hash": "92ac225b00504cd2b282a6e8c7fb48bb"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_backup.go": {
+    "mtime": 1785485059.4697914,
+    "ast_hash": "ecf80bca2d1ea17fedc0d6dbf1a72b18",
+    "semantic_hash": "ecf80bca2d1ea17fedc0d6dbf1a72b18"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_debug.go": {
+    "mtime": 1785483214.023201,
+    "ast_hash": "d8cbc6e08dc3d4c416a797cb58e11f3f",
+    "semantic_hash": "d8cbc6e08dc3d4c416a797cb58e11f3f"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_games.go": {
+    "mtime": 1785484201.041545,
+    "ast_hash": "1d866dfbeaa3184c2d24cf7ef9905e6b",
+    "semantic_hash": "1d866dfbeaa3184c2d24cf7ef9905e6b"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_google_drive.go": {
+    "mtime": 1785492438.0285122,
+    "ast_hash": "49adca84a3d78577d24f2eee163fa2ab",
+    "semantic_hash": "49adca84a3d78577d24f2eee163fa2ab"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_lifecycle.go": {
+    "mtime": 1785494456.3878586,
+    "ast_hash": "bf5f9b50b075cf27b2568a2d7556b224",
+    "semantic_hash": "bf5f9b50b075cf27b2568a2d7556b224"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_lifecycle_test.go": {
+    "mtime": 1785495558.0682747,
+    "ast_hash": "6564dcdd4f83de8a2166b5a55704bf57",
+    "semantic_hash": "6564dcdd4f83de8a2166b5a55704bf57"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_logs.go": {
+    "mtime": 1774815713.7659032,
+    "ast_hash": "1a2ea635f9834b759ba5c15f5a0ebfec",
+    "semantic_hash": "1a2ea635f9834b759ba5c15f5a0ebfec"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_protection.go": {
+    "mtime": 1785486028.4931731,
+    "ast_hash": "65c657a14a2a999188ca352ec2436b40",
+    "semantic_hash": "65c657a14a2a999188ca352ec2436b40"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_settings.go": {
+    "mtime": 1785492436.5932357,
+    "ast_hash": "5816d6284f781765b8d544e0b26243bc",
+    "semantic_hash": "5816d6284f781765b8d544e0b26243bc"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_settings_test.go": {
+    "mtime": 1785491749.686808,
+    "ast_hash": "3df7234bcb233e4de9954295fab43d4c",
+    "semantic_hash": "3df7234bcb233e4de9954295fab43d4c"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_snapshots.go": {
+    "mtime": 1785485061.1636999,
+    "ast_hash": "a55b57c77d3fe9ed28b75e18617fa8e2",
+    "semantic_hash": "a55b57c77d3fe9ed28b75e18617fa8e2"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\handlers_sync.go": {
+    "mtime": 1784324820.422852,
+    "ast_hash": "a2e2153cb97e723967c35c4c1c15cfeb",
+    "semantic_hash": "a2e2153cb97e723967c35c4c1c15cfeb"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\middleware.go": {
+    "mtime": 1774815713.7664375,
+    "ast_hash": "33f5d837e172468983c09a9789d406c5",
+    "semantic_hash": "33f5d837e172468983c09a9789d406c5"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\middleware_test.go": {
+    "mtime": 1785503094.8317313,
+    "ast_hash": "df149afc3d67d7f4ba101d92eec8ad6a",
+    "semantic_hash": "df149afc3d67d7f4ba101d92eec8ad6a"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\server.go": {
+    "mtime": 1785496006.8346903,
+    "ast_hash": "67ac16f766b0c7bc36643ebcae5bfdce",
+    "semantic_hash": "67ac16f766b0c7bc36643ebcae5bfdce"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\api\\server_test.go": {
+    "mtime": 1785502676.852205,
+    "ast_hash": "a72fe6db09709b44c5360a1954348aa2",
+    "semantic_hash": "a72fe6db09709b44c5360a1954348aa2"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\app\\app.go": {
+    "mtime": 1785496007.9951913,
+    "ast_hash": "1ff3ce6f827034098f2bfe9058fcee52",
+    "semantic_hash": "1ff3ce6f827034098f2bfe9058fcee52"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\auth\\googledrive\\dpapi_windows.go": {
+    "mtime": 1784324828.7920108,
+    "ast_hash": "836aeafbfa07f86abd3d879c2fce1416",
+    "semantic_hash": "836aeafbfa07f86abd3d879c2fce1416"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\auth\\googledrive\\service.go": {
+    "mtime": 1785490903.667084,
+    "ast_hash": "589fb78fe5e824ad1aa885a9ff1b98de",
+    "semantic_hash": "589fb78fe5e824ad1aa885a9ff1b98de"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\auth\\googledrive\\service_test.go": {
+    "mtime": 1785490623.5017073,
+    "ast_hash": "46a6803ae425b462a82f7f1490364891",
+    "semantic_hash": "46a6803ae425b462a82f7f1490364891"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\autobackup\\service.go": {
+    "mtime": 1775414152.5023203,
+    "ast_hash": "bf9eed91d5be8bf6e8352e9382e856c6",
+    "semantic_hash": "bf9eed91d5be8bf6e8352e9382e856c6"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\backup\\zip.go": {
+    "mtime": 1785485571.9723668,
+    "ast_hash": "32d020d4836438600785779fb3acf371",
+    "semantic_hash": "32d020d4836438600785779fb3acf371"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\backup\\zip_test.go": {
+    "mtime": 1785502678.2188604,
+    "ast_hash": "4f2f0d1cf5b6538363bfcc3bcf5c472a",
+    "semantic_hash": "4f2f0d1cf5b6538363bfcc3bcf5c472a"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\branding\\branding.go": {
+    "mtime": 1785495471.5095117,
+    "ast_hash": "42881e738f8bd31709784ad301a68804",
+    "semantic_hash": "42881e738f8bd31709784ad301a68804"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\config\\games.go": {
+    "mtime": 1785482923.0422232,
+    "ast_hash": "ac9c03d370f69be517a083fbeea9e8d2",
+    "semantic_hash": "ac9c03d370f69be517a083fbeea9e8d2"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\config\\manager.go": {
+    "mtime": 1785491773.3398926,
+    "ast_hash": "c2078d22c5bb5907e4e361c02f3d8ebd",
+    "semantic_hash": "c2078d22c5bb5907e4e361c02f3d8ebd"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\config\\manager_test.go": {
+    "mtime": 1785491748.5807755,
+    "ast_hash": "2224f6ccdc9b5f7d74fd0d9b4b0334e4",
+    "semantic_hash": "2224f6ccdc9b5f7d74fd0d9b4b0334e4"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\gamemon\\monitor.go": {
+    "mtime": 1785483411.1292737,
+    "ast_hash": "abaa592d25695e846a004d7d6f43a243",
+    "semantic_hash": "abaa592d25695e846a004d7d6f43a243"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\logstore\\protection.go": {
+    "mtime": 1785484105.0827131,
+    "ast_hash": "55c483a6fb90a91a6235de64c909df25",
+    "semantic_hash": "55c483a6fb90a91a6235de64c909df25"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\logstore\\sqlite.go": {
+    "mtime": 1785482544.256031,
+    "ast_hash": "dc8457976b818c6d4cacfae5de0c454b",
+    "semantic_hash": "dc8457976b818c6d4cacfae5de0c454b"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\models\\backup_constants.go": {
+    "mtime": 1779628397.1400692,
+    "ast_hash": "82813a62160efea81ab11cc9798ad623",
+    "semantic_hash": "82813a62160efea81ab11cc9798ad623"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\models\\models.go": {
+    "mtime": 1785492435.0656974,
+    "ast_hash": "200fc2b3a0f9732310519d10ead2356f",
+    "semantic_hash": "200fc2b3a0f9732310519d10ead2356f"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\models\\models_test.go": {
+    "mtime": 1785503094.8317313,
+    "ast_hash": "0223db38238e39066c37cdf7ea0c71cc",
+    "semantic_hash": "0223db38238e39066c37cdf7ea0c71cc"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\networkwatch\\network_stub.go": {
+    "mtime": 1785484693.386156,
+    "ast_hash": "b51868e60251f9c138b18b0d115d1f5c",
+    "semantic_hash": "b51868e60251f9c138b18b0d115d1f5c"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\networkwatch\\network_windows.go": {
+    "mtime": 1785484691.4164703,
+    "ast_hash": "52b9060f1034f2d14173c338e65fdd41",
+    "semantic_hash": "52b9060f1034f2d14173c338e65fdd41"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\runtime\\network.go": {
+    "mtime": 1775413981.7310631,
+    "ast_hash": "5683e31c3dabbba67ed7985df3061ca4",
+    "semantic_hash": "5683e31c3dabbba67ed7985df3061ca4"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\runtimepriority\\priority_stub.go": {
+    "mtime": 1785484787.5926087,
+    "ast_hash": "4dbec21fda0a628bc8cebb4283ddb86f",
+    "semantic_hash": "4dbec21fda0a628bc8cebb4283ddb86f"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\runtimepriority\\priority_windows.go": {
+    "mtime": 1785484785.4249082,
+    "ast_hash": "bcaf1e6f56f3de040bfe9294bd366df6",
+    "semantic_hash": "bcaf1e6f56f3de040bfe9294bd366df6"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\singleinstance\\mutex_stub.go": {
+    "mtime": 1785483470.8620067,
+    "ast_hash": "5d8abd5cd55d037b1d2f417a8e586592",
+    "semantic_hash": "5d8abd5cd55d037b1d2f417a8e586592"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\singleinstance\\mutex_windows.go": {
+    "mtime": 1785483469.7479143,
+    "ast_hash": "28915b814c7593b9a1bd1de4719f9cda",
+    "semantic_hash": "28915b814c7593b9a1bd1de4719f9cda"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\snapshots\\service.go": {
+    "mtime": 1779628164.7034082,
+    "ast_hash": "9f02e3b97146ade24a4f64d300e2a227",
+    "semantic_hash": "9f02e3b97146ade24a4f64d300e2a227"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\snapshots\\service_test.go": {
+    "mtime": 1785503089.0117323,
+    "ast_hash": "1e9d3d3e544f8421b4895f014bc3c3af",
+    "semantic_hash": "1e9d3d3e544f8421b4895f014bc3c3af"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\snapshots\\store.go": {
+    "mtime": 1784282415.9197369,
+    "ast_hash": "30f5a71071be66c5a2d3f0df090adf26",
+    "semantic_hash": "30f5a71071be66c5a2d3f0df090adf26"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\constants.go": {
+    "mtime": 1775413981.7337587,
+    "ast_hash": "e69e70d36b04a84c5ce39d11edb9d52c",
+    "semantic_hash": "e69e70d36b04a84c5ce39d11edb9d52c"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\drive\\store.go": {
+    "mtime": 1785494244.4919791,
+    "ast_hash": "882769c8d53cfb82eff45d1a5cf69131",
+    "semantic_hash": "882769c8d53cfb82eff45d1a5cf69131"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\drive\\store_test.go": {
+    "mtime": 1785493431.868138,
+    "ast_hash": "4d99bb1c9d07c316abcfed62e709979b",
+    "semantic_hash": "4d99bb1c9d07c316abcfed62e709979b"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\engine.go": {
+    "mtime": 1785493399.0598226,
+    "ast_hash": "472266e60afabef129faa63efeac5a06",
+    "semantic_hash": "472266e60afabef129faa63efeac5a06"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\engine_test.go": {
+    "mtime": 1785494238.027739,
+    "ast_hash": "74af598387de2ee7a72088fa30b3f829",
+    "semantic_hash": "74af598387de2ee7a72088fa30b3f829"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\folder.go": {
+    "mtime": 1785484953.8039997,
+    "ast_hash": "c81aed076cd62eff0e38a160da4a425a",
+    "semantic_hash": "c81aed076cd62eff0e38a160da4a425a"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\folder_test.go": {
+    "mtime": 1784282720.3179514,
+    "ast_hash": "785422ba2382131e4c9fd19ec213c69b",
+    "semantic_hash": "785422ba2382131e4c9fd19ec213c69b"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\reconcile_store.go": {
+    "mtime": 1785485171.6945026,
+    "ast_hash": "0ec4bc65deb3d7ecab19080ee432f612",
+    "semantic_hash": "0ec4bc65deb3d7ecab19080ee432f612"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\syncer\\store.go": {
+    "mtime": 1785493306.4461007,
+    "ast_hash": "d37833f77f1a0d42ac21e612a5c1d476",
+    "semantic_hash": "d37833f77f1a0d42ac21e612a5c1d476"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\tray\\status.go": {
+    "mtime": 1785486189.634855,
+    "ast_hash": "91ecacefafb7a0e8bf88d7aa4dd0932d",
+    "semantic_hash": "91ecacefafb7a0e8bf88d7aa4dd0932d"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\tray\\tray_stub.go": {
+    "mtime": 1785494458.8892205,
+    "ast_hash": "841f13552c27dc5721b3ee4a03d53415",
+    "semantic_hash": "841f13552c27dc5721b3ee4a03d53415"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\tray\\tray_windows.go": {
+    "mtime": 1785494457.68542,
+    "ast_hash": "dda623439b8d8639017dc612ba9fd093",
+    "semantic_hash": "dda623439b8d8639017dc612ba9fd093"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\internal\\watcher\\watcher.go": {
+    "mtime": 1775302963.8613095,
+    "ast_hash": "e5ba46c87efc1740bc9ab958eb1201d1",
+    "semantic_hash": "e5ba46c87efc1740bc9ab958eb1201d1"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\third_party\\systray\\go.mod": {
+    "mtime": 1774470155.5140336,
+    "ast_hash": "6db826774e27e18499a65cd06a24a6a4",
+    "semantic_hash": "6db826774e27e18499a65cd06a24a6a4"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\third_party\\systray\\systray.go": {
+    "mtime": 1775748229.101695,
+    "ast_hash": "476750a97327cb0f64e951ebdb1e5f17",
+    "semantic_hash": "476750a97327cb0f64e951ebdb1e5f17"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\third_party\\systray\\systray_windows.go": {
+    "mtime": 1775712478.9086127,
+    "ast_hash": "7320b192028d658c370814a8db847744",
+    "semantic_hash": "7320b192028d658c370814a8db847744"
+  },
+  "D:\\MyProjects\\cloud-saver\\scripts\\generate-update-manifest.mjs": {
+    "mtime": 1785497262.710342,
+    "ast_hash": "d3468ff6ab02514e1be32d85cc2a7271",
+    "semantic_hash": "d3468ff6ab02514e1be32d85cc2a7271"
+  },
+  "D:\\MyProjects\\cloud-saver\\scripts\\setup-updater-signing.mjs": {
+    "mtime": 1785497139.531144,
+    "ast_hash": "b27426c93c4834c9ff4a1c0810e87a7a",
+    "semantic_hash": "b27426c93c4834c9ff4a1c0810e87a7a"
+  },
+  "D:\\MyProjects\\cloud-saver\\scripts\\stage-backend-daemon.mjs": {
+    "mtime": 1785495474.369974,
+    "ast_hash": "a30cb05cac58ecaa95a250cd4e6492fc",
+    "semantic_hash": "a30cb05cac58ecaa95a250cd4e6492fc"
+  },
+  "D:\\MyProjects\\cloud-saver\\scripts\\sync-version.mjs": {
+    "mtime": 1785495475.6465948,
+    "ast_hash": "cbfc65a4fb1a6d51fa7c35d76083f98b",
+    "semantic_hash": "cbfc65a4fb1a6d51fa7c35d76083f98b"
+  },
+  "D:\\MyProjects\\cloud-saver\\.agents\\rules\\graphify.md": {
+    "mtime": 1785501571.725602,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": "a0e4d192b9e2e17256124dbfc8e24e6a"
+  },
+  "D:\\MyProjects\\cloud-saver\\.agents\\skills\\nostalgia-design\\DESIGN.md": {
+    "mtime": 1784322559.7416742,
+    "ast_hash": "946a4ec248cfb5cc695b856b19f5e440",
+    "semantic_hash": "946a4ec248cfb5cc695b856b19f5e440"
+  },
+  "D:\\MyProjects\\cloud-saver\\.agents\\skills\\nostalgia-design\\SKILL.md": {
+    "mtime": 1784322559.7426789,
+    "ast_hash": "06994f69317682f6dd7298fdd4a1854b",
+    "semantic_hash": "06994f69317682f6dd7298fdd4a1854b"
+  },
+  "D:\\MyProjects\\cloud-saver\\.agents\\workflows\\graphify.md": {
+    "mtime": 1785501571.7266026,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": "637776aa6f7496d069afe7520c845c8a"
+  },
+  "D:\\MyProjects\\cloud-saver\\.github\\copilot-instructions.md": {
+    "mtime": 1774990403.5703232,
+    "ast_hash": "ec018486eacd4e3602c0c15ef8796d00",
+    "semantic_hash": "ec018486eacd4e3602c0c15ef8796d00"
+  },
+  "D:\\MyProjects\\cloud-saver\\.github\\workflows\\release-windows.yml": {
+    "mtime": 1785499257.9539292,
+    "ast_hash": "b2d1e1754d8c810a5f1fa4aebdebcfef",
+    "semantic_hash": "b2d1e1754d8c810a5f1fa4aebdebcfef"
+  },
+  "D:\\MyProjects\\cloud-saver\\AGENTS.md": {
+    "mtime": 1785501546.5532498,
+    "ast_hash": "f080bbb56af88a61ef618195e5d64de0",
+    "semantic_hash": "f080bbb56af88a61ef618195e5d64de0"
+  },
+  "D:\\MyProjects\\cloud-saver\\CLAUDE.md": {
+    "mtime": 1785501555.4455938,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
+  },
+  "D:\\MyProjects\\cloud-saver\\CONTRIBUTING.md": {
+    "mtime": 1785503204.9208047,
+    "ast_hash": "9f0945f0cee144e17e631dca00558af1",
+    "semantic_hash": "9f0945f0cee144e17e631dca00558af1"
+  },
+  "D:\\MyProjects\\cloud-saver\\README.md": {
+    "mtime": 1785502916.6437614,
+    "ast_hash": "6584307c42eb9df9c61b9ec8da6ddbbf",
+    "semantic_hash": "6584307c42eb9df9c61b9ec8da6ddbbf"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\index.html": {
+    "mtime": 1775414152.396681,
+    "ast_hash": "746d12d636b7602279bf83c88ec96578",
+    "semantic_hash": "746d12d636b7602279bf83c88ec96578"
+  },
+  "D:\\MyProjects\\cloud-saver\\app\\src-tauri\\updater-public-key.txt": {
+    "mtime": 1785502722.2749035,
+    "ast_hash": "1b13cb7c2cac8e15bd604057bbeddf1b",
+    "semantic_hash": "1b13cb7c2cac8e15bd604057bbeddf1b"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\README.md": {
+    "mtime": 1785491327.837215,
+    "ast_hash": "d23663958ddd68efb1a67c5f344a2ecf",
+    "semantic_hash": "d23663958ddd68efb1a67c5f344a2ecf"
+  },
+  "D:\\MyProjects\\cloud-saver\\backend\\third_party\\systray\\README.md": {
+    "mtime": 1774470155.1897728,
+    "ast_hash": "7f81cdd29a7bcd2a937da9af15d96628",
+    "semantic_hash": "7f81cdd29a7bcd2a937da9af15d96628"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\DEVELOPER_GUIDE.md": {
+    "mtime": 1785496969.0703733,
+    "ast_hash": "b9fd8e04a77bcccf80e3911546f2fbda",
+    "semantic_hash": "b9fd8e04a77bcccf80e3911546f2fbda"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\README.md": {
+    "mtime": 1785495958.4641604,
+    "ast_hash": "066da608f78a32875a316d8f92e82796",
+    "semantic_hash": "066da608f78a32875a316d8f92e82796"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\TESTING.md": {
+    "mtime": 1785503203.1487532,
+    "ast_hash": "e398cd3ad2ac6827c995079704c47ad5",
+    "semantic_hash": "e398cd3ad2ac6827c995079704c47ad5"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\USER_GUIDE.md": {
+    "mtime": 1785497815.5754013,
+    "ast_hash": "48c625081ccada7b3325d35dc1e36b2f",
+    "semantic_hash": "48c625081ccada7b3325d35dc1e36b2f"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\developers\\ARCHITECTURE.md": {
+    "mtime": 1785485553.2347257,
+    "ast_hash": "fb92c7a70aa901d833ced128bfa2c30d",
+    "semantic_hash": "fb92c7a70aa901d833ced128bfa2c30d"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\developers\\GOOGLE_DRIVE_DEVELOPMENT.md": {
+    "mtime": 1785491844.2217138,
+    "ast_hash": "dcaaa6a54051a97919d1fdf4d5547e61",
+    "semantic_hash": "dcaaa6a54051a97919d1fdf4d5547e61"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\developers\\PROVIDER_INTERFACE.md": {
+    "mtime": 1785497287.3296142,
+    "ast_hash": "346b1983189ee5536026f4e17fce8d57",
+    "semantic_hash": "346b1983189ee5536026f4e17fce8d57"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\developers\\RELEASES_AND_UPDATES.md": {
+    "mtime": 1785499240.9141634,
+    "ast_hash": "9de66148c3284ae0af43cbf15db84076",
+    "semantic_hash": "9de66148c3284ae0af43cbf15db84076"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\developers\\WINDOWS_LIFECYCLE.md": {
+    "mtime": 1785495960.637536,
+    "ast_hash": "8564d95df39b3aab4eb5d85e933874b2",
+    "semantic_hash": "8564d95df39b3aab4eb5d85e933874b2"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\end-users\\FAQ.md": {
+    "mtime": 1785497817.1642442,
+    "ast_hash": "bef7d217d11bead1f75509a8370e9be5",
+    "semantic_hash": "bef7d217d11bead1f75509a8370e9be5"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\end-users\\GETTING_STARTED.md": {
+    "mtime": 1785495976.1769023,
+    "ast_hash": "fefdb1a5662e5c1a3771de8ed306958b",
+    "semantic_hash": "fefdb1a5662e5c1a3771de8ed306958b"
+  },
+  "D:\\MyProjects\\cloud-saver\\docs\\end-users\\RECOVERY.md": {
+    "mtime": 1785485548.1932633,
+    "ast_hash": "30b527a8dc14d8c73d7663839197b00f",
+    "semantic_hash": "30b527a8dc14d8c73d7663839197b00f"
   }
 }
