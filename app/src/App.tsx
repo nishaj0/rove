@@ -1187,6 +1187,7 @@ export default function App() {
             onDiscardUpdate={() => void onDiscardUpdate()}
             onAutomaticUpdateChecks={(enabled) => void onAutomaticUpdateChecks(enabled)}
             onViewUpdateNotes={() => setUpdateNotesOpen(true)}
+            onDownloadLogs={() => { api.downloadLogsZip().catch((err: unknown) => setError(toFriendlyError(err))); }}
           />
         ) : null}
       </main>

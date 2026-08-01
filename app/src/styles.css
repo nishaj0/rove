@@ -238,3 +238,67 @@ input::placeholder { color: var(--muted); }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* ── Debug console ─────────────────────────────────────────────────────────── */
+.debug-console-panel { gap: 0; padding: 52px 0 0; overflow: hidden; }
+.debug-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--window) 90%, var(--surface));
+}
+.debug-toolbar-status { font: 12px/1 Consolas, "Courier New", monospace; }
+.debug-status-ok { color: var(--olive); }
+.debug-status-error { color: var(--danger); }
+.debug-toolbar-actions { display: flex; align-items: center; gap: 8px; }
+.debug-autoscroll-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.debug-autoscroll-label input { width: 15px; min-height: 15px; accent-color: var(--brand-strong); }
+.debug-terminal {
+  height: 340px;
+  overflow-y: auto;
+  padding: 10px 14px;
+  background: #1a110a;
+  font: 12px/1.6 Consolas, "Courier New", monospace;
+  color: #c8b89a;
+  scroll-behavior: smooth;
+}
+.app-layout[data-theme="dark"] .debug-terminal { background: #120c07; }
+.debug-entry {
+  display: grid;
+  grid-template-columns: 56px 52px 120px 1fr;
+  gap: 8px;
+  padding: 1px 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.debug-entry:hover { background: rgba(255, 120, 50, 0.07); }
+.debug-ts { color: #7a6650; flex-shrink: 0; }
+.debug-event { color: #a08060; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.debug-msg { color: #c8b89a; }
+.debug-entry .log-level { align-self: start; }
+.debug-entry .log-level.info,
+.debug-entry .log-level.debug { color: #4a9b6f; border-color: #4a9b6f; }
+.debug-entry .log-level.warn,
+.debug-entry .log-level.warning { color: #c88a30; border-color: #c88a30; }
+.debug-entry .log-level.error { color: #d95050; border-color: #d95050; }
+.debug-clear-marker {
+  text-align: center;
+  color: #5a4535;
+  padding: 6px 0;
+  font-size: 11px;
+  border-bottom: 1px dashed #3a2a1a;
+  margin-bottom: 6px;
+}
+.debug-empty { color: #5a4535; padding: 12px 0; font-size: 12px; }

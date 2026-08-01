@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { PauseScope, ProtectionTarget, Settings, ThemeMode } from "../types";
 import type { AppUpdateState } from "../update";
+import { DebugConsoleView } from "./DebugConsoleView";
 
 type SettingsViewProps = {
   settings: Settings;
@@ -25,6 +26,7 @@ type SettingsViewProps = {
   onDiscardUpdate: () => void;
   onAutomaticUpdateChecks: (enabled: boolean) => void;
   onViewUpdateNotes: () => void;
+  onDownloadLogs: () => void;
 };
 
 export function SettingsView(props: SettingsViewProps) {
@@ -33,7 +35,7 @@ export function SettingsView(props: SettingsViewProps) {
     onDisconnectGoogleDrive, onBrowseSyncRoot, onAutostartChange, onPause,
     onResume, onProtectionEnabled, onRetry, onSaveSettings, updateState,
     updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
-    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes,
+    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs,
   } = props;
   const [googleBusy, setGoogleBusy] = useState(false);
   async function runGoogle(action: () => Promise<void>) {
@@ -189,9 +191,21 @@ export function SettingsView(props: SettingsViewProps) {
             Ignore patterns
             <input value={settings.ignorePatterns.join(",")} onChange={(event) => onChange({ ...settings, ignorePatterns: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) })} />
           </label>
+          <label className="inline-check">
+            <input
+              type="checkbox"
+              checked={settings.debugLogging}
+              onChange={(event) => onChange({ ...settings, debugLogging: event.target.checked })}
+            />
+            Enable debug logging
+          </label>
         </div>
         <button className="btn primary" onClick={onSaveSettings} type="button">Save settings</button>
       </section>
+
+      {settings.debugLogging ? (
+        <DebugConsoleView onDownloadLogs={onDownloadLogs} />
+      ) : null}
     </>
   );
 }

@@ -89,6 +89,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/providers/google-drive/disconnect", s.handleGoogleDriveDisconnect)
 	mux.HandleFunc("/providers/google-drive/status", s.handleGoogleDriveStatus)
 	mux.HandleFunc("/logs/recent", s.handleLogsRecent)
+	mux.HandleFunc("/logs/download", s.handleLogsDownload)
 	mux.HandleFunc("/debug/info", s.handleDebugInfo)
 	mux.HandleFunc("/backup/export", s.handleBackupExport)
 	mux.HandleFunc("/backup/import", s.handleBackupImport)
@@ -136,7 +137,7 @@ func (s *Server) withDebugRequestLogs(next http.Handler) http.Handler {
 		if r.Method == http.MethodOptions {
 			return
 		}
-		if r.URL.Path == "/status" || r.URL.Path == "/logs/recent" || r.URL.Path == "/debug/info" {
+		if r.URL.Path == "/status" || r.URL.Path == "/logs/recent" || r.URL.Path == "/logs/download" || r.URL.Path == "/debug/info" {
 			return
 		}
 		duration := time.Since(start)
