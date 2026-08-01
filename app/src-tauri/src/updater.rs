@@ -24,6 +24,9 @@ use crate::{backend_running, ensure_backend_running, BACKEND_API_ADDR};
 
 const UPDATE_ENDPOINT: &str =
     "https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json";
+// Tauri static updater manifests identify Windows by OS and architecture. The
+// installer format belongs to the release asset, not to this platform key.
+const UPDATE_TARGET: &str = "windows-x86_64";
 const UPDATE_STATE_SCHEMA: u32 = 1;
 const CHECK_CACHE_SECONDS: u64 = 6 * 60 * 60;
 const CHECK_TIMEOUT: Duration = Duration::from_secs(3);
@@ -256,7 +259,7 @@ pub async fn check_for_update(
             .map_err(|err| format!("invalid update endpoint: {err}"))?;
         let updater = app
             .updater_builder()
-            .target("windows-x86_64-nsis")
+            .target(UPDATE_TARGET)
             .endpoints(vec![endpoint])
             .map_err(|err| err.to_string())?
             .pubkey(updater_public_key())
@@ -833,6 +836,11 @@ mod tests {
     #[test]
     fn version_is_safe_for_cache_filename() {
         assert_eq!(sanitize_version("v1.2.3/../../bad"), "v1.2.3....bad");
+    }
+
+    #[test]
+    fn updater_uses_tauri_windows_platform_key() {
+        assert_eq!(UPDATE_TARGET, "windows-x86_64");
     }
 
     #[test]

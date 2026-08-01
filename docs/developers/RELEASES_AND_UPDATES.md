@@ -74,7 +74,7 @@ The dialog must remain plain-text only: release notes are rendered as text, neve
 2. runs TypeScript and backend build checks;
 3. validates OAuth and updater signing configuration;
 4. builds the NSIS bundle with `createUpdaterArtifacts` and Tauri signing variables;
-5. generates `latest.json` for `windows-x86_64-nsis` from the actual archive and `.sig`;
+5. generates `latest.json` for Tauri's `windows-x86_64` platform key from the actual NSIS archive and `.sig`;
 6. verifies the manifest checksum/size/URL/signature and tests the signature against the committed public key;
 7. generates release checksums;
 8. creates a draft GitHub Release and uploads installer, updater archive, signature, manifest, and checksums;

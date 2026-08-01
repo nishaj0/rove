@@ -25,6 +25,9 @@ const archive = fs.readFileSync(archivePath);
 const signature = fs.readFileSync(signaturePath, "utf8").trim();
 if (archive.length === 0 || signature.length === 0) throw new Error("Updater archive or signature is empty");
 const version = tagArg.slice(1);
+// Tauri's static updater protocol uses OS-architecture keys. NSIS describes
+// the bundled installer artifact, not the manifest platform.
+const tauriPlatform = "windows-x86_64";
 const releaseNotes = process.env.CLOUD_SAVER_RELEASE_NOTES?.trim() || `Cloud Saver ${version}. See the GitHub release for complete notes.`;
 const assetUrl = `https://github.com/${repositoryArg}/releases/download/${tagArg}/${encodeURIComponent(archiveName)}`;
 const manifest = {
@@ -32,7 +35,7 @@ const manifest = {
   notes: releaseNotes,
   pub_date: new Date().toISOString(),
   platforms: {
-    "windows-x86_64-nsis": {
+    [tauriPlatform]: {
       url: assetUrl,
       signature,
       sha256: crypto.createHash("sha256").update(archive).digest("hex"),
@@ -45,8 +48,8 @@ const serialized = `${JSON.stringify(manifest, null, 2)}\n`;
 
 if (checkOnly) {
   const existing = JSON.parse(fs.readFileSync(outputPath, "utf8"));
-  const expected = manifest.platforms["windows-x86_64-nsis"];
-  const actual = existing.platforms?.["windows-x86_64-nsis"];
+  const expected = manifest.platforms[tauriPlatform];
+  const actual = existing.platforms?.[tauriPlatform];
   if (existing.version !== version || actual?.url !== expected.url || actual?.signature !== signature || actual?.sha256 !== expected.sha256 || actual?.size !== expected.size) {
     throw new Error("latest.json does not agree with the signed updater artifact");
   }
