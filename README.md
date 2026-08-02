@@ -1,6 +1,6 @@
 # Rove
 
-Rove is a Windows desktop utility for games that do not have dependable built-in cloud saves. It protects ordinary save folders locally first, then optionally replicates immutable revisions directly to Google Drive or a user-selected folder managed by OneDrive, Dropbox, Syncthing, or another sync client.
+Rove is a Windows desktop utility for games that do not have dependable built-in cloud saves. It syncs ordinary save folders locally first, then optionally replicates immutable revisions directly to Google Drive or a user-selected folder managed by OneDrive, Dropbox, Syncthing, or another sync client.
 
 **Game cloud saves for everyone.**
 
@@ -8,18 +8,18 @@ There is no Rove server or VPS. End users never enter developer API keys.
 
 Rove uses its own warm, editorial brand system across the desktop UI, application icon, and documentation. See the [brand implementation guide](docs/BRAND.md) for the approved assets and rules.
 
-## Current protection model
+## Current Cloud Sync model
 
-- **Balanced** is the default: changed, stable files are checkpointed every 10 minutes while a game is running, followed by final protection after exit.
+- **Balanced** is the default: changed, stable files are checkpointed every 10 minutes while a game is running, followed by a final sync after exit.
 - **Exit only**, **Continuous**, and **Manual** policies are available per game.
 - Watcher events mark individual paths dirty. Clean gameplay does not recursively hash save folders.
 - Every revision is committed to the local content-addressed vault before cloud upload begins.
 - Offline uploads are durable and retry automatically after connectivity returns.
 - The latest three automatic revision records are retained. Named Recovery Points stay pinned until the user removes them.
 - Conflicting local and remote edits require an explicit choice; Rove does not silently pick a winner.
-- Global and per-game controls can pause uploads while keeping local protection active, or pause all protection while leaving the tray process available.
+- Global and per-game controls can pause uploads while keeping local sync active, or pause all sync while leaving the tray process available.
 
-## Protection targets
+## Sync destinations
 
 1. **Local only** — no account or Internet required. It does not survive loss of the disk containing Rove's vault.
 2. **Google Drive** — direct desktop-to-Drive replication using the narrow `drive.file` scope. OAuth tokens are protected with Windows DPAPI.
@@ -45,7 +45,7 @@ Objects use SHA-256 names, manifests are immutable, and a head is published only
 
 ```text
 cloud-saver/
-├── backend/  Go daemon, SQLite state, protection engine, providers, local API
+├── backend/  Go daemon, SQLite state, Cloud Sync engine, providers, local API
 ├── app/      Tauri 2 + React desktop application
 └── docs/     end-user and contributor documentation
 ```
@@ -103,7 +103,7 @@ cargo check
 
 The Tauri release build uses the official autostart plugin and registers `Rove.exe --background`. The background bootstrap ensures the single daemon is running, opens no main window, and exits.
 
-Installed releases check the stable GitHub Releases update manifest at startup and before a game launch when the last successful check is more than six hours old. Checks time out after three seconds and never block play. Accepted updates download as signed NSIS updater archives in the background, survive application restarts, and install in place after tracked games and active protection work close. Manual uninstall is neither required nor recommended. Source/development builds can check the UI state but cannot install updates.
+Installed releases check the stable GitHub Releases update manifest at startup and before a game launch when the last successful check is more than six hours old. Checks time out after three seconds and never block play. Accepted updates download as signed NSIS updater archives in the background, survive application restarts, and install in place after tracked games and active Cloud Sync work close. Manual uninstall is neither required nor recommended. Source/development builds can check the UI state but cannot install updates.
 
 ## Security
 

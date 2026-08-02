@@ -194,15 +194,15 @@ func (e *Engine) SetServiceControl(gameID string, value models.ServiceControlSta
 		e.paused.Store(!value.ProtectionEnabled || value.PauseScope == models.PauseAll)
 		e.setRunning(!e.paused.Load())
 	}
-	title := "Protection resumed"
-	detail := "Protection workers are active."
+	title := "Cloud Sync resumed"
+	detail := "Cloud Sync workers are active."
 	if value.PauseScope != models.PauseNone || !value.ProtectionEnabled {
-		title, detail = "Protection paused", value.Reason
+		title, detail = "Cloud Sync paused", value.Reason
 		if detail == "" {
-			detail = "Protection work is paused until you resume it."
+			detail = "Cloud Sync work is paused until you resume it."
 		}
 	}
-	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "protection", Severity: "info", GameID: gameID, Title: title, Detail: detail})
+	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "sync", Severity: "info", GameID: gameID, Title: title, Detail: detail})
 	e.signalStatus()
 	return nil
 }
@@ -248,7 +248,7 @@ func (e *Engine) WaitForLocalProtection(ctx context.Context, jobID string) (mode
 			if job.Error != "" {
 				return models.Revision{}, errors.New(job.Error)
 			}
-			return models.Revision{}, errors.New("local protection failed")
+			return models.Revision{}, errors.New("local sync failed")
 		}
 		select {
 		case <-ctx.Done():
@@ -279,7 +279,7 @@ func (e *Engine) enqueue(gameID, reason string, priority int, revisionID string)
 	default:
 		e.updateJob(job.ID, func(value *models.SyncJob) {
 			value.State, value.Stage = "waiting", "waiting"
-			value.Error = "Protection is queued behind other work."
+			value.Error = "Cloud Sync is queued behind other work."
 		})
 	}
 	e.signalStatus()
@@ -754,13 +754,13 @@ func (e *Engine) resumePending(now time.Time) {
 func (e *Engine) runOnce(request syncTrigger) {
 	game, ok := e.cfg.FindGame(request.gameID)
 	if !ok {
-		e.finishJob(request.jobID, "failed", "failed", 0, 0, "game_not_found", "Protection target game not found.")
+		e.finishJob(request.jobID, "failed", "failed", 0, 0, "game_not_found", "Cloud Sync game not found.")
 		return
 	}
 	global, perGame := e.GlobalControl(), e.GameControl(game.ID)
 	if !global.ProtectionEnabled || !perGame.ProtectionEnabled || global.PauseScope == models.PauseAll || perGame.PauseScope == models.PauseAll {
 		e.updateJob(request.jobID, func(job *models.SyncJob) {
-			job.State, job.Stage, job.Error = "paused", "paused", "Protection is paused."
+			job.State, job.Stage, job.Error = "paused", "paused", "Cloud Sync is paused."
 		})
 		return
 	}
@@ -1129,15 +1129,15 @@ func userProviderMessage(code string) string {
 	case "offline":
 		return "This device is offline. The local revision is safe and will upload automatically after reconnection."
 	case "authentication_required":
-		return "Provider sign-in is required. Local protection will continue."
+		return "Provider sign-in is required. Local sync will continue."
 	case "quota_full":
-		return "Provider storage is full. Local protection will continue until space is available."
+		return "Provider storage is full. Local sync will continue until space is available."
 	case "rate_limited":
 		return "The provider asked Rove to slow down. Upload will retry automatically."
 	case "remote_data_problem":
 		return "Remote revision data is incomplete or invalid. Nothing was applied."
 	case "file_unstable":
-		return "A save file is still changing. Protection will retry after it settles."
+		return "A save file is still changing. Cloud Sync will retry after it settles."
 	case "local_disk_full":
 		return "The local disk does not have enough free space for a safe revision."
 	case "permission_denied":
@@ -1184,7 +1184,7 @@ func (e *Engine) noteProviderSuccess() {
 	e.status.LastError = ""
 	e.mu.Unlock()
 	e.persistHealth()
-	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "provider", Severity: "info", Title: "Cloud connection available", Detail: "Pending protection can be uploaded.", DeduplicationKey: ""})
+	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "provider", Severity: "info", Title: "Cloud connection available", Detail: "Pending Cloud Sync work can be uploaded.", DeduplicationKey: ""})
 }
 
 func (e *Engine) refreshHealth() {
@@ -1220,7 +1220,7 @@ func (e *Engine) noteProtectionComplete(game models.Game, revisionID string, upl
 	if uploaded {
 		detail = "A durable local revision was created and uploaded."
 	}
-	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "protection", Severity: "info", GameID: game.ID, Title: "Protection completed", Detail: detail})
+	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "sync", Severity: "info", GameID: game.ID, Title: "Cloud Sync completed", Detail: detail})
 	e.mu.Lock()
 	delete(e.dirty, game.ID)
 	e.mu.Unlock()

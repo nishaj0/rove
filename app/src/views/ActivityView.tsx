@@ -15,7 +15,7 @@ export function ActivityView({ events, status, onRefresh, onCopyDiagnostics, saf
         <div className="activity-header">
           <div>
             <h1>Activity</h1>
-            <p>Protection, recovery, provider, and conflict history.</p>
+            <p>Cloud sync, recovery, provider, and conflict history.</p>
           </div>
           <div className="detail-actions">
             <button className="btn" type="button" onClick={onCopyDiagnostics}>Copy diagnostics</button>
@@ -31,7 +31,7 @@ export function ActivityView({ events, status, onRefresh, onCopyDiagnostics, saf
 
       <section className="panel" data-window-title="USEFUL.HISTORY">
         {events.length === 0 ? (
-          <p className="empty-state">No protection activity yet. Routine scans and technical request logs are intentionally hidden.</p>
+          <p className="empty-state">No cloud sync activity yet. Routine scans and technical request logs are intentionally hidden.</p>
         ) : (
           <ul className="log-feed">
             {events.map((entry) => (

@@ -83,7 +83,7 @@ func validateSyncPolicy(policy models.SyncPolicy) error {
 	switch policy.Mode {
 	case models.ProtectionBalanced, models.ProtectionExitOnly, models.ProtectionContinuous, models.ProtectionManual:
 	default:
-		return errors.New("invalid protection mode")
+		return errors.New("invalid Cloud Sync mode")
 	}
 	if policy.CheckpointIntervalMinutes < minCheckpointMinutes || policy.CheckpointIntervalMinutes > maxCheckpointMinutes {
 		return fmt.Errorf("checkpoint interval must be between %d and %d minutes", minCheckpointMinutes, maxCheckpointMinutes)
@@ -239,7 +239,7 @@ func (m *Manager) Update(next models.Settings) error {
 	switch next.ProtectionTarget {
 	case models.ProtectionTargetLocal, models.ProtectionTargetFolder, models.ProtectionTargetDrive:
 	default:
-		return errors.New("invalid protection target")
+		return errors.New("invalid Cloud Sync destination")
 	}
 	if next.ProtectionTarget == models.ProtectionTargetDrive && !next.GoogleDrive.Connected {
 		return errors.New("connect Google Drive before selecting it as the cloud provider")
@@ -260,7 +260,7 @@ func (m *Manager) Update(next models.Settings) error {
 		return errors.New("automatic revision retention must be between 1 and 50")
 	}
 	if next.ServiceControl.PauseScope != models.PauseNone && next.ServiceControl.PauseScope != models.PauseUploads && next.ServiceControl.PauseScope != models.PauseAll {
-		return errors.New("invalid protection pause scope")
+		return errors.New("invalid Cloud Sync pause scope")
 	}
 
 	m.mu.Lock()

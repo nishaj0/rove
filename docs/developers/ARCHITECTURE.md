@@ -1,9 +1,9 @@
-# Architecture and protection workflow
+# Architecture and Cloud Sync workflow
 
 ```mermaid
 flowchart LR
   UI["Tauri + React"] --> API["Loopback API"]
-  API --> ENG["Unified protection engine"]
+  API --> ENG["Unified Cloud Sync engine"]
   WATCH["fsnotify"] -->|"dirty path only"| ENG
   MON["Adaptive game monitor"] --> ENG
   NET["Windows network change"] --> ENG

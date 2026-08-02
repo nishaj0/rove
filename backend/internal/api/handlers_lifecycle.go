@@ -23,7 +23,7 @@ func (s *Server) handlePrepareUpdate(w http.ResponseWriter, r *http.Request) {
 	if s.engine != nil && s.engine.Status().ActiveJobID != "" {
 		writeJSON(w, http.StatusConflict, map[string]string{
 			"status": "protection_active",
-			"error":  "Wait for the active protection job to finish before installing the update.",
+			"error":  "Wait for the active Cloud Sync job to finish before installing the update.",
 		})
 		return
 	}

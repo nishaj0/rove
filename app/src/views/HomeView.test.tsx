@@ -10,7 +10,7 @@ const status: Status = {
 };
 
 describe("HomeView", () => {
-  it("renders actionable protection and recovery states", () => {
+  it("renders actionable Cloud Sync and recovery states", () => {
     const onOpenLibrary = vi.fn();
     const onRestoreRecovery = vi.fn();
     render(<HomeView games={[]} onOpenLibrary={onOpenLibrary} onOpenActivity={vi.fn()} onOpenGame={vi.fn()} initials={() => "GS"} status={status} recoveryLibrary={[{ profileId: "profile-1", syncId: "sync-1", name: "Example", fileCount: 4, totalBytes: 2048, latestProtected: "", pathHint: "C:/Saves", automaticCount: 2, recoveryPoints: [] }]} onRestoreRecovery={onRestoreRecovery} />);

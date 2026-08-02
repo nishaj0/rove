@@ -336,7 +336,7 @@ func scanManifestCached(ctx context.Context, root string, ignorePatterns []strin
 			return nil, statErr
 		}
 		if stable.Size() != item.info.Size() || stable.ModTime().UnixNano() != item.info.ModTime().UnixNano() {
-			return nil, fmt.Errorf("save file %q is still changing; protection will retry", item.rel)
+			return nil, fmt.Errorf("save file %q is still changing; Cloud Sync will retry", item.rel)
 		}
 		hash, size, hashErr := hashFileWithContext(ctx, item.path)
 		if hashErr != nil {
@@ -344,7 +344,7 @@ func scanManifestCached(ctx context.Context, root string, ignorePatterns []strin
 		}
 		after, statErr := os.Stat(item.path)
 		if statErr != nil || after.Size() != stable.Size() || after.ModTime().UnixNano() != stable.ModTime().UnixNano() {
-			return nil, fmt.Errorf("save file %q changed during capture; protection will retry", item.rel)
+			return nil, fmt.Errorf("save file %q changed during capture; Cloud Sync will retry", item.rel)
 		}
 		result.Files[item.rel] = manifestFile{Hash: hash, Size: size}
 		if err := logs.UpsertFileState(logstore.FileState{

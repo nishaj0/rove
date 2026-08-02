@@ -89,19 +89,19 @@ export function GameDetailView(props: GameDetailViewProps) {
         </div>
         <div className="detail-actions">
           <button className="btn primary" onClick={onPlay} type="button">Play with pre-check</button>
-          <button className="btn" onClick={onProtect} disabled={Boolean(active)} type="button">{active ? `${syncJob?.stage?.replace(/_/g, " ")} ${syncJob?.progress ?? 0}%` : "Protect now"}</button>
+          <button className="btn" onClick={onProtect} disabled={Boolean(active)} type="button">{active ? `${syncJob?.stage?.replace(/_/g, " ")} ${syncJob?.progress ?? 0}%` : "Sync now"}</button>
           <button className="btn" onClick={onCreateRecoveryPoint} disabled={Boolean(active)} type="button">Create Recovery Point</button>
           <button className="btn danger" onClick={onDelete} type="button">Remove Game</button>
         </div>
       </section>
 
-      <section className="panel" data-window-title="PROTECTION.HEALTH">
+      <section className="panel" data-window-title="CLOUD.SYNC.HEALTH">
         <div className="panel-head">
-          <h2>Protection health</h2>
+          <h2>Cloud Sync health</h2>
           <span className={`state-text ${paused ? "warning" : health.conflictCount ? "error" : "success"}`}>{paused ? `Paused: ${health.serviceControl.pauseScope}` : health.conflictCount ? "Needs review" : "Active"}</span>
         </div>
         <div className="health-grid">
-          <div><span>Local protection</span><strong>{health.lastLocalProtection ? safeDateTime(health.lastLocalProtection) : "Not yet"}</strong></div>
+          <div><span>Last local sync</span><strong>{health.lastLocalProtection ? safeDateTime(health.lastLocalProtection) : "Not yet"}</strong></div>
           <div><span>Cloud upload</span><strong>{health.lastCloudUpload ? safeDateTime(health.lastCloudUpload) : "Not yet"}</strong></div>
           <div><span>Dirty files</span><strong>{health.dirtyFiles}</strong></div>
           <div><span>Pending uploads</span><strong>{health.pendingCount} · {formatBytes(health.pendingBytes)}</strong></div>
@@ -109,12 +109,12 @@ export function GameDetailView(props: GameDetailViewProps) {
         {syncJob?.error ? <p className="banner error">{syncJob.error}</p> : null}
       </section>
 
-      <section className="panel" data-window-title="PROTECTION.POLICY">
-        <h2>Protection policy</h2>
+      <section className="panel" data-window-title="CLOUD.SYNC.POLICY">
+        <h2>Cloud Sync policy</h2>
         <div className="settings-grid">
           <label className="inline-check">
             <input type="checkbox" checked={policy.enabled} onChange={(event) => setPolicy({ ...policy, enabled: event.target.checked })} />
-            Protection enabled for this game
+            Cloud Sync enabled for this game
           </label>
           <label>
             Mode
@@ -131,7 +131,7 @@ export function GameDetailView(props: GameDetailViewProps) {
           </label>
           <label className="inline-check">
             <input type="checkbox" checked={policy.exitProtection} onChange={(event) => setPolicy({ ...policy, exitProtection: event.target.checked })} />
-            Protect after game exit
+            Sync after game exit
           </label>
         </div>
         <div className="detail-actions">

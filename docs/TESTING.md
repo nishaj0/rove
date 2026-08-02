@@ -74,7 +74,7 @@ These paths require a real Windows desktop or CI integration environment and are
 - Tauri command wiring, native folder/file dialogs, autostart, tray menu, process launch, and Windows DPAPI;
 - daemon startup/shutdown, single-instance mutex, watcher events, and tray lifecycle;
 - a live Google Drive OAuth callback and upload/download against a disposable test account;
-- signed updater download, signature failure, rollback, and install blocking while a game/protection job is active;
+- signed updater download, signature failure, rollback, and install blocking while a game/Cloud Sync job is active;
 - packaged NSIS installer upgrade/uninstall behavior;
 - accessibility smoke checks with keyboard navigation and reduced-motion settings;
 - a full user flow: first launch → add game → protect locally → disconnect provider → reconnect → conflict review → restore.

@@ -289,7 +289,7 @@ func (a *Application) Run(ctx context.Context, noTray bool) error {
 				}
 				control := a.engine.GameControl(ids[0])
 				control.PauseScope = models.PauseAll
-				control.Reason = "Game protection paused from the tray"
+				control.Reason = "Game Cloud Sync paused from the tray"
 				_ = a.engine.SetServiceControl(ids[0], control)
 			},
 			Resume: func() {

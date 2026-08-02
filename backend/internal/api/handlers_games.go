@@ -211,7 +211,7 @@ func (s *Server) handleGameProtectionPolicy(w http.ResponseWriter, r *http.Reque
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
-	_ = s.logs.WriteActivity(models.ActivityEvent{Category: "protection", Severity: "info", GameID: updated.ID, Title: "Protection policy updated", Detail: "Mode set to " + string(updated.ProtectionPolicy.Mode) + "."})
+	_ = s.logs.WriteActivity(models.ActivityEvent{Category: "sync", Severity: "info", GameID: updated.ID, Title: "Cloud Sync policy updated", Detail: "Mode set to " + string(updated.ProtectionPolicy.Mode) + "."})
 	writeJSON(w, http.StatusOK, s.toGameResponse(updated, 0, time.Time{}, s.monitor != nil && s.monitor.IsRunning(updated.ID)))
 }
 

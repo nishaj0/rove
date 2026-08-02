@@ -7,20 +7,20 @@ Add the folder containing actual progress files, not the installation folder unl
 ## Choose a destination
 
 - Start with **Local only** to test safely without an account.
-- Use **Connect Google Drive** for direct cloud protection. The app asks for normal Google consent and uses only files it creates.
+- Use **Connect Google Drive** for direct Cloud Sync. The app asks for normal Google consent and uses only files it creates.
 - Use **Synced folder** if OneDrive, Dropbox, Syncthing, or another client already syncs a folder between PCs.
 
 No option requires a VPS, a user-managed server, or user-supplied API keys.
 
 ## Recommended first run
 
-1. Keep **Balanced**, 10 minutes, and exit protection enabled.
-2. Choose **Protect now** while the game is closed.
-3. Confirm that **Last local protection** is populated.
+1. Keep **Balanced**, 10 minutes, and exit sync enabled.
+2. Choose **Sync now** while the game is closed.
+3. Confirm that **Last local sync** is populated.
 4. For a cloud target, wait for **Last cloud upload** or check the pending count.
 5. Create a named Recovery Point before a risky mod, boss, or game update.
 
-Rove application updates are optional. If prompted before launching a game, **Download and play** starts the game normally and downloads the signed update in the background. Install it later after the game and protection work finish; no manual uninstall is needed.
+Rove application updates are optional. If prompted before launching a game, **Download and play** starts the game normally and downloads the signed update in the background. Install it later after the game and Cloud Sync work finish; no manual uninstall is needed.
 
 ## Second computer
 
@@ -28,4 +28,4 @@ Connect the same provider and use the Recovery Library to find the protected gam
 
 ## Low-impact choice
 
-Choose **Exit only** if you want no save-file reads during gameplay. You lose crash-time checkpoints but still receive final protection after a normal detected exit. Balanced is the safer default for small RPG/action-game save folders.
+Choose **Exit only** if you want no save-file reads during gameplay. You lose crash-time checkpoints but still receive a final sync after a normal detected exit. Balanced is the safer default for small RPG/action-game save folders.

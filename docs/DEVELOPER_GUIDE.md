@@ -1,6 +1,6 @@
 # Rove developer guide
 
-This guide covers the implemented Windows-focused, offline-first protection engine. Detailed references:
+This guide covers the implemented Windows-focused, offline-first Cloud Sync engine. Detailed references:
 
 - [Architecture and workflow](developers/ARCHITECTURE.md)
 - [Provider interface](developers/PROVIDER_INTERFACE.md)
@@ -20,7 +20,7 @@ backend/internal/
   networkwatch/     Windows connectivity-change signal
   runtimepriority/  game-time process priority control
   singleinstance/   per-user daemon mutex
-  syncer/           protection engine and local/folder protocol
+  syncer/           Cloud Sync engine and local/folder protocol
   syncer/drive/     Google Drive RevisionStore
   tray/             event-driven Windows tray
 app/
@@ -41,13 +41,13 @@ app/
 
 ## Persistence
 
-Settings JSON retains compatibility fields but the primary model is `ProtectionTarget`, `SyncPolicy`, and `ServiceControlState`. Migration supplies Balanced/10-minute defaults, a stable device ID, per-game cloud `syncId`, auto-revision retention of three, and enabled protection/reconnect defaults.
+Settings JSON retains compatibility fields but the primary model is `ProtectionTarget`, `SyncPolicy`, and `ServiceControlState`. Migration supplies Balanced/10-minute defaults, a stable device ID, per-game cloud `syncId`, auto-revision retention of three, and enabled Cloud Sync/reconnect defaults.
 
 SQLite uses WAL and persists:
 
 - file metadata/hash cache;
 - sessions and dirty state;
-- durable protection jobs and retry stages;
+- durable Cloud Sync jobs and retry stages;
 - immutable revision metadata and Recovery Points;
 - provider health and cursor slots;
 - global/per-game pause state;

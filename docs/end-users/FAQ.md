@@ -12,11 +12,11 @@ Fork developers point `CLOUD_SAVER_GOOGLE_OAUTH_JSON` at their downloaded Deskto
 
 ## What happens offline?
 
-Local checkpoints, final-exit protection, manual protection, and Recovery Points continue. Upload work stays durable and resumes after a Windows connectivity event or scheduled retry.
+Local checkpoints, final-exit sync, manual sync, and Recovery Points continue. Upload work stays durable and resumes after a Windows connectivity event or scheduled retry.
 
-## Upload pause versus all-protection pause?
+## Upload pause versus all-sync pause?
 
-Upload pause queues cloud work while local revisions continue. All-protection pause stops captures and transfers but preserves dirty paths, revisions, and jobs.
+Upload pause queues cloud work while local revisions continue. All-sync pause stops captures and transfers but preserves dirty paths, revisions, and jobs.
 
 ## Why does the cloud time lag behind local time?
 
@@ -32,7 +32,7 @@ No. Current versions migrate missing fields, ignore obsolete fields, and keep th
 
 ## Do I uninstall Rove before updating?
 
-No. Choose **Download update**, continue playing if you want, then choose **Install** after tracked games and protection work finish. The signed NSIS updater replaces application files in place and restarts Rove. `%APPDATA%` settings, the SQLite database, local revisions, saves, and Windows-protected provider credentials are outside the installation files and remain in place.
+No. Choose **Download update**, continue playing if you want, then choose **Install** after tracked games and Cloud Sync work finish. The signed NSIS updater replaces application files in place and restarts Rove. `%APPDATA%` settings, the SQLite database, local revisions, saves, and Windows-protected provider credentials are outside the installation files and remain in place.
 
 ## Where can I see what changed in an update?
 
@@ -44,7 +44,7 @@ Game launch continues. A failed or timed-out check is informational and can be r
 
 ## Why is Install disabled?
 
-Close every tracked game and wait for the active local protection job to finish. Rove will not stop the background service or replace program files while save capture is active.
+Close every tracked game and wait for the active local sync job to finish. Rove will not stop the background service or replace program files while save capture is active.
 
 ## Quota full
 

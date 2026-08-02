@@ -217,20 +217,240 @@ input::placeholder { color: var(--muted); }
 .log-level.warn, .log-level.warning { color: var(--rust); }
 .log-level.error { color: var(--danger); }
 
+/* Rove's pared-back workspace treatment: the navigation carries the structure,
+   while the content remains quiet and easy to scan. */
+:root {
+  --window-shadow: none;
+  --font-display: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+.app-layout {
+  grid-template-columns: 216px minmax(0, 1fr);
+  grid-template-rows: 58px minmax(0, 1fr);
+  background: var(--surface);
+}
+.sidebar {
+  grid-row: 2;
+  height: auto;
+  gap: 18px;
+  padding: 0;
+  background: var(--paper-deep);
+}
+.side-nav { gap: 4px; padding: 12px 14px 0; }
+.side-nav::before {
+  display: none;
+}
+.side-link {
+  grid-template-columns: 16px 1fr auto;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 10px;
+  border-radius: 2px;
+  color: var(--muted);
+}
+.side-link:hover { border-color: transparent; background: color-mix(in srgb, var(--window) 62%, transparent); color: var(--body); }
+.side-link.active { border-color: var(--border); background: var(--window); color: var(--heading); }
+.side-icon { width: 16px; height: 16px; }
+.side-icon svg { width: 15px; height: 15px; }
+.side-label { font-size: 14px; font-weight: 500; }
+.side-link.active .side-label { font-weight: 700; }
+.nav-count { font-family: var(--font-body); }
+.sidebar-status {
+  gap: 2px;
+  margin: auto 14px 14px;
+  padding: 0;
+  border-top: 0;
+}
+.sidebar-status > span:first-child,
+.sidebar-status > span:last-child { display: none; }
+.sidebar-status strong {
+  position: relative;
+  padding-left: 10px;
+  color: var(--olive);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+}
+.sidebar-status strong::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+  transform: translateY(-50%);
+}
+
+.main-panel {
+  display: flex;
+  grid-column: 2;
+  grid-row: 2;
+  height: auto;
+  gap: 18px;
+  flex-direction: column;
+  padding: 24px 28px 36px;
+  background: var(--surface);
+}
+.main-panel > * { flex: 0 0 auto; }
+.app-utility {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  grid-template-columns: 216px auto minmax(0, 1fr) auto;
+  min-height: 48px;
+  padding: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: var(--paper-deep);
+  box-shadow: none;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  height: 58px;
+  padding: 10px 16px;
+}
+.topbar-brand-logo { display: block; width: 142px; height: auto; }
+.history-nav { padding-left: 4px; }
+.app-utility-title { justify-self: center; font-size: 13px; letter-spacing: .055em; }
+.app-utility-actions { padding-right: 16px; }
+
+.panel, .summary-card, .snapshot-row, .backup-history-row, .log-row {
+  box-shadow: none;
+}
+.panel { gap: 16px; padding: 24px; background: var(--window); }
+.panel::before, .library-shell::before { display: none; }
+.panel-head { padding-bottom: 10px; }
+.home-hero { min-height: 220px; }
+.home-title { max-width: 18ch; }
+h1 { font-size: clamp(30px, 3.2vw, 40px); }
+h2 { font-size: clamp(21px, 2vw, 27px); }
+
+.btn, .icon-btn, .update-indicator, .modal-close { border-radius: 2px; box-shadow: none; }
+.btn.primary, .update-indicator { box-shadow: none; }
+.banner, .health-grid > div, .recovery-library-row { box-shadow: none; }
+.health-grid > div { background: var(--surface); }
+
+.library-shell {
+  gap: 18px;
+  padding: 24px;
+  box-shadow: none;
+}
+.library-card {
+  min-height: 238px;
+  padding: 0;
+  border-radius: 3px;
+  box-shadow: none;
+}
+.library-card::before { display: none; }
+.library-card:hover { transform: translateY(-1px); box-shadow: 0 2px 0 rgb(41 28 20 / 16%); }
+.library-card-fallback { min-height: 238px; }
+
+.snapshot-row, .backup-history-row, .log-row, .summary-card { box-shadow: none; }
+.add-modal { box-shadow: 0 8px 24px rgb(41 28 20 / 20%); }
+
+/* Content is deliberately flat: sections are separated by space and a quiet
+   rule, rather than each being another boxed-in window. Game cards remain the
+   one deliberate card treatment in the library. */
+.panel {
+  gap: 18px;
+  padding: 6px 4px 30px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.panel + .panel {
+  padding-top: 28px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+.panel-head { padding-bottom: 12px; }
+.home-hero {
+  display: flex;
+  min-height: 0;
+  padding-top: 16px;
+  align-items: flex-start;
+  align-content: initial;
+  flex-direction: column;
+}
+.home-title { max-width: none; }
+.game-detail-head { padding-top: 0; }
+
+.health-grid,
+.activity-summary {
+  gap: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+.health-grid > div,
+.summary-card,
+.update-settings-grid > div {
+  min-height: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.health-grid > div + div,
+.summary-card + .summary-card,
+.update-settings-grid > div + div { border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent); }
+
+.recovery-library-list,
+.snapshot-list,
+.backup-history-list,
+.log-feed { gap: 0; }
+.recovery-library-row,
+.snapshot-row,
+.backup-history-row,
+.log-row {
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: 0;
+  background: transparent;
+}
+.log-row:hover { background: color-mix(in srgb, var(--brand-soft) 38%, transparent); }
+
+.library-shell {
+  padding: 8px 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.provider-status {
+  padding: 4px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.inline-check,
+.file-input-wrap { padding: 8px 0; border-width: 0; background: transparent; }
+
+.app-layout[data-theme="dark"] .health-grid > div,
+.app-layout[data-theme="dark"] .summary-card,
+.app-layout[data-theme="dark"] .update-settings-grid > div { background: transparent; }
+
+.app-layout[data-theme="dark"] .sidebar { background: var(--paper-deep); }
+.app-layout[data-theme="dark"] .app-utility { background: var(--paper-deep); }
+
 @media (max-width: 960px) {
   html, body, #root { height: auto; overflow: visible; }
-  .app-layout { height: auto; min-height: 100vh; grid-template-columns: 1fr; overflow: visible; }
-  .sidebar { height: auto; min-height: auto; gap: 15px; overflow: visible; padding: 15px 16px; border-right: 0; border-bottom: 1px solid var(--border); }
-  .sidebar-brand { display: flex; align-items: baseline; padding: 0; border-bottom: 0; }
-  .sidebar-brand::before { display: none; }
-  .sidebar-brand span { margin-left: auto; }
+  .app-layout { height: auto; min-height: 100vh; grid-template-columns: 1fr; grid-template-rows: auto; overflow: visible; }
+  .app-utility { grid-column: 1; grid-row: auto; grid-template-columns: auto 1fr auto; min-height: 52px; }
+  .topbar-brand { display: none; }
+  .sidebar { grid-column: 1; grid-row: auto; height: auto; min-height: auto; gap: 15px; overflow: visible; padding: 15px 16px; border-right: 0; border-bottom: 1px solid var(--border); }
   .side-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .side-nav::before, .sidebar-status { display: none; }
   .side-link { grid-template-columns: 1fr; justify-items: center; padding: 7px 4px; }
   .side-label { font-size: 11px; }
   .nav-count { display: none; }
-  .main-panel { height: auto; min-height: 0; overflow: visible; padding: 18px; }
+  .main-panel { grid-column: 1; grid-row: auto; height: auto; min-height: 0; overflow: visible; padding: 18px; }
   .settings-grid, .add-game-form, .backup-policy-grid, .split, .activity-summary, .game-detail-hero, .health-grid { grid-template-columns: 1fr; }
+  .health-grid > div + div,
+  .summary-card + .summary-card,
+  .update-settings-grid > div + div {
+    border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+    border-left: 0;
+  }
   .provider-picker, .provider-picker-three { grid-template-columns: 1fr; }
   .split .backup-pane + .backup-pane { padding-top: 20px; padding-left: 0; border-top: 1px solid var(--border); border-left: 0; }
   .library-toolbar { grid-template-columns: 1fr; }
@@ -238,7 +458,8 @@ input::placeholder { color: var(--muted); }
 
 @media (max-width: 560px) {
   .main-panel { gap: 15px; padding: 13px; }
-  .panel, .library-shell { padding: 54px 16px 16px; }
+  .panel { padding: 6px 0 26px; }
+  .library-shell { padding: 8px 0 0; }
   .add-modal { padding: 16px; }
   .app-utility { grid-template-columns: auto 1fr; }
   .app-utility-actions { display: none; }

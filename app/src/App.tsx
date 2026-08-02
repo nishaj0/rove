@@ -2,7 +2,6 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
-import { APP_TAGLINE } from "./constants/branding";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
 import { SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import roveLogo from "./assets/rove-primary-horizontal.svg";
@@ -103,6 +102,7 @@ export default function App() {
 
   const navHistoryRef = useRef<NavSnapshot[]>([{ view: "home", selectedGameId: "" }]);
   const navCursorRef = useRef(0);
+  const mainPanelRef = useRef<HTMLElement>(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
 
@@ -391,6 +391,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    mainPanelRef.current?.scrollTo({ top: 0, behavior: "auto" });
+
     let timer: number | undefined;
 
     if (activeView === "activity") {
@@ -590,7 +592,7 @@ export default function App() {
     }
     try {
       const result = await api.syncGame({ gameId: selectedGame.id });
-      setToast(`Protection started (${result.jobId.slice(0, 8)})`);
+      setToast(`Cloud Sync started (${result.jobId.slice(0, 8)})`);
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -716,7 +718,7 @@ export default function App() {
     try {
       const updated = await api.updateGameProtectionPolicy({ gameId: selectedGame.id, policy });
       setGames((existing) => existing.map((game) => game.id === updated.id ? updated : game));
-      setToast("Protection policy saved");
+      setToast("Cloud Sync policy saved");
       return true;
     } catch (err) {
       setError(toFriendlyError(err));
@@ -743,12 +745,12 @@ export default function App() {
         protectionEnabled,
         pauseScope,
         duration,
-        reason: !protectionEnabled ? "Protection disabled by user" : pauseScope === "uploads" ? "Cloud uploads paused by user" : pauseScope === "all" ? "Protection paused by user" : "",
+        reason: !protectionEnabled ? "Cloud Sync disabled by user" : pauseScope === "uploads" ? "Cloud uploads paused by user" : pauseScope === "all" ? "Cloud Sync paused by user" : "",
       });
       if (!gameId) {
         setSettings((current) => ({ ...current, serviceControl: { protectionEnabled, pauseScope } }));
       }
-      setToast(!protectionEnabled ? "Protection disabled" : pauseScope === "none" ? "Protection resumed" : pauseScope === "uploads" ? "Cloud uploads paused; local protection continues" : "Protection paused");
+      setToast(!protectionEnabled ? "Cloud Sync disabled" : pauseScope === "none" ? "Cloud Sync resumed" : pauseScope === "uploads" ? "Cloud uploads paused; local sync continues" : "Cloud Sync paused");
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -829,7 +831,7 @@ export default function App() {
     try {
       const status = await api.connectGoogleDrive();
       setSettings((s) => ({ ...s, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
-      setToast("Google Drive connected. Save Settings to use it for protection.");
+      setToast("Google Drive connected. Save Settings to use it for Cloud Sync.");
     } catch (err) {
       setError(`Google Drive could not be connected: ${toFriendlyError(err)}`);
     }
@@ -843,7 +845,7 @@ export default function App() {
       ]);
       setSettings({ ...nextSettings, googleDrive: { connected: false } });
       if (nextStatus) setStatus(nextStatus);
-      setToast("Google Drive disconnected; local protection remains active");
+      setToast("Google Drive disconnected; local sync remains active");
     } catch (err) {
       setError(`Google Drive could not be disconnected: ${toFriendlyError(err)}`);
     }
@@ -1010,11 +1012,30 @@ export default function App() {
 
   return (
     <div className="app-layout" data-theme={isDarkTheme ? "dark" : "light"}>
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <img className="sidebar-brand-logo" src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" />
-          <span>{APP_TAGLINE}</span>
+      <header className="app-utility">
+        <div className="topbar-brand">
+          <img className="topbar-brand-logo" src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" />
         </div>
+        <div className="history-nav">
+          <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back">&#8249;</button>
+          <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward">&#8250;</button>
+        </div>
+        <p className="app-utility-title">{currentViewTitle}</p>
+        <div className="app-utility-actions">
+          {updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle) ? (
+            <button
+              className="update-indicator"
+              type="button"
+              onClick={() => updateState.lifecycle === "ready" ? void onInstallUpdate() : pushNavigation("settings")}
+              disabled={updateState.lifecycle === "downloading" || updateState.lifecycle === "installing"}
+            >
+              {updateActionLabel(updateState)}
+            </button>
+          ) : null}
+        </div>
+      </header>
+
+      <aside className="sidebar">
         <nav className="side-nav">
           {navItems.map((item) => {
             const isActive = activeView === item.id || (item.id === "games" && activeView === "game");
@@ -1036,33 +1057,13 @@ export default function App() {
           })}
         </nav>
         <div className="sidebar-status">
-          <span>Protection</span>
+          <span>Cloud Sync</span>
           <strong>{status?.protectionTarget === "google_drive" ? "Google Drive" : status?.protectionTarget === "folder" ? "Synced folder" : "Local only"}</strong>
           <span>{status?.serviceControl.pauseScope !== "none" ? "paused" : (status?.provider.state ?? "starting").replace(/_/g, " ")} · {status?.pending ?? 0} pending · {status?.conflictCount ?? 0} conflicts</span>
         </div>
       </aside>
 
-      <main className="main-panel">
-        <div className="app-utility">
-          <div className="history-nav">
-            <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back">&#8249;</button>
-            <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward">&#8250;</button>
-          </div>
-          <p className="app-utility-title">{currentViewTitle}</p>
-          <div className="app-utility-actions">
-            {updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle) ? (
-              <button
-                className="update-indicator"
-                type="button"
-                onClick={() => updateState.lifecycle === "ready" ? void onInstallUpdate() : pushNavigation("settings")}
-                disabled={updateState.lifecycle === "downloading" || updateState.lifecycle === "installing"}
-              >
-                {updateActionLabel(updateState)}
-              </button>
-            ) : null}
-          </div>
-        </div>
-
+      <main className="main-panel" ref={mainPanelRef}>
         {error ? <div className="banner error">{error}</div> : null}
         {updateState && !updateDismissed && ["available", "downloading", "ready", "error"].includes(updateState.lifecycle) ? (
           <div className="banner toast update-banner">
@@ -1204,7 +1205,7 @@ export default function App() {
                 <h2 id="update-launch-title">Version {updateState.availableVersion} is available</h2>
               </div>
             </div>
-            <p>Rove can download the signed update in the background while your game launches. Installation will wait until every tracked game and protection job has finished.</p>
+            <p>Rove can download the signed update in the background while your game launches. Installation will wait until every tracked game and sync job has finished.</p>
             {updateState.notes ? <div className="update-notes">{updateState.notes}</div> : null}
             <div className="modal-actions">
               <button className="btn primary" autoFocus type="button" onClick={() => resolveLaunchUpdateChoice("download")}>Download and play</button>
@@ -1224,11 +1225,11 @@ export default function App() {
                 <h2 id="update-notes-title">What's new in v{updateState.availableVersion}</h2>
               </div>
             </div>
-            <p id="update-notes-copy">The signed update is downloaded and verified. Review the release notes, then install whenever no tracked game or protection job is active.</p>
+            <p id="update-notes-copy">The signed update is downloaded and verified. Review the release notes, then install whenever no tracked game or sync job is active.</p>
             <div className="update-notes" tabIndex={0} aria-label={`Release notes for version ${updateState.availableVersion}`}>
               {updateState.notes || "No release notes were supplied for this update."}
             </div>
-            {games.some((game) => game.running) || Boolean(status?.activeJobId) ? <p className="snapshot-meta">Installation is waiting for tracked games and active protection to finish.</p> : null}
+            {games.some((game) => game.running) || Boolean(status?.activeJobId) ? <p className="snapshot-meta">Installation is waiting for tracked games and active sync work to finish.</p> : null}
             <div className="modal-actions">
               <button className="btn primary" autoFocus type="button" disabled={games.some((game) => game.running) || Boolean(status?.activeJobId)} onClick={() => { setUpdateNotesOpen(false); void onInstallUpdate(); }}>Install update</button>
               <button className="btn" type="button" onClick={() => setUpdateNotesOpen(false)}>Install later</button>

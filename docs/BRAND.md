@@ -43,6 +43,10 @@ The visible application name, window title, installer name, tray text, and produ
 
 Do not rename those internal identifiers as part of a visual change. A future identity migration, if ever required, must copy data atomically and preserve the existing update path.
 
+## Product terminology
+
+Use **Cloud Sync** for the player-facing feature name and **sync** for its actions: *Cloud Sync health*, *Sync now*, *Pause all sync*, and *last local sync*. The compatibility API, persisted settings, and database still use `protection` identifiers such as `protectionTarget` and `ProtectionTarget`; these are implementation details and must not leak into new UI copy.
+
 ## Asset changes
 
 Use the Tauri icon generator only when replacing the 1024px source icon:

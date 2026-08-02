@@ -59,7 +59,7 @@ The updater dialog uses the `notes` field in `latest.json`. During the release w
 Before creating a stable release, the maintainer should make the generated notes useful to non-technical players:
 
 1. Use clear, user-facing PR titles and labels before merging; GitHub uses this history to generate the release notes.
-2. Review the generated draft release notes for the version tag. Call out protection behavior, restore/migration implications, provider changes, and any action a user must take. Do not include credentials, personal paths, tokens, save data, or internal-only diagnostics.
+2. Review the generated draft release notes for the version tag. Call out Cloud Sync behavior, restore/migration implications, provider changes, and any action a user must take. Do not include credentials, personal paths, tokens, save data, or internal-only diagnostics.
 3. Update the relevant user documentation when behavior changes: `README.md`, `docs/USER_GUIDE.md`, and `docs/end-users/FAQ.md` for player-facing changes; `docs/developers/` for architecture, provider, lifecycle, build, or release-process changes.
 4. Keep this document accurate when changing the update manifest schema, signing procedure, cache location, release assets, release endpoint, or required CI secrets. Treat those changes as updater protocol changes and test an upgrade from the previous stable release.
 5. Add migration/recovery notes before publishing whenever settings, database data, provider credentials, or local revisions need special handling.

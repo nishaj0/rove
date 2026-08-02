@@ -39,7 +39,7 @@ func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 		systray.SetTooltip(branding.DisplayName)
 
 		openItem := systray.AddMenuItem("Open Rove", "Open desktop app")
-		stateItem := systray.AddMenuItem("State: starting", "Current protection state")
+		stateItem := systray.AddMenuItem("State: starting", "Current Cloud Sync state")
 		stateItem.Disable()
 		providerItem := systray.AddMenuItem("Provider: checking", "Cloud provider and pending uploads")
 		providerItem.Disable()
@@ -51,10 +51,10 @@ func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 		playingItem := systray.AddMenuItem("Playing: none", "Tracked games currently running")
 		playingItem.Disable()
 		systray.AddSeparator()
-		pauseUploadsItem := systray.AddMenuItem("Pause cloud uploads", "Keep local protection active")
-		pauseAllItem := systray.AddMenuItem("Pause all protection", "Suspend capture and provider work")
+		pauseUploadsItem := systray.AddMenuItem("Pause cloud uploads", "Keep local sync active")
+		pauseAllItem := systray.AddMenuItem("Pause all sync", "Suspend capture and provider work")
 		pauseGameItem := systray.AddMenuItem("Pause this game", "Pause the only tracked game currently running")
-		resumeItem := systray.AddMenuItem("Resume protection", "Resume paused protection work")
+		resumeItem := systray.AddMenuItem("Resume sync", "Resume paused Cloud Sync work")
 		systray.AddSeparator()
 		exitItem := systray.AddMenuItem("Quit Rove", fmt.Sprintf("Exit %s", branding.DisplayName))
 

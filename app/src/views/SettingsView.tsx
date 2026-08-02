@@ -47,10 +47,10 @@ export function SettingsView(props: SettingsViewProps) {
 
   return (
     <>
-      <section className="panel" data-window-title="PROTECTION.DESTINATION">
-        <h2>Protection destination</h2>
+      <section className="panel" data-window-title="CLOUD.SYNC.DESTINATION">
+        <h2>Sync destination</h2>
         <p className="empty-state">Every revision is committed locally first. Cloud replication happens afterward and can wait safely while offline.</p>
-        <div className="provider-picker provider-picker-three" aria-label="Protection destination">
+        <div className="provider-picker provider-picker-three" aria-label="Sync destination">
           <button className={`provider-card ${settings.protectionTarget === "local" ? "selected" : ""}`} onClick={() => onTargetChange("local")} type="button">
             <strong>Local only</strong><span>No account required. This cannot survive losing or resetting this disk.</span>
           </button>
@@ -68,7 +68,7 @@ export function SettingsView(props: SettingsViewProps) {
 
         {settings.protectionTarget === "google_drive" ? (
           <div className="provider-status" aria-live="polite">
-            <p>{settings.googleDrive.connected ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to replicate protected revisions."}</p>
+            <p>{settings.googleDrive.connected ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to replicate local revisions."}</p>
             {settings.googleDrive.oauthClientSource ? <p className="snapshot-meta">OAuth client: {settings.googleDrive.oauthClientSource.replace(/_/g, " ")} · credential: {(settings.googleDrive.oauthCredentialSource ?? "unknown").replace(/_/g, " ")}</p> : null}
             <div className="detail-actions">
               <button className="btn primary" disabled={googleBusy} onClick={() => void runGoogle(onConnectGoogleDrive)} type="button">{googleBusy ? "Waiting for sign-in…" : settings.googleDrive.connected ? "Reconnect" : "Connect Google Drive"}</button>
@@ -87,7 +87,7 @@ export function SettingsView(props: SettingsViewProps) {
 
       <section className="panel" data-window-title="SERVICE.CONTROLS">
         <div className="panel-head">
-          <h2>Protection controls</h2>
+          <h2>Cloud Sync controls</h2>
           <span className={`state-text ${paused ? "warning" : "success"}`}>{paused ? `Paused: ${settings.serviceControl.pauseScope}` : "Active"}</span>
         </div>
         <label className="inline-check">
@@ -96,13 +96,13 @@ export function SettingsView(props: SettingsViewProps) {
             checked={settings.serviceControl.protectionEnabled}
             onChange={(event) => void onProtectionEnabled(event.target.checked)}
           />
-          Protection enabled globally
+          Cloud Sync enabled globally
         </label>
         <div className="detail-actions">
           <button className="btn" type="button" onClick={() => void onPause("uploads", "manual")}>Pause cloud uploads</button>
           <button className="btn" type="button" onClick={() => void onPause("all", "one_hour")}>Pause all for one hour</button>
           <button className="btn" type="button" onClick={() => void onPause("all", "until_login")}>Pause until next login</button>
-          <button className="btn primary" type="button" disabled={!paused} onClick={() => void onResume()}>Resume protection</button>
+          <button className="btn primary" type="button" disabled={!paused} onClick={() => void onResume()}>Resume sync</button>
           <button className="btn" type="button" onClick={() => void onRetry()}>Retry provider</button>
         </div>
       </section>
@@ -141,7 +141,7 @@ export function SettingsView(props: SettingsViewProps) {
           </div>
         ) : null}
         {updateState?.error ? <p className="banner error" role="alert">{updateState.error}</p> : null}
-        {updateInstallBlocked && updateState?.lifecycle === "ready" ? <p className="snapshot-meta">Close tracked games and wait for active protection to finish before installing.</p> : null}
+        {updateInstallBlocked && updateState?.lifecycle === "ready" ? <p className="snapshot-meta">Close tracked games and wait for active sync work to finish before installing.</p> : null}
         {updateState?.development ? <p className="snapshot-meta">Installation is disabled in source/development builds. Release builds embed the public signing key.</p> : null}
         <div className="detail-actions">
           <button className="btn" type="button" disabled={updateState?.lifecycle === "checking" || updateState?.lifecycle === "downloading" || updateState?.development} onClick={onCheckForUpdate}>Check now</button>

@@ -9,7 +9,7 @@
 
 ## For contributors
 
-- [Architecture and protection workflow](developers/ARCHITECTURE.md)
+- [Architecture and Cloud Sync workflow](developers/ARCHITECTURE.md)
 - [Provider interface](developers/PROVIDER_INTERFACE.md)
 - [Google Drive development and release setup](developers/GOOGLE_DRIVE_DEVELOPMENT.md)
 - [Application updates and release pipeline](developers/RELEASES_AND_UPDATES.md)
