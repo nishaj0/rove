@@ -85,6 +85,8 @@ export interface Game {
   path: string;
   executablePath: string;
   coverImageData?: string;
+  version?: string;
+  coverSource?: "manual" | "executable_icon" | "generated" | string;
   backupPolicy: BackupPolicy;
   playtimeSeconds?: number;
   lastPlayedAt?: string;
@@ -124,7 +126,7 @@ export interface Settings {
   games: Game[];
 }
 
-export type SettingsUpdate = Pick<Settings,
+export type SettingsUpdate = Partial<Pick<Settings,
   | "port"
   | "syncIntervalSeconds"
   | "conflictPolicy"
@@ -147,7 +149,7 @@ export type SettingsUpdate = Pick<Settings,
   | "importantNotifications"
   | "debugLogging"
   | "autoRevisionRetention"
->;
+>>;
 
 export interface Status {
   running: boolean;
@@ -226,6 +228,10 @@ export interface RecoveryLibraryEntry {
   profileId: string;
   gameId?: string;
   name: string;
+  version?: string;
+  coverSource?: string;
+  coverAvailable?: boolean;
+  playtimeSeconds?: number;
   syncId: string;
   executableName?: string;
   pathHint?: string;
@@ -243,6 +249,15 @@ export interface StorageUsage {
   recoveryPoints: number;
   pendingBytes: number;
   reclaimableBytes: number;
+}
+
+export interface StorageSummary {
+  localBytes: number;
+  cloudBytes: number;
+  pendingBytes: number;
+  reclaimableBytes: number;
+  gameCount: number;
+  cloudAvailable: boolean;
 }
 
 export interface SyncConflict {

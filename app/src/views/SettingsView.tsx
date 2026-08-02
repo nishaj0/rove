@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Save } from "lucide-react";
+import { InfoTooltip } from "../components/InfoTooltip";
 import type { PauseScope, ProtectionTarget, Settings, ThemeMode } from "../types";
 import type { AppUpdateState } from "../update";
 import { DebugConsoleView } from "./DebugConsoleView";
@@ -18,6 +20,7 @@ type SettingsViewProps = {
   onProtectionEnabled: (enabled: boolean) => Promise<void>;
   onRetry: () => Promise<void>;
   onSaveSettings: () => void;
+  onSaveDestination: () => void;
   updateState: AppUpdateState | null;
   updateInstallBlocked: boolean;
   onCheckForUpdate: () => void;
@@ -33,7 +36,7 @@ export function SettingsView(props: SettingsViewProps) {
   const {
     settings, activeProtectionTarget, onChange, onThemeModeChange, onTargetChange, onConnectGoogleDrive,
     onDisconnectGoogleDrive, onBrowseSyncRoot, onAutostartChange, onPause,
-    onResume, onProtectionEnabled, onRetry, onSaveSettings, updateState,
+    onResume, onProtectionEnabled, onRetry, onSaveSettings, onSaveDestination, updateState,
     updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
     onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs,
   } = props;
@@ -49,7 +52,7 @@ export function SettingsView(props: SettingsViewProps) {
     <>
       <section className="panel" data-window-title="CLOUD.SYNC.DESTINATION">
         <h2>Sync destination</h2>
-        <p className="empty-state">Every revision is committed locally first. Cloud replication happens afterward and can wait safely while offline.</p>
+        <p className="empty-state">Local save copies are created before cloud upload. <InfoTooltip label="Cloud uploads can wait safely while offline." /></p>
         <div className="provider-picker provider-picker-three" aria-label="Sync destination">
           <button className={`provider-card ${settings.protectionTarget === "local" ? "selected" : ""}`} onClick={() => onTargetChange("local")} type="button">
             <strong>Local only</strong><span>No account required. This cannot survive losing or resetting this disk.</span>
@@ -83,6 +86,7 @@ export function SettingsView(props: SettingsViewProps) {
             <input className="picker-input" value={settings.syncRoot} onClick={onBrowseSyncRoot} readOnly placeholder="Choose a folder shared between devices" />
           </label>
         ) : null}
+        {settings.protectionTarget !== activeProtectionTarget ? <button className="btn primary destination-save" type="button" onClick={onSaveDestination}><Save aria-hidden="true" size={15} /> Save destination</button> : null}
       </section>
 
       <section className="panel" data-window-title="SERVICE.CONTROLS">

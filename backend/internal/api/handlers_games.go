@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"cloud-saver/backend/internal/gameicon"
 	"cloud-saver/backend/internal/models"
 	"cloud-saver/backend/internal/syncer"
 )
@@ -21,6 +22,8 @@ type gameResponse struct {
 	Path             string                      `json:"path"`
 	ExecutablePath   string                      `json:"executablePath"`
 	CoverImageData   string                      `json:"coverImageData,omitempty"`
+	Version          string                      `json:"version,omitempty"`
+	CoverSource      string                      `json:"coverSource,omitempty"`
 	BackupPolicy     models.BackupPolicy         `json:"backupPolicy"`
 	ProtectionPolicy models.SyncPolicy           `json:"protectionPolicy"`
 	ProtectionStatus models.GameProtectionStatus `json:"protectionStatus"`
@@ -40,6 +43,7 @@ func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
 			Path           string               `json:"path"`
 			ExecutablePath string               `json:"executablePath"`
 			CoverImageData string               `json:"coverImageData"`
+			Version        string               `json:"version"`
 			BackupPolicy   *models.BackupPolicy `json:"backupPolicy"`
 		}
 		if err := decodeJSON(r, &req); err != nil {
@@ -51,7 +55,15 @@ func (s *Server) handleGames(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		game, err := s.cfg.AddGameWithPolicy(req.Name, req.Path, req.ExecutablePath, coverImageData, req.BackupPolicy)
+		coverSource := "manual"
+		if coverImageData == "" {
+			if extracted, extractErr := gameicon.ExtractDataURL(req.ExecutablePath); extractErr == nil {
+				coverImageData, coverSource = extracted, "executable_icon"
+			} else {
+				coverSource = "generated"
+			}
+		}
+		game, err := s.cfg.AddGameWithMetadata(req.Name, req.Path, req.ExecutablePath, coverImageData, req.Version, coverSource, req.BackupPolicy, "")
 		if err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
@@ -92,13 +104,14 @@ func (s *Server) handleGameByID(w http.ResponseWriter, r *http.Request) {
 		if s.monitor != nil {
 			pending = s.monitor.PendingSeconds(game.ID)
 		}
-		writeJSON(w, http.StatusOK, s.toGameResponse(game, stat.PlaytimeSeconds+pending, stat.LastPlayedAt, running))
+		writeJSON(w, http.StatusOK, s.toGameResponse(game, s.displayedPlaytime(game, stat.PlaytimeSeconds, pending), stat.LastPlayedAt, running))
 	case http.MethodPut:
 		var req struct {
 			Name           string               `json:"name"`
 			Path           string               `json:"path"`
 			ExecutablePath string               `json:"executablePath"`
 			CoverImageData string               `json:"coverImageData"`
+			Version        string               `json:"version"`
 			BackupPolicy   *models.BackupPolicy `json:"backupPolicy"`
 		}
 		if err := decodeJSON(r, &req); err != nil {
@@ -110,7 +123,16 @@ func (s *Server) handleGameByID(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadRequest, err)
 			return
 		}
-		game, err := s.cfg.UpdateGameWithPolicy(id, req.Name, req.Path, req.ExecutablePath, coverImageData, req.BackupPolicy)
+		current, found := s.cfg.FindGame(id)
+		if !found {
+			writeErr(w, http.StatusNotFound, errors.New("game not found"))
+			return
+		}
+		coverSource := current.CoverSource
+		if coverImageData != current.CoverImageData {
+			coverSource = gameicon.SourceForDataURL(coverImageData)
+		}
+		game, err := s.cfg.UpdateGameWithMetadata(id, req.Name, req.Path, req.ExecutablePath, coverImageData, req.Version, coverSource, req.BackupPolicy)
 		if err != nil {
 			writeErr(w, http.StatusBadRequest, err)
 			return
@@ -253,6 +275,7 @@ func (s *Server) handleGameCover(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		GameID         string `json:"gameId"`
 		CoverImageData string `json:"coverImageData"`
+		Mode           string `json:"mode"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
@@ -272,7 +295,27 @@ func (s *Server) handleGameCover(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotFound, errors.New("game not found"))
 		return
 	}
-	updated, err := s.cfg.UpdateGameWithPolicy(game.ID, game.Name, game.Path, game.ExecutablePath, coverImageData, nil)
+	coverSource := "manual"
+	switch req.Mode {
+	case "executable_icon":
+		coverImageData, err = gameicon.ExtractDataURL(game.ExecutablePath)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, errors.New("no usable icon was found in this executable"))
+			return
+		}
+		coverSource = "executable_icon"
+	case "generated":
+		coverImageData, coverSource = "", "generated"
+	case "", "manual":
+		if coverImageData == "" {
+			writeErr(w, http.StatusBadRequest, errors.New("choose an image or select a cover source"))
+			return
+		}
+	default:
+		writeErr(w, http.StatusBadRequest, errors.New("unknown cover mode"))
+		return
+	}
+	updated, err := s.cfg.UpdateGameWithMetadata(game.ID, game.Name, game.Path, game.ExecutablePath, coverImageData, game.Version, coverSource, nil)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
@@ -319,7 +362,7 @@ func (s *Server) handleGameBackupPolicy(w http.ResponseWriter, r *http.Request) 
 	if s.monitor != nil {
 		pending = s.monitor.PendingSeconds(updated.ID)
 	}
-	writeJSON(w, http.StatusOK, s.toGameResponse(updated, stat.PlaytimeSeconds+pending, stat.LastPlayedAt, running))
+	writeJSON(w, http.StatusOK, s.toGameResponse(updated, s.displayedPlaytime(updated, stat.PlaytimeSeconds, pending), stat.LastPlayedAt, running))
 }
 
 func (s *Server) handleGamePair(w http.ResponseWriter, r *http.Request) {
@@ -367,9 +410,16 @@ func (s *Server) toGameResponses(games []models.Game) []gameResponse {
 		if s.monitor != nil {
 			pending = s.monitor.PendingSeconds(game.ID)
 		}
-		result = append(result, s.toGameResponse(game, stats.PlaytimeSeconds+pending, stats.LastPlayedAt, running))
+		result = append(result, s.toGameResponse(game, s.displayedPlaytime(game, stats.PlaytimeSeconds, pending), stats.LastPlayedAt, running))
 	}
 	return result
+}
+
+func (s *Server) displayedPlaytime(game models.Game, localSeconds, pendingSeconds int64) int64 {
+	if total, ok := s.engine.AggregatedPlaytime(game.SyncID, localSeconds); ok {
+		return total + pendingSeconds
+	}
+	return localSeconds + pendingSeconds
 }
 
 func (s *Server) toGameResponse(game models.Game, playtimeSeconds int64, lastPlayedAt time.Time, running bool) gameResponse {
@@ -379,6 +429,8 @@ func (s *Server) toGameResponse(game models.Game, playtimeSeconds int64, lastPla
 		Path:             game.Path,
 		ExecutablePath:   game.ExecutablePath,
 		CoverImageData:   game.CoverImageData,
+		Version:          game.Version,
+		CoverSource:      game.CoverSource,
 		BackupPolicy:     game.BackupPolicy,
 		ProtectionPolicy: game.ProtectionPolicy,
 		ProtectionStatus: s.engine.ProtectionStatus(game.ID),

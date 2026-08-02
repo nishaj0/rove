@@ -11,6 +11,7 @@ import type {
   LogEntry,
   PlayGameRequest,
   RecoveryLibraryEntry,
+  StorageSummary,
   StorageUsage,
   RecoveryPoint,
   Revision,
@@ -71,7 +72,7 @@ export const api = {
     const payload = await request<unknown>("/games");
     return normalizeGames(payload);
   },
-  addGame(input: { name: string; path: string; executablePath: string; coverImageData?: string }) {
+  addGame(input: { name: string; path: string; executablePath: string; coverImageData?: string; version?: string }) {
     return request<Game>("/games", {
       method: "POST",
       body: JSON.stringify(input),
@@ -80,7 +81,7 @@ export const api = {
   getGame(id: string) {
     return request<Game>(`/games/${encodeURIComponent(id)}`);
   },
-  updateGame(id: string, input: { name: string; path: string; executablePath: string; coverImageData?: string }) {
+  updateGame(id: string, input: { name: string; path: string; executablePath: string; coverImageData?: string; version?: string }) {
     return request<Game>(`/games/${encodeURIComponent(id)}`, {
       method: "PUT",
       body: JSON.stringify(input),
@@ -114,7 +115,7 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  updateGameCover(payload: { gameId: string; coverImageData: string }) {
+  updateGameCover(payload: { gameId: string; coverImageData?: string; mode?: "manual" | "executable_icon" | "generated" }) {
     return request<Game>("/games/cover", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -212,9 +213,13 @@ export const api = {
       body: JSON.stringify({ syncId, destination, confirmed: true }),
     });
   },
+  restoreAndTrackRecoveryLibrary(syncId: string, destination: string, executablePath: string) {
+    return request<Game>("/recovery-library/restore-and-track", { method: "POST", body: JSON.stringify({ syncId, destination, executablePath, confirmed: true }) });
+  },
   getStorageUsage(gameId: string) {
     return request<StorageUsage>(`/storage/usage?gameId=${encodeURIComponent(gameId)}`);
   },
+  getStorageSummary() { return request<StorageSummary>("/storage/summary"); },
   getActivity() {
     return request<ActivityEvent[]>("/activity");
   },

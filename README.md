@@ -18,6 +18,9 @@ Rove uses its own warm, editorial brand system across the desktop UI, applicatio
 - The latest three automatic revision records are retained. Named Recovery Points stay pinned until the user removes them.
 - Conflicting local and remote edits require an explicit choice; Rove does not silently pick a winner.
 - Global and per-game controls can pause uploads while keeping local sync active, or pause all sync while leaving the tray process available.
+- Rove can use the icon embedded in a selected game executable as its cover. A manual image wins; otherwise Rove uses a stable generated cover.
+- Optional game version, cover, portable playtime, and restore hints travel with Rove's `game.json` metadata. The immutable save layout continues to use the stable Sync ID, not a title-derived folder name.
+- Home reports Rove-managed local/cloud storage only; it never reports unrelated files in a provider account.
 
 ## Sync destinations
 

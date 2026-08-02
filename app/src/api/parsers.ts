@@ -115,6 +115,8 @@ export function normalizeGames(input: unknown): Game[] {
       path: asString(value.path),
       executablePath: asString(value.executablePath),
       coverImageData: asString(value.coverImageData),
+      version: asString(value.version),
+      coverSource: asString(value.coverSource),
       backupPolicy: normalizeBackupPolicy(value.backupPolicy),
       playtimeSeconds: asNumber(value.playtimeSeconds, 0),
       lastPlayedAt: asString(value.lastPlayedAt),

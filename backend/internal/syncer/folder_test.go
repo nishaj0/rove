@@ -4,10 +4,29 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"cloud-saver/backend/internal/logstore"
 	"cloud-saver/backend/internal/models"
 )
+
+func TestPlaytimeLedgersMergeByDeviceAndRoundTrip(t *testing.T) {
+	store := NewFolderStore(t.TempDir())
+	ctx := t.Context()
+	if err := store.WritePlaytimeLedger(ctx, "shared-game", models.PlaytimeLedger{SchemaVersion: 1, DeviceID: "device-a", Seconds: 120, UpdatedAt: time.Now().UTC()}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.WritePlaytimeLedger(ctx, "shared-game", models.PlaytimeLedger{SchemaVersion: 1, DeviceID: "device-b", Seconds: 75, UpdatedAt: time.Now().UTC()}); err != nil {
+		t.Fatal(err)
+	}
+	records, err := store.ListPlaytimeLedgers(ctx, "shared-game")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := mergePlaytimeLedgers(append(records, models.PlaytimeLedger{DeviceID: "device-a", Seconds: 90})); got != 195 {
+		t.Fatalf("merged seconds = %d, want 195", got)
+	}
+}
 
 func TestFolderReconcileTransfersUpdatesDeletesAndConflicts(t *testing.T) {
 	root := t.TempDir()

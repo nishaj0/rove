@@ -125,6 +125,56 @@ func (s *Store) ListGameProfiles(ctx context.Context) ([]models.GameProfile, err
 	}
 	return result, nil
 }
+func (s *Store) WriteGameCover(ctx context.Context, syncID string, content []byte) error {
+	if len(content) == 0 {
+		return nil
+	}
+	return s.writeNamedFile(ctx, syncID, "cover.png", content, false)
+}
+func (s *Store) ReadGameCover(ctx context.Context, syncID string) ([]byte, error) {
+	return s.readFile(ctx, syncID, "cover.png")
+}
+func (s *Store) WritePlaytimeLedger(ctx context.Context, syncID string, ledger models.PlaytimeLedger) error {
+	if strings.TrimSpace(ledger.DeviceID) == "" {
+		return errors.New("playtime device id is required")
+	}
+	payload, err := json.Marshal(ledger)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, syncID, "playtime/"+ledger.DeviceID+".json", payload, false)
+}
+func (s *Store) ListPlaytimeLedgers(ctx context.Context, syncID string) ([]models.PlaytimeLedger, error) {
+	query := fmt.Sprintf("appProperties has { key='cloudSaverType' and value='playtime' } and appProperties has { key='syncId' and value='%s' } and trashed = false", strings.ReplaceAll(syncID, "'", "\\'"))
+	pageToken := ""
+	result := []models.PlaytimeLedger{}
+	for {
+		call := s.service.Files.List().Q(query).Spaces("drive").Fields("nextPageToken,files(id)").PageSize(100).Context(ctx)
+		if pageToken != "" {
+			call = call.PageToken(pageToken)
+		}
+		page, err := call.Do()
+		if err != nil {
+			return nil, wrapDriveError(err)
+		}
+		for _, file := range page.Files {
+			response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
+			if err != nil {
+				return nil, wrapDriveError(err)
+			}
+			var ledger models.PlaytimeLedger
+			decodeErr := json.NewDecoder(io.LimitReader(response.Body, 64*1024)).Decode(&ledger)
+			_ = response.Body.Close()
+			if decodeErr == nil && ledger.DeviceID != "" && ledger.Seconds >= 0 {
+				result = append(result, ledger)
+			}
+		}
+		if page.NextPageToken == "" {
+			return result, nil
+		}
+		pageToken = page.NextPageToken
+	}
+}
 func (s *Store) WriteRecoveryPoint(ctx context.Context, syncID string, point models.RecoveryPoint) error {
 	payload, err := json.Marshal(point)
 	if err != nil {
@@ -242,6 +292,10 @@ func logicalType(name string) string {
 		return "archive"
 	case strings.HasPrefix(name, "recovery-points/"):
 		return "recovery_point"
+	case name == "cover.png":
+		return "game_cover"
+	case strings.HasPrefix(name, "playtime/"):
+		return "playtime"
 	default:
 		return "metadata"
 	}

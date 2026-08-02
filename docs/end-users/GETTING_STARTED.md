@@ -24,7 +24,11 @@ Rove application updates are optional. If prompted before launching a game, **Do
 
 ## Second computer
 
-Connect the same provider and use the Recovery Library to find the protected game. Restore to a new or empty save folder, then add that game/executable to Rove for ongoing monitoring. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
+Connect the same provider and use the Recovery Library to find the protected game. Choose **Restore and track**, then select the newly installed executable and a new or empty save folder. Rove restores the revision and links the local game to its existing cloud identity in one confirmation flow. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
+
+## Covers, versions, and playtime
+
+Game version is optional. Rove first uses a manual cover image, otherwise the selected executable's icon, then a stable generated cover with the game's initials. Playtime is published as separate device records and merged for the total shown in recovery metadata; two computers do not overwrite each other's time.
 
 ## Low-impact choice
 

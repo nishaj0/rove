@@ -94,7 +94,9 @@ Important routes:
 | `GET/POST/DELETE /recovery-points` | pinned revisions |
 | `GET /recovery-library` | portable provider profiles |
 | `POST /recovery-library/restore` | verified restore to empty folder |
+| `POST /recovery-library/restore-and-track` | verified restore plus new local game paired to the existing Sync ID |
 | `GET /storage/usage?gameId=` | unique retained content and pending bytes |
+| `GET /storage/summary` | Rove-managed local/cloud/pending aggregate, never provider-account totals |
 | `GET /activity` | structured user events |
 | `GET /diagnostics` | sanitized report |
 | `GET/POST /settings` | settings and target selection |

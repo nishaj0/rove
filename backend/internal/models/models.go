@@ -105,12 +105,17 @@ type BackupPolicy struct {
 
 // stores tracked title metadata and local filesystem paths.
 type Game struct {
-	ID             string       `json:"id"`
-	Name           string       `json:"name"`
-	Path           string       `json:"path"`
-	ExecutablePath string       `json:"executablePath"`
-	CoverImageData string       `json:"coverImageData,omitempty"`
-	BackupPolicy   BackupPolicy `json:"backupPolicy"`
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	Path           string `json:"path"`
+	ExecutablePath string `json:"executablePath"`
+	CoverImageData string `json:"coverImageData,omitempty"`
+	// Version is optional user-facing metadata kept with the portable profile.
+	Version string `json:"version,omitempty"`
+	// CoverSource describes whether the image was chosen by the user, read from
+	// the executable, or is the deterministic generated fallback.
+	CoverSource  string       `json:"coverSource,omitempty"`
+	BackupPolicy BackupPolicy `json:"backupPolicy"`
 	// SyncID identifies this title in a shared sync folder. It deliberately differs
 	// from the local ID so the same game can be paired on another computer.
 	SyncID           string     `json:"syncId,omitempty"`
@@ -340,6 +345,17 @@ type StorageUsage struct {
 	ReclaimableBytes int64  `json:"reclaimableBytes"`
 }
 
+// StorageSummary is the whole-library storage view. CloudBytes represents only
+// Rove-managed provider content, never the user's unrelated account files.
+type StorageSummary struct {
+	LocalBytes       int64 `json:"localBytes"`
+	CloudBytes       int64 `json:"cloudBytes"`
+	PendingBytes     int64 `json:"pendingBytes"`
+	ReclaimableBytes int64 `json:"reclaimableBytes"`
+	GameCount        int   `json:"gameCount"`
+	CloudAvailable   bool  `json:"cloudAvailable"`
+}
+
 // ActivityEvent is the useful, sanitized history shown to end users.
 type ActivityEvent struct {
 	ID               int64     `json:"id"`
@@ -370,14 +386,29 @@ type GameProtectionStatus struct {
 
 // GameProfile is portable provider metadata used by fresh-install recovery.
 type GameProfile struct {
+	SchemaVersion   int       `json:"schemaVersion,omitempty"`
 	SyncID          string    `json:"syncId"`
 	Name            string    `json:"name"`
+	Version         string    `json:"version,omitempty"`
+	CoverSource     string    `json:"coverSource,omitempty"`
+	CoverAvailable  bool      `json:"coverAvailable,omitempty"`
+	PlaytimeSeconds int64     `json:"playtimeSeconds,omitempty"`
 	ExecutableName  string    `json:"executableName,omitempty"`
 	PathHint        string    `json:"pathHint,omitempty"`
 	LatestRevision  string    `json:"latestRevision,omitempty"`
 	LatestProtected time.Time `json:"latestProtected,omitempty"`
 	FileCount       int       `json:"fileCount"`
 	TotalBytes      int64     `json:"totalBytes"`
+}
+
+// PlaytimeLedger records the cumulative time contributed by one installation.
+// Files are independent per device so concurrent play sessions cannot overwrite
+// or double-count another device's total.
+type PlaytimeLedger struct {
+	SchemaVersion int       `json:"schemaVersion"`
+	DeviceID      string    `json:"deviceId"`
+	Seconds       int64     `json:"seconds"`
+	UpdatedAt     time.Time `json:"updatedAt"`
 }
 
 // SyncConflict is a non-destructive collision requiring an explicit decision.

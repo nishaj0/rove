@@ -2,6 +2,7 @@
 app/node_modules/
 app/dist/
 app/coverage/
+.pnpm-store/
 
 # Tauri/Rust
 app/src-tauri/target/

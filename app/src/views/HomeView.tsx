@@ -1,4 +1,6 @@
 import type { Game, RecoveryLibraryEntry, Status } from "../types";
+import type { StorageSummary } from "../types";
+import { GameCover } from "../components/GameCover";
 import { HOME_KICKER_LABEL } from "../constants/branding";
 
 type HomeViewProps = {
@@ -10,10 +12,11 @@ type HomeViewProps = {
   status: Status | null;
   recoveryLibrary: RecoveryLibraryEntry[];
   onRestoreRecovery: (entry: RecoveryLibraryEntry) => void;
+  storageSummary?: StorageSummary | null;
 };
 
 export function HomeView(props: HomeViewProps) {
-  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials, status, recoveryLibrary, onRestoreRecovery } = props;
+  const { games, onOpenLibrary, onOpenActivity, onOpenGame, initials, status, recoveryLibrary, onRestoreRecovery, storageSummary } = props;
 
   return (
     <>
@@ -39,6 +42,7 @@ export function HomeView(props: HomeViewProps) {
           <div><span>Last cloud upload</span><strong>{status?.lastCloudUpload ? new Date(status.lastCloudUpload).toLocaleString() : status?.provider.state === "local_only" ? "Local only" : "Not yet"}</strong></div>
           <div><span>Pending uploads</span><strong>{status?.pending ?? 0} · {formatBytes(status?.pendingBytes ?? 0)}</strong></div>
           <div><span>Conflicts</span><strong>{status?.conflictCount ?? 0} need review</strong></div>
+          <div><span>Rove storage</span><strong>{storageSummary ? `${formatBytes(storageSummary.cloudAvailable ? storageSummary.cloudBytes : storageSummary.localBytes)}${storageSummary.cloudAvailable ? " cloud" : " local"}` : "Calculating"}</strong></div>
         </div>
         {status?.provider.message ? <p className="empty-state">{status.provider.message}</p> : null}
         {status?.lastError ? <p className="banner error">{status.lastError}</p> : null}
@@ -63,7 +67,7 @@ export function HomeView(props: HomeViewProps) {
                 {entry.gameId ? (
                   <button className="btn" type="button" onClick={() => onOpenGame(entry.gameId!)}>Open game</button>
                 ) : (
-                  <button className="btn primary" type="button" onClick={() => onRestoreRecovery(entry)}>Restore to folder</button>
+                  <button className="btn primary" type="button" onClick={() => onRestoreRecovery(entry)}>Restore and track</button>
                 )}
               </article>
             ))}
@@ -82,7 +86,7 @@ export function HomeView(props: HomeViewProps) {
           <div className="library-grid">
             {games.slice(0, 4).map((g) => (
               <button className="library-card" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
-                {g.coverImageData ? <img className="library-card-image" src={g.coverImageData} alt={`${g.name} cover`} /> : <div className="library-card-fallback">{initials(g.name)}</div>}
+                <GameCover game={g} className="library-card-image" />
                 <div className="library-card-name">{g.name}</div>
               </button>
             ))}

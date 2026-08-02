@@ -218,6 +218,19 @@ func (s *Server) handleStorageUsage(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, usage)
 }
 
+func (s *Server) handleStorageSummary(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	summary, err := s.engine.StorageSummary()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
+}
+
 func (s *Server) handleDiagnostics(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -243,6 +256,10 @@ type recoveryLibraryEntry struct {
 	ProfileID       string                 `json:"profileId"`
 	GameID          string                 `json:"gameId,omitempty"`
 	Name            string                 `json:"name"`
+	Version         string                 `json:"version,omitempty"`
+	CoverSource     string                 `json:"coverSource,omitempty"`
+	CoverAvailable  bool                   `json:"coverAvailable,omitempty"`
+	PlaytimeSeconds int64                  `json:"playtimeSeconds,omitempty"`
 	SyncID          string                 `json:"syncId"`
 	ExecutableName  string                 `json:"executableName,omitempty"`
 	PathHint        string                 `json:"pathHint,omitempty"`
@@ -272,10 +289,15 @@ func (s *Server) handleRecoveryLibrary(w http.ResponseWriter, r *http.Request) {
 				automatic++
 			}
 		}
+		stats, _ := s.logs.GameStats([]string{game.ID})
 		result = append(result, recoveryLibraryEntry{
 			ProfileID:       uuid.NewSHA1(uuid.NameSpaceURL, []byte(game.SyncID)).String(),
 			GameID:          game.ID,
 			Name:            game.Name,
+			Version:         game.Version,
+			CoverSource:     game.CoverSource,
+			CoverAvailable:  game.CoverImageData != "",
+			PlaytimeSeconds: stats[game.ID].PlaytimeSeconds,
 			SyncID:          game.SyncID,
 			ExecutableName:  baseName(game.ExecutablePath),
 			PathHint:        tokenizePathHint(game.Path),
@@ -297,6 +319,10 @@ func (s *Server) handleRecoveryLibrary(w http.ResponseWriter, r *http.Request) {
 			result = append(result, recoveryLibraryEntry{
 				ProfileID:       uuid.NewSHA1(uuid.NameSpaceURL, []byte(profile.SyncID)).String(),
 				Name:            profile.Name,
+				Version:         profile.Version,
+				CoverSource:     profile.CoverSource,
+				CoverAvailable:  profile.CoverAvailable,
+				PlaytimeSeconds: profile.PlaytimeSeconds,
 				SyncID:          profile.SyncID,
 				ExecutableName:  profile.ExecutableName,
 				PathHint:        profile.PathHint,
@@ -309,6 +335,43 @@ func (s *Server) handleRecoveryLibrary(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.Slice(result, func(i, j int) bool { return result[i].LatestProtected.After(result[j].LatestProtected) })
 	writeJSON(w, http.StatusOK, result)
+}
+
+func (s *Server) handleRecoveryLibraryRestoreAndTrack(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	var req struct {
+		SyncID         string `json:"syncId"`
+		Destination    string `json:"destination"`
+		ExecutablePath string `json:"executablePath"`
+		Confirmed      bool   `json:"confirmed"`
+	}
+	if err := decodeJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	if !req.Confirmed {
+		writeErr(w, http.StatusPreconditionRequired, errors.New("recovery destination confirmation is required"))
+		return
+	}
+	if strings.TrimSpace(req.ExecutablePath) == "" {
+		writeErr(w, http.StatusBadRequest, errors.New("choose the installed game executable before restoring"))
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Minute)
+	defer cancel()
+	game, err := s.engine.RestoreAndTrack(ctx, req.SyncID, req.Destination, req.ExecutablePath)
+	if err != nil {
+		writeErr(w, http.StatusConflict, err)
+		return
+	}
+	s.onGamesChanged(s.cfg.Get().Games)
+	if s.monitor != nil {
+		s.monitor.ForcePoll()
+	}
+	writeJSON(w, http.StatusCreated, s.toGameResponse(game, 0, time.Now().UTC(), false))
 }
 
 func (s *Server) handleRecoveryLibraryRestore(w http.ResponseWriter, r *http.Request) {

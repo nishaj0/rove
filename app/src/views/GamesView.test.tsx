@@ -32,7 +32,7 @@ describe("GamesView", () => {
   it("shows the empty state and add-game modal", async () => {
     renderView({ games: [] });
     expect(screen.getByText("No games added yet.")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "+ Add Game" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add game" }));
     expect(screen.getByRole("heading", { name: "Add a game" })).toBeInTheDocument();
     fireEvent.submit(screen.getByRole("heading", { name: "Add a game" }).closest("section")!.querySelector("form")!);
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Add a game" })).not.toBeInTheDocument());

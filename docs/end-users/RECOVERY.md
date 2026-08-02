@@ -5,11 +5,13 @@
 1. Install Rove.
 2. Select Local only, connect Google Drive, or select the same synced folder.
 3. Open the Home **Recovery Library**.
-4. Choose a remote-only game and select a new or empty destination folder.
-5. Confirm the destination.
-6. After restore, add the game and its executable so monitoring resumes.
+4. Choose a remote-only game and select **Restore and track**.
+5. Choose the installed game executable and a new or empty destination save folder.
+6. Confirm the destination. Rove verifies and stages the complete revision, restores it, and links the restored game to the same cloud identity.
 
 Cloud metadata stores environment-tokenized hints such as `%APPDATA%` and executable basenames. It does not publish the previous Windows username or an absolute personal path.
+
+Rove also carries an optional game version, a compact cover image (when one is available), and playtime metadata. Covers use your manual image first, then the executable icon, then a stable generated cover. Save contents remain separate immutable objects.
 
 ## Restoring tracked games
 

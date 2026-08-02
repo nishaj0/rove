@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
@@ -18,7 +19,7 @@ import {
   setAutomaticUpdateChecks,
   updateActionLabel,
 } from "./update";
-import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
+import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
 import { ActivityView } from "./views/ActivityView";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -116,6 +117,7 @@ export default function App() {
   const [recoveryPoints, setRecoveryPoints] = useState<RecoveryPoint[]>([]);
   const [recoveryLibrary, setRecoveryLibrary] = useState<RecoveryLibraryEntry[]>([]);
   const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
+  const [storageSummary, setStorageSummary] = useState<StorageSummary | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
   const [updateState, setUpdateState] = useState<AppUpdateState | null>(null);
@@ -129,6 +131,7 @@ export default function App() {
   const [newPath, setNewPath] = useState("");
   const [newExecutablePath, setNewExecutablePath] = useState("");
   const [newCoverImageData, setNewCoverImageData] = useState("");
+  const [newVersion, setNewVersion] = useState("");
 
   const [exportPath, setExportPath] = useState("");
   const [importPath, setImportPath] = useState("");
@@ -256,16 +259,18 @@ export default function App() {
   async function refreshGamesData() {
     try {
       setError("");
-      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary] = await Promise.all([
+      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary, nextStorageSummary] = await Promise.all([
         api.getGames(),
         api.getStatus(),
         api.getSyncJobs(),
         api.getRecoveryLibrary().catch(() => recoveryLibrary),
+        api.getStorageSummary().catch(() => storageSummary),
       ]);
       setGames(nextGames);
       setStatus(nextStatus);
       setSyncJobs(nextJobs);
       setRecoveryLibrary(nextRecoveryLibrary);
+      setStorageSummary(nextStorageSummary);
     } catch (e) {
       setError(toFriendlyError(e));
     }
@@ -506,11 +511,13 @@ export default function App() {
         path: newPath.trim(),
         executablePath: newExecutablePath.trim(),
         coverImageData: newCoverImageData,
+        version: newVersion.trim(),
       });
       setNewName("");
       setNewPath("");
       setNewExecutablePath("");
       setNewCoverImageData("");
+      setNewVersion("");
       setToast("Game added");
       await refreshGamesData();
       return true;
@@ -700,12 +707,12 @@ export default function App() {
     }
   }
 
-  async function onUpdateCover(coverImageData: string) {
+  async function onUpdateCover(coverImageData: string, mode: "manual" | "executable_icon" | "generated" = "manual") {
     if (!selectedGame) {
       return;
     }
     try {
-      await api.updateGameCover({ gameId: selectedGame.id, coverImageData });
+      await api.updateGameCover({ gameId: selectedGame.id, coverImageData, mode });
       setToast("Cover updated");
       await refreshGamesData();
     } catch (err) {
@@ -724,6 +731,23 @@ export default function App() {
       setError(toFriendlyError(err));
       return false;
     }
+  }
+
+  async function onQuickThemeToggle() {
+    const themeMode = settings.themeMode === "dark" ? "light" : "dark";
+    setSettings((current) => ({ ...current, themeMode }));
+    try { await api.saveSettings({ themeMode }); } catch (err) { setError(toFriendlyError(err)); }
+  }
+
+  async function onSaveDestination() {
+    try {
+      if (settings.protectionTarget === "folder" && !settings.syncRoot.trim()) throw new Error("Choose a synced folder before saving this destination.");
+      if (settings.protectionTarget === "google_drive" && !settings.googleDrive.connected) throw new Error("Connect Google Drive before saving this destination.");
+      const saved = await api.saveSettings({ protectionTarget: settings.protectionTarget, syncRoot: settings.syncRoot });
+      setSettings((current) => ({ ...current, ...saved }));
+      setStatus(await api.getStatus());
+      setToast("Cloud Sync destination saved");
+    } catch (err) { setError(toFriendlyError(err)); }
   }
 
   function resolveLaunchUpdateChoice(choice: "download" | "later" | "cancel") {
@@ -816,12 +840,14 @@ export default function App() {
 
   async function onRestoreRecoveryEntry(entry: RecoveryLibraryEntry) {
     try {
+      const executablePath = await pickExecutable();
+      if (!executablePath) return;
       const destination = await pickFolder();
       if (!destination) return;
-      if (!window.confirm(`Restore ${entry.name} into this empty folder?\n\n${destination}\n\nRove will verify the complete revision before publishing it.`)) return;
-      await api.restoreRecoveryLibrary(entry.syncId, destination);
-      setToast(`${entry.name} restored. Add the game to Rove to continue protecting it.`);
-      setRecoveryLibrary(await api.getRecoveryLibrary());
+      if (!window.confirm(`Restore and track ${entry.name} in this empty folder?\n\n${destination}\n\nRove will verify the complete revision before publishing it.`)) return;
+      await api.restoreAndTrackRecoveryLibrary(entry.syncId, destination, executablePath);
+      setToast(`${entry.name} restored and added to Rove.`);
+      await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
     }
@@ -1017,11 +1043,12 @@ export default function App() {
           <img className="topbar-brand-logo" src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" />
         </div>
         <div className="history-nav">
-          <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back">&#8249;</button>
-          <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward">&#8250;</button>
+          <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back"><ChevronLeft aria-hidden="true" size={18} /></button>
+          <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward"><ChevronRight aria-hidden="true" size={18} /></button>
         </div>
         <p className="app-utility-title">{currentViewTitle}</p>
         <div className="app-utility-actions">
+          <button className="icon-btn theme-toggle" type="button" onClick={() => void onQuickThemeToggle()} aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"} title={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}>{isDarkTheme ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}</button>
           {updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle) ? (
             <button
               className="update-indicator"
@@ -1096,6 +1123,7 @@ export default function App() {
             status={status}
             recoveryLibrary={recoveryLibrary}
             onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
+            storageSummary={storageSummary}
           />
         ) : null}
 
@@ -1106,10 +1134,12 @@ export default function App() {
             newPath={newPath}
             newExecutablePath={newExecutablePath}
             newCoverImageData={newCoverImageData}
+            newVersion={newVersion}
             onNewNameChange={setNewName}
             onBrowseSaveFolder={() => void onBrowseNewSaveFolder()}
             onBrowseExecutable={() => void onBrowseNewExecutablePath()}
             onNewCoverImageChange={setNewCoverImageData}
+            onNewVersionChange={setNewVersion}
             onAddGame={onAddGame}
             onOpenGame={openGame}
             initials={initials}
@@ -1147,7 +1177,7 @@ export default function App() {
             onDeleteRecoveryPoint={(id) => void onDeleteRecoveryPoint(id)}
             onRestoreLegacySnapshot={(id) => void onRestoreSnapshot(id)}
             onDeleteLegacySnapshot={(id) => void onDeleteSnapshot(id)}
-            onUpdateCover={(coverImageData) => void onUpdateCover(coverImageData)}
+            onUpdateCover={(coverImageData, mode) => void onUpdateCover(coverImageData, mode)}
             formatPlaytime={formatPlaytime}
             safeDateTime={safeDateTime}
             formatBytes={formatBytes}
@@ -1183,6 +1213,7 @@ export default function App() {
             onProtectionEnabled={(enabled) => onSetProtectionControl(undefined, enabled ? "none" : "all", "manual", enabled)}
             onRetry={async () => { await api.retryProtection(); setToast("Provider retry requested"); }}
             onSaveSettings={() => void onSaveSettings()}
+            onSaveDestination={() => void onSaveDestination()}
             updateState={updateState}
             updateInstallBlocked={games.some((game) => game.running) || Boolean(status?.activeJobId)}
             onCheckForUpdate={() => void onCheckForUpdate()}

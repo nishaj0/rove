@@ -18,7 +18,7 @@ describe("HomeView", () => {
     expect(screen.getByText("Paused")).toBeInTheDocument();
     expect(screen.getByText("Provider offline")).toBeInTheDocument();
     expect(screen.getByText("3 · 2.0 KB")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Restore to folder" }));
+    fireEvent.click(screen.getByRole("button", { name: "Restore and track" }));
     expect(onRestoreRecovery).toHaveBeenCalledWith(expect.objectContaining({ profileId: "profile-1" }));
     fireEvent.click(screen.getByRole("button", { name: "Open Library" }));
     expect(onOpenLibrary).toHaveBeenCalledTimes(1);

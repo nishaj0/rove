@@ -1,4 +1,6 @@
 import { type FormEvent, useMemo, useState } from "react";
+import { Plus, Search, X } from "lucide-react";
+import { GameCover } from "../components/GameCover";
 import type { Game } from "../types";
 
 type GamesViewProps = {
@@ -7,10 +9,12 @@ type GamesViewProps = {
   newPath: string;
   newExecutablePath: string;
   newCoverImageData: string;
+  newVersion?: string;
   onNewNameChange: (value: string) => void;
   onBrowseSaveFolder: () => void;
   onBrowseExecutable: () => void;
   onNewCoverImageChange: (value: string) => void;
+  onNewVersionChange: (value: string) => void;
   onAddGame: (e: FormEvent) => Promise<boolean>;
   onOpenGame: (gameId: string) => void;
   initials: (name: string) => string;
@@ -22,11 +26,11 @@ export function GamesView(props: GamesViewProps) {
     newName,
     newPath,
     newExecutablePath,
-    newCoverImageData,
+    newCoverImageData, newVersion = "",
     onNewNameChange,
     onBrowseSaveFolder,
     onBrowseExecutable,
-    onNewCoverImageChange,
+    onNewCoverImageChange, onNewVersionChange,
     onAddGame,
     onOpenGame,
     initials,
@@ -55,7 +59,7 @@ export function GamesView(props: GamesViewProps) {
       <section className="library-shell" data-window-title="GAMES.LIBRARY">
         <div className="library-toolbar">
           <label className="library-search">
-            <span aria-hidden="true">&#128269;</span>
+            <Search aria-hidden="true" size={17} />
             <input
               type="search"
               value={searchTerm}
@@ -63,7 +67,7 @@ export function GamesView(props: GamesViewProps) {
               placeholder="Search games"
             />
           </label>
-          <button className="btn action-outline" onClick={() => setShowAddModal(true)} type="button">+ Add Game</button>
+          <button className="btn action-outline" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={16} /> Add game</button>
         </div>
 
         <div className="library-header">
@@ -77,10 +81,11 @@ export function GamesView(props: GamesViewProps) {
           <div className="library-grid">
             {filteredGames.map((g) => (
               <button className="library-card" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
-                {g.coverImageData ? <img className="library-card-image" src={g.coverImageData} alt={`${g.name} cover`} /> : <div className="library-card-fallback">{initials(g.name)}</div>}
+                <GameCover game={g} className="library-card-image" />
                 <div className="library-card-name">{g.name}</div>
               </button>
             ))}
+            <button className="library-card library-add-card" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={25} /><span>Add game</span></button>
           </div>
         )}
       </section>
@@ -90,10 +95,11 @@ export function GamesView(props: GamesViewProps) {
           <section className="add-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h2>Add a game</h2>
-              <button className="modal-close" onClick={() => setShowAddModal(false)} type="button" aria-label="Close">&#10005;</button>
+              <button className="modal-close" onClick={() => setShowAddModal(false)} type="button" aria-label="Close"><X aria-hidden="true" size={18} /></button>
             </div>
             <form className="add-game-form" onSubmit={onSubmitAddGame}>
               <input placeholder="Game name" value={newName} onChange={(e) => onNewNameChange(e.target.value)} required />
+              <input placeholder="Version (optional)" value={newVersion} onChange={(e) => onNewVersionChange(e.target.value)} maxLength={80} />
               <input
                 className="picker-input"
                 placeholder="Save folder"
@@ -122,7 +128,7 @@ export function GamesView(props: GamesViewProps) {
                 }}
                 required
               />
-              <label className="file-input-wrap">
+              {!newExecutablePath || newCoverImageData ? <label className="file-input-wrap">
                 <span>Cover image (optional)</span>
                 <input
                   type="file"
@@ -140,7 +146,7 @@ export function GamesView(props: GamesViewProps) {
                     reader.readAsDataURL(file);
                   }}
                 />
-              </label>
+              </label> : <p className="snapshot-meta">Rove will use this executable's icon when it can; you can replace it later.</p>}
               {newCoverImageData ? <img className="cover-preview" src={newCoverImageData} alt="Cover preview" /> : null}
               <div className="modal-actions">
                 <button className="btn" onClick={() => setShowAddModal(false)} type="button">Cancel</button>

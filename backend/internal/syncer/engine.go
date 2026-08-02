@@ -2,9 +2,11 @@ package syncer
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -47,6 +49,9 @@ type Engine struct {
 	running map[string]struct{}
 	dirty   map[string]dirtyGame
 	exits   map[string]time.Time
+	// playtime caches independent per-device contributions published with
+	// portable profiles. The cache avoids provider reads on normal UI refreshes.
+	playtime map[string]map[string]int64
 
 	trigger chan syncTrigger
 	started atomic.Bool
@@ -72,6 +77,7 @@ func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 		running:       make(map[string]struct{}),
 		dirty:         make(map[string]dirtyGame),
 		exits:         make(map[string]time.Time),
+		playtime:      make(map[string]map[string]int64),
 		statusUpdates: make(chan struct{}, 1),
 		ctx:           context.Background(),
 		storeFactory: func(_ context.Context, settings models.Settings) (RevisionStore, error) {
@@ -485,6 +491,29 @@ func (e *Engine) StorageUsage(gameID string) (models.StorageUsage, error) {
 	return usage, nil
 }
 
+// StorageSummary reports logical Rove-managed storage across the library. It
+// intentionally excludes unrelated provider/account files.
+func (e *Engine) StorageSummary() (models.StorageSummary, error) {
+	settings := e.cfg.Get()
+	summary := models.StorageSummary{GameCount: len(settings.Games), CloudAvailable: settings.ProtectionTarget != models.ProtectionTargetLocal}
+	for _, game := range settings.Games {
+		usage, err := e.StorageUsage(game.ID)
+		if err != nil {
+			return models.StorageSummary{}, err
+		}
+		summary.LocalBytes += usage.UniqueBytes
+		summary.PendingBytes += usage.PendingBytes
+		summary.ReclaimableBytes += usage.ReclaimableBytes
+	}
+	if summary.CloudAvailable {
+		summary.CloudBytes = summary.LocalBytes - summary.PendingBytes
+		if summary.CloudBytes < 0 {
+			summary.CloudBytes = 0
+		}
+	}
+	return summary, nil
+}
+
 func (e *Engine) CloudProfiles(ctx context.Context) ([]models.GameProfile, error) {
 	settings := e.cfg.Get()
 	if settings.ProtectionTarget == models.ProtectionTargetLocal {
@@ -499,6 +528,52 @@ func (e *Engine) CloudProfiles(ctx context.Context) ([]models.GameProfile, error
 		return nil, errors.New("provider does not support recovery library metadata")
 	}
 	return profiles.ListGameProfiles(ctx)
+}
+
+// RestoreAndTrack performs the safe materialization first, then registers the
+// restored save directory against its existing portable SyncID.
+func (e *Engine) RestoreAndTrack(ctx context.Context, syncID, destination, executablePath string) (models.Game, error) {
+	if info, err := os.Stat(strings.TrimSpace(executablePath)); err != nil || info.IsDir() {
+		return models.Game{}, errors.New("installed game executable is unavailable")
+	}
+	profiles, err := e.CloudProfiles(ctx)
+	if err != nil {
+		return models.Game{}, err
+	}
+	var profile models.GameProfile
+	found := false
+	for _, candidate := range profiles {
+		if candidate.SyncID == syncID {
+			profile, found = candidate, true
+			break
+		}
+	}
+	if !found {
+		return models.Game{}, errors.New("cloud game profile was not found")
+	}
+	e.setRecoveredPlaytime(syncID, profile.PlaytimeSeconds)
+	if err := e.RestoreCloudProfile(ctx, syncID, destination); err != nil {
+		return models.Game{}, err
+	}
+	cover := ""
+	settings := e.cfg.Get()
+	var revisionStore RevisionStore = e.localStore
+	if settings.ProtectionTarget != models.ProtectionTargetLocal {
+		if revisionStore, err = e.storeFactory(ctx, settings); err != nil {
+			return models.Game{}, err
+		}
+	}
+	if assets, ok := revisionStore.(ProfileAssetStore); ok && profile.CoverAvailable {
+		if raw, readErr := assets.ReadGameCover(ctx, syncID); readErr == nil && len(raw) > 0 {
+			cover = "data:" + http.DetectContentType(raw) + ";base64," + base64.StdEncoding.EncodeToString(raw)
+		}
+	}
+	game, err := e.cfg.AddGameWithMetadata(profile.Name, destination, executablePath, cover, profile.Version, profile.CoverSource, nil, syncID)
+	if err != nil {
+		return models.Game{}, err
+	}
+	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "recovery", Severity: "info", GameID: game.ID, Title: "Cloud save restored and tracked", Detail: profile.Name})
+	return game, nil
 }
 
 // RestoreCloudProfile restores a provider profile into a new or empty
@@ -811,7 +886,7 @@ func (e *Engine) runOnce(request syncTrigger) {
 		if profiles, ok := store.(ProfileStore); ok {
 			revision, revisionErr := e.logs.Revision(revisionID)
 			if revisionErr == nil {
-				err = profiles.WriteGameProfile(e.ctx, gameProfile(game, revision))
+				err = e.publishProfile(e.ctx, profiles, store, game, revision)
 			}
 		}
 	}
@@ -905,7 +980,7 @@ func (e *Engine) captureLocal(ctx context.Context, game models.Game, kind, name 
 	if err := e.logs.SaveRevision(revision); err != nil {
 		return models.Revision{}, Result{}, err
 	}
-	_ = e.localStore.WriteGameProfile(ctx, gameProfile(game, revision))
+	_ = e.publishProfile(ctx, e.localStore, e.localStore, game, revision)
 	if pinned {
 		point := models.RecoveryPoint{ID: uuid.NewString(), GameID: game.ID, RevisionID: revision.ID, Name: name, CreatedAt: revision.CreatedAt, FileCount: revision.FileCount, TotalBytes: revision.TotalBytes}
 		if err := e.logs.CreateRecoveryPoint(point); err != nil {
@@ -922,8 +997,12 @@ func (e *Engine) captureLocal(ctx context.Context, game models.Game, kind, name 
 
 func gameProfile(game models.Game, revision models.Revision) models.GameProfile {
 	return models.GameProfile{
+		SchemaVersion:   2,
 		SyncID:          game.SyncID,
 		Name:            game.Name,
+		Version:         game.Version,
+		CoverSource:     game.CoverSource,
+		CoverAvailable:  game.CoverImageData != "",
 		ExecutableName:  filepath.Base(game.ExecutablePath),
 		PathHint:        portablePathHint(game.Path),
 		LatestRevision:  revision.ID,
@@ -931,6 +1010,105 @@ func gameProfile(game models.Game, revision models.Revision) models.GameProfile 
 		FileCount:       revision.FileCount,
 		TotalBytes:      revision.TotalBytes,
 	}
+}
+
+func (e *Engine) publishProfile(ctx context.Context, profiles ProfileStore, store RevisionStore, game models.Game, revision models.Revision) error {
+	profile := gameProfile(game, revision)
+	if stats, err := e.logs.GameStats([]string{game.ID}); err == nil {
+		profile.PlaytimeSeconds = stats[game.ID].PlaytimeSeconds
+	}
+	if ledgers, ok := store.(PlaytimeStore); ok {
+		settings := e.cfg.Get()
+		ledger := models.PlaytimeLedger{
+			SchemaVersion: 1,
+			DeviceID:      settings.DeviceID,
+			Seconds:       profile.PlaytimeSeconds,
+			UpdatedAt:     time.Now().UTC(),
+		}
+		if err := ledgers.WritePlaytimeLedger(ctx, game.SyncID, ledger); err != nil {
+			return err
+		}
+		if records, err := ledgers.ListPlaytimeLedgers(ctx, game.SyncID); err == nil {
+			profile.PlaytimeSeconds = mergePlaytimeLedgers(records)
+			e.setPlaytimeLedgers(game.SyncID, records)
+		}
+	}
+	if assets, ok := store.(ProfileAssetStore); ok && game.CoverImageData != "" {
+		if comma := strings.Index(game.CoverImageData, ","); comma >= 0 {
+			if raw, err := base64.StdEncoding.DecodeString(game.CoverImageData[comma+1:]); err == nil && len(raw) > 0 && http.DetectContentType(raw) != "application/octet-stream" {
+				_ = assets.WriteGameCover(ctx, game.SyncID, raw)
+			}
+		}
+	}
+	return profiles.WriteGameProfile(ctx, profile)
+}
+
+// AggregatedPlaytime returns a provider-derived total without performing I/O.
+// It substitutes the current device's local running total for the last
+// published value so the UI stays accurate between metadata publications.
+func (e *Engine) AggregatedPlaytime(syncID string, localSeconds int64) (int64, bool) {
+	syncID = strings.TrimSpace(syncID)
+	if syncID == "" {
+		return 0, false
+	}
+	settings := e.cfg.Get()
+	e.mu.RLock()
+	records, found := e.playtime[syncID]
+	if !found {
+		e.mu.RUnlock()
+		return 0, false
+	}
+	copy := make(map[string]int64, len(records)+1)
+	for deviceID, seconds := range records {
+		copy[deviceID] = seconds
+	}
+	e.mu.RUnlock()
+	if localSeconds > copy[settings.DeviceID] {
+		copy[settings.DeviceID] = localSeconds
+	}
+	var total int64
+	for _, seconds := range copy {
+		total += seconds
+	}
+	return total, true
+}
+
+func (e *Engine) setPlaytimeLedgers(syncID string, records []models.PlaytimeLedger) {
+	byDevice := make(map[string]int64, len(records))
+	for _, record := range records {
+		if record.DeviceID != "" && record.Seconds > byDevice[record.DeviceID] {
+			byDevice[record.DeviceID] = record.Seconds
+		}
+	}
+	e.mu.Lock()
+	e.playtime[syncID] = byDevice
+	e.mu.Unlock()
+}
+
+func (e *Engine) setRecoveredPlaytime(syncID string, total int64) {
+	if total <= 0 {
+		return
+	}
+	e.mu.Lock()
+	if _, exists := e.playtime[syncID]; !exists {
+		e.playtime[syncID] = map[string]int64{"recovered-aggregate": total}
+	}
+	e.mu.Unlock()
+}
+
+func mergePlaytimeLedgers(records []models.PlaytimeLedger) int64 {
+	byDevice := make(map[string]int64, len(records))
+	for _, record := range records {
+		if record.DeviceID == "" || record.Seconds < 0 || record.Seconds <= byDevice[record.DeviceID] {
+			continue
+		}
+		byDevice[record.DeviceID] = record.Seconds
+	}
+	var total int64
+	for _, seconds := range byDevice {
+		total += seconds
+	}
+	return total
 }
 
 func portablePathHint(path string) string {

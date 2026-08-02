@@ -13,11 +13,17 @@ import (
 )
 
 func (m *Manager) AddGame(name, path, executablePath, coverImageData string) (models.Game, error) {
-	return m.AddGameWithPolicy(name, path, executablePath, coverImageData, nil)
+	return m.AddGameWithMetadata(name, path, executablePath, coverImageData, "", "", nil, "")
 }
 
 // adds a tracked game and optionally overrides default backup policy values.
 func (m *Manager) AddGameWithPolicy(name, path, executablePath, coverImageData string, policy *models.BackupPolicy) (models.Game, error) {
+	return m.AddGameWithMetadata(name, path, executablePath, coverImageData, "", "", policy, "")
+}
+
+// AddGameWithMetadata creates a normal local entry or links it to an existing
+// portable profile when pairedSyncID is supplied by Recovery Library.
+func (m *Manager) AddGameWithMetadata(name, path, executablePath, coverImageData, version, coverSource string, policy *models.BackupPolicy, pairedSyncID string) (models.Game, error) {
 	if name == "" || path == "" || executablePath == "" {
 		return models.Game{}, errors.New("name, path, and executablePath are required")
 	}
@@ -50,9 +56,17 @@ func (m *Manager) AddGameWithPolicy(name, path, executablePath, coverImageData s
 		Path:             path,
 		ExecutablePath:   executablePath,
 		CoverImageData:   coverImageData,
+		Version:          strings.TrimSpace(version),
+		CoverSource:      strings.TrimSpace(coverSource),
 		BackupPolicy:     backupPolicy,
-		SyncID:           uuid.NewString(),
+		SyncID:           strings.TrimSpace(pairedSyncID),
 		ProtectionPolicy: defaultSyncPolicy(),
+	}
+	if game.SyncID == "" {
+		game.SyncID = uuid.NewString()
+	}
+	if game.CoverSource == "" {
+		game.CoverSource = "generated"
 	}
 	m.settings.Games = append(m.settings.Games, game)
 	if err := m.saveLocked(); err != nil {
@@ -88,6 +102,11 @@ func (m *Manager) UpdateGame(id string, name string, path string, executablePath
 
 // updates game identity/path fields and can replace backup policy when provided.
 func (m *Manager) UpdateGameWithPolicy(id string, name string, path string, executablePath string, coverImageData string, policy *models.BackupPolicy) (models.Game, error) {
+	current, _ := m.FindGame(id)
+	return m.UpdateGameWithMetadata(id, name, path, executablePath, coverImageData, current.Version, current.CoverSource, policy)
+}
+
+func (m *Manager) UpdateGameWithMetadata(id string, name string, path string, executablePath string, coverImageData, version, coverSource string, policy *models.BackupPolicy) (models.Game, error) {
 	if id == "" || name == "" || path == "" || executablePath == "" {
 		return models.Game{}, errors.New("id, name, path, and executablePath are required")
 	}
@@ -119,6 +138,10 @@ func (m *Manager) UpdateGameWithPolicy(id string, name string, path string, exec
 	m.settings.Games[idx].Path = path
 	m.settings.Games[idx].ExecutablePath = executablePath
 	m.settings.Games[idx].CoverImageData = coverImageData
+	m.settings.Games[idx].Version = strings.TrimSpace(version)
+	if coverSource != "" {
+		m.settings.Games[idx].CoverSource = coverSource
+	}
 	if policy != nil {
 		if err := validateBackupPolicy(*policy); err != nil {
 			return models.Game{}, err

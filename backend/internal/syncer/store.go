@@ -48,6 +48,20 @@ type ProfileStore interface {
 	ListGameProfiles(ctx context.Context) ([]models.GameProfile, error)
 }
 
+// ProfileAssetStore carries small non-save metadata assets such as cover art.
+// It is deliberately separate from game.json so profile metadata stays small.
+type ProfileAssetStore interface {
+	WriteGameCover(ctx context.Context, syncID string, content []byte) error
+	ReadGameCover(ctx context.Context, syncID string) ([]byte, error)
+}
+
+// PlaytimeStore keeps one cumulative ledger record per device. It is separate
+// from game.json so two devices never race to replace an aggregate total.
+type PlaytimeStore interface {
+	WritePlaytimeLedger(ctx context.Context, syncID string, ledger models.PlaytimeLedger) error
+	ListPlaytimeLedgers(ctx context.Context, syncID string) ([]models.PlaytimeLedger, error)
+}
+
 type RecoveryPointStore interface {
 	WriteRecoveryPoint(ctx context.Context, syncID string, point models.RecoveryPoint) error
 	DeleteRecoveryPoint(ctx context.Context, syncID, pointID string) error
@@ -257,6 +271,58 @@ func (s *FolderStore) ListGameProfiles(_ context.Context) ([]models.GameProfile,
 		var profile models.GameProfile
 		if json.Unmarshal(payload, &profile) == nil && profile.SyncID != "" {
 			result = append(result, profile)
+		}
+	}
+	return result, nil
+}
+
+func (s *FolderStore) WriteGameCover(_ context.Context, syncID string, content []byte) error {
+	if len(content) == 0 {
+		return nil
+	}
+	path := filepath.Join(s.gameRoot(syncID), "cover.png")
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	tmp := path + ".tmp-" + uuid.NewString()
+	if err := os.WriteFile(tmp, content, 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
+}
+
+func (s *FolderStore) ReadGameCover(_ context.Context, syncID string) ([]byte, error) {
+	return os.ReadFile(filepath.Join(s.gameRoot(syncID), "cover.png"))
+}
+
+func (s *FolderStore) WritePlaytimeLedger(_ context.Context, syncID string, ledger models.PlaytimeLedger) error {
+	if strings.TrimSpace(ledger.DeviceID) == "" {
+		return errors.New("playtime device id is required")
+	}
+	return writeJSONAtomic(filepath.Join(s.gameRoot(syncID), "playtime", ledger.DeviceID+".json"), ledger)
+}
+
+func (s *FolderStore) ListPlaytimeLedgers(_ context.Context, syncID string) ([]models.PlaytimeLedger, error) {
+	directory := filepath.Join(s.gameRoot(syncID), "playtime")
+	entries, err := os.ReadDir(directory)
+	if errors.Is(err, os.ErrNotExist) {
+		return []models.PlaytimeLedger{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	result := make([]models.PlaytimeLedger, 0, len(entries))
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+		payload, err := os.ReadFile(filepath.Join(directory, entry.Name()))
+		if err != nil {
+			continue
+		}
+		var ledger models.PlaytimeLedger
+		if json.Unmarshal(payload, &ledger) == nil && ledger.DeviceID != "" && ledger.Seconds >= 0 {
+			result = append(result, ledger)
 		}
 	}
 	return result, nil

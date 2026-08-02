@@ -22,6 +22,14 @@ Upload pause queues cloud work while local revisions continue. All-sync pause st
 
 The local commit succeeded but provider replication is pending, paused, rate-limited, offline, unauthenticated, or out of quota. The two timestamps are intentionally separate.
 
+## What does “Rove storage” mean?
+
+It is the space used by Rove-managed revision objects, metadata, and pending uploads. It is not your whole Google Drive account or every file in a synced folder. In Local only mode, cloud storage is unavailable while local-vault storage remains visible.
+
+## How do game covers and playtime work?
+
+Manual cover images take priority. If there is no manual image, Rove tries the selected executable's icon; if that is unavailable it shows a stable generated cover. Game version is optional. Playtime is stored as one cumulative record per Rove device and merged for the portable total, so playing on a second PC adds time instead of replacing the first PC's history.
+
 ## Authentication required
 
 Open Settings and reconnect Google Drive. Existing local revisions and queued uploads remain.

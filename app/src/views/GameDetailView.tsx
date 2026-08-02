@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ImagePlus, MonitorUp, Palette } from "lucide-react";
+import { GameCover } from "../components/GameCover";
 import { newDefaultSyncPolicy } from "../constants/defaults";
 import type { Game, PauseScope, RecoveryPoint, Revision, SnapshotSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "../types";
 
@@ -32,7 +34,7 @@ type GameDetailViewProps = {
   onDeleteRecoveryPoint: (id: string) => void;
   onRestoreLegacySnapshot: (id: string) => void;
   onDeleteLegacySnapshot: (id: string) => void;
-  onUpdateCover: (coverImageData: string) => void;
+  onUpdateCover: (coverImageData: string, mode?: "manual" | "executable_icon" | "generated") => void;
   formatPlaytime: (seconds: number) => string;
   safeDateTime: (value: string) => string;
   formatBytes: (bytes: number) => string;
@@ -78,10 +80,11 @@ export function GameDetailView(props: GameDetailViewProps) {
         <button className="btn nav-back" onClick={onBack} type="button">← Back to Games</button>
         <div className="game-detail-hero">
           <div className="game-detail-cover">
-            {game.coverImageData ? <img src={game.coverImageData} alt={`${game.name} cover`} /> : <span>{game.name.slice(0, 2).toUpperCase()}</span>}
+            <GameCover game={game} />
           </div>
           <div className="game-detail-meta">
             <h1>{game.name}</h1>
+            {game.version ? <p>Version: {game.version}</p> : null}
             <p title={game.path}>Save folder: {game.path}</p>
             <p>Play time: {formatPlaytime(game.playtimeSeconds ?? 0)}</p>
             <p>Status: <strong className={`state-text ${game.running ? "success" : "warning"}`}>{game.running ? "Playing" : "Idle"}</strong></p>
@@ -233,13 +236,13 @@ export function GameDetailView(props: GameDetailViewProps) {
 
       <section className="panel" data-window-title="COVER.ART">
         <h2>Cover image</h2>
-        <label className="file-input-wrap"><span>Upload image</span><input type="file" accept="image/*" onChange={(event) => {
+        <div className="detail-actions"><label className="file-input-wrap"><span><ImagePlus aria-hidden="true" size={15} /> Upload image</span><input type="file" accept="image/*" onChange={(event) => {
           const file = event.target.files?.[0];
           if (!file) return;
           const reader = new FileReader();
           reader.onload = () => { if (typeof reader.result === "string") onUpdateCover(reader.result); };
           reader.readAsDataURL(file);
-        }} /></label>
+        }} /></label><button className="btn" type="button" onClick={() => onUpdateCover("", "executable_icon")}><MonitorUp aria-hidden="true" size={15} />Use executable icon</button><button className="btn" type="button" onClick={() => onUpdateCover("", "generated")}><Palette aria-hidden="true" size={15} />Use generated cover</button></div>
       </section>
     </>
   );

@@ -30,6 +30,14 @@ Provider errors are classified into stable codes and health states. Retryable jo
 
 Tracked restore creates a pre-restore pinned revision and applies through verified temporary files. Fresh Recovery Library restore materializes the full remote head in a sibling staging directory and publishes it only to a new/empty destination.
 
+## Portable game profile and presentation data
+
+Each stable Sync ID owns a `game.json` profile. It contains display metadata (name, optional version, executable basename, tokenized path hint, latest revision, and aggregate playtime) but never an absolute personal path. The physical provider directory remains keyed by Sync ID so renaming a title cannot break pairing. Small cover art is stored separately as `cover.png`; profile metadata only declares whether it is available. Add-game attempts to read a PNG icon from the selected Windows executable using `winres`; extraction failure is non-fatal and the client renders a deterministic generated cover.
+
+Playtime does not use last-writer-wins `game.json` state. Each installation writes `playtime/<deviceId>.json` with its cumulative contribution; profile publication takes the maximum current value per device and sums device records. A newly restored game starts with no local contribution, so it cannot re-upload the already-aggregated portable total as new time.
+
+`GET /storage/summary` aggregates Rove-managed logical bytes over the tracked library. It excludes unrelated Google Drive/synced-folder account content. Recovery's restore-and-track endpoint stages the revision, then creates a local game entry paired to the profile Sync ID.
+
 ## Scheduling
 
 - engine scheduling tick: one second, doing only due-state checks;
