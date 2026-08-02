@@ -1,6 +1,6 @@
-# Cloud Saver user guide
+# Rove user guide
 
-Cloud Saver protects a game's save folder even when the game or store does not provide cloud saves. Protection is local first: losing Internet access never prevents a local revision from being created.
+Rove protects a game's save folder even when the game or store does not provide cloud saves. Protection is local first: losing Internet access never prevents a local revision from being created.
 
 ## First setup
 
@@ -21,7 +21,7 @@ Cloud Saver protects a game's save folder even when the game or store does not p
 | Continuous | Captures after five quiet seconds, no more than once every two minutes. | Final protection after exit. |
 | Manual | Only **Protect now** and Recovery Points. | No automatic exit capture. |
 
-Cloud Saver watches only running tracked games. An event marks a path dirty; it does not immediately scan or hash the whole save folder. Files must have unchanged size and modification time across two checks one second apart before capture.
+Rove watches only running tracked games. An event marks a path dirty; it does not immediately scan or hash the whole save folder. Files must have unchanged size and modification time across two checks one second apart before capture.
 
 ## Offline behavior
 
@@ -42,13 +42,13 @@ The states shown are **Local only**, **Online**, **Offline**, **Reconnecting**, 
 - A pause can last one hour, until next login, or until manually resumed.
 - Settings controls the global state. Each Game page has its own pause state layered over the global state.
 
-Defaults are protection enabled, automatic reconnect enabled, upload on metered connections disabled, remote check before a Cloud Saver launch enabled, important-notification preference enabled, and conflict review required. Metered-network enforcement and native toast delivery are not active in this build; the settings are retained for the Windows integration that will enforce them.
+Defaults are protection enabled, automatic reconnect enabled, upload on metered connections disabled, remote check before a Rove launch enabled, important-notification preference enabled, and conflict review required. Metered-network enforcement and native toast delivery are not active in this build; the settings are retained for the Windows integration that will enforce them.
 
 ## Launching
 
-**Play with pre-check** gives the provider up to five seconds to report its head. If a newer clean revision exists, Cloud Saver creates a pre-restore Recovery Point and applies it before launch. Provider failure never blocks forever: the UI offers explicit offline play.
+**Play with pre-check** gives the provider up to five seconds to report its head. If a newer clean revision exists, Rove creates a pre-restore Recovery Point and applies it before launch. Provider failure never blocks forever: the UI offers explicit offline play.
 
-Games launched externally are still detected and protected. Only a Cloud Saver launch guarantees the pre-launch provider check.
+Games launched externally are still detected and protected. Only a Rove launch guarantees the pre-launch provider check.
 
 ## Recovery Points and history
 
@@ -56,7 +56,7 @@ A Recovery Point is a named pinned revision. It is never removed automatically. 
 
 The Game page reports unique retained content, automatic record count, pinned count, and pending-upload bytes. Reclaimable space remains zero until the quarantine cleanup implementation is activated.
 
-Restore is exact: files absent from the selected revision are removed. Cloud Saver refuses restore while the game is running, creates a pre-restore Recovery Point, verifies object hashes, and uses temporary files or a staging directory before replacement.
+Restore is exact: files absent from the selected revision are removed. Rove refuses restore while the game is running, creates a pre-restore Recovery Point, verifies object hashes, and uses temporary files or a staging directory before replacement.
 
 The Home **Recovery Library** lists provider profiles without relying on an old local game ID. A remote-only profile can be restored to a new or empty folder. Non-empty fresh-install destinations are refused; add the destination as a game first so conflicts can be reviewed.
 
@@ -64,7 +64,7 @@ See [Recovery and safe restore](end-users/RECOVERY.md).
 
 ## Conflicts
 
-If the same relative path changed on two devices, Cloud Saver preserves both states and creates a review item:
+If the same relative path changed on two devices, Rove preserves both states and creates a review item:
 
 - **Keep local** publishes the current local file.
 - **Use remote** applies the remote file or deletion.
@@ -80,17 +80,17 @@ Old snapshot vaults are not scheduled and new legacy snapshots cannot be created
 
 ## Windows startup and tray
 
-**Start with Windows** uses the native Tauri autostart integration. Windows launches `Cloud Saver.exe --background`; no main window is shown. A per-user Windows mutex prevents two daemons.
+**Start with Windows** uses the native Tauri autostart integration. Windows launches `Rove.exe --background`; no main window is shown. A per-user Windows mutex prevents two daemons.
 
 The current tray provides status, provider/pending count, **Protect now**, **Create Recovery Point** for running games, **Retry connection**, **Review conflicts**, upload pause, all-protection pause, a single-running-game pause, resume, open, and quit. Its updates are event-driven rather than polled.
 
 ## Application updates
 
-Cloud Saver checks stable GitHub Releases when the desktop opens and before launching a game if its last successful check is older than six hours. A launch-time check stops after three seconds and never prevents play.
+Rove checks stable GitHub Releases when the desktop opens and before launching a game if its last successful check is older than six hours. A launch-time check stops after three seconds and never prevents play.
 
-When an update is available before launch, choose **Download and play**, **Not now**, or **Cancel launch**. Downloading can continue while the game runs, but installation remains disabled until tracked games close and active local protection finishes. A verified completed download remains ready after an app restart. Installation replaces the existing program in place and restarts Cloud Saver; do not uninstall first. Failed and offline checks leave the installed version and all protection data unchanged.
+When an update is available before launch, choose **Download and play**, **Not now**, or **Cancel launch**. Downloading can continue while the game runs, but installation remains disabled until tracked games close and active local protection finishes. A verified completed download remains ready after an app restart. Installation replaces the existing program in place and restarts Rove; do not uninstall first. Failed and offline checks leave the installed version and all protection data unchanged.
 
-When a signed download completes, Cloud Saver opens a **What's new** window with the release notes. Choose **Install update** when nothing is running, or **Install later** to keep the verified update ready. You can reopen the notes from the update banner or Settings at any time.
+When a signed download completes, Rove opens a **What's new** window with the release notes. Choose **Install update** when nothing is running, or **Install later** to keep the verified update ready. You can reopen the notes from the update banner or Settings at any time.
 
 Settings > **Application updates** shows the installed/available versions, check time, release notes, byte progress, automatic-check option, retry action, and install action. Source/development builds intentionally cannot install releases.
 

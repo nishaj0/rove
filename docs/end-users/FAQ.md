@@ -1,6 +1,6 @@
 # FAQ and troubleshooting
 
-## Does Cloud Saver require a server or VPS?
+## Does Rove require a server or VPS?
 
 No. The desktop app communicates directly with Google Drive or reads/writes the synced folder you select.
 
@@ -28,43 +28,43 @@ Open Settings and reconnect Google Drive. Existing local revisions and queued up
 
 ## Should I delete `settings.json` after an update error?
 
-No. Current versions migrate missing fields, ignore obsolete fields, and keep the previous valid settings as a backup. If the primary JSON is damaged, Cloud Saver preserves it separately and restores the backup when possible. Check Activity for **Settings repaired after update** and use **Copy diagnostics** if help is still needed.
+No. Current versions migrate missing fields, ignore obsolete fields, and keep the previous valid settings as a backup. If the primary JSON is damaged, Rove preserves it separately and restores the backup when possible. Check Activity for **Settings repaired after update** and use **Copy diagnostics** if help is still needed.
 
-## Do I uninstall Cloud Saver before updating?
+## Do I uninstall Rove before updating?
 
-No. Choose **Download update**, continue playing if you want, then choose **Install** after tracked games and protection work finish. The signed NSIS updater replaces application files in place and restarts Cloud Saver. `%APPDATA%` settings, the SQLite database, local revisions, saves, and Windows-protected provider credentials are outside the installation files and remain in place.
+No. Choose **Download update**, continue playing if you want, then choose **Install** after tracked games and protection work finish. The signed NSIS updater replaces application files in place and restarts Rove. `%APPDATA%` settings, the SQLite database, local revisions, saves, and Windows-protected provider credentials are outside the installation files and remain in place.
 
 ## Where can I see what changed in an update?
 
-After a signed download finishes, Cloud Saver shows a **What's new** window containing the release notes. Choosing **Install later** keeps that verified update ready without changing the app. Reopen the notes from the update banner or **Settings > Application updates** whenever you want.
+After a signed download finishes, Rove shows a **What's new** window containing the release notes. Choosing **Install later** keeps that verified update ready without changing the app. Reopen the notes from the update banner or **Settings > Application updates** whenever you want.
 
 ## What if an update check or download fails offline?
 
-Game launch continues. A failed or timed-out check is informational and can be retried later. Interrupted `.part` downloads are discarded on startup; a completed verified download remains available after closing and reopening Cloud Saver. If installation cannot begin, the verified download is retained and the existing version continues running.
+Game launch continues. A failed or timed-out check is informational and can be retried later. Interrupted `.part` downloads are discarded on startup; a completed verified download remains available after closing and reopening Rove. If installation cannot begin, the verified download is retained and the existing version continues running.
 
 ## Why is Install disabled?
 
-Close every tracked game and wait for the active local protection job to finish. Cloud Saver will not stop the background service or replace program files while save capture is active.
+Close every tracked game and wait for the active local protection job to finish. Rove will not stop the background service or replace program files while save capture is active.
 
 ## Quota full
 
-Free provider space or remove provider data through supported provider tools, then choose retry. Do not manually remove individual Cloud Saver objects unless you are abandoning that protected library.
+Free provider space or remove provider data through supported provider tools, then choose retry. Do not manually remove individual Rove objects unless you are abandoning that protected library.
 
 ## Google Drive says rate limited or unavailable
 
-Cloud Saver keeps the revision locally and retries the same pending upload without reading the game save again. It follows Google's requested retry time when supplied and otherwise uses increasing delays, capped at 15 minutes. Repeated clicks and connectivity events do not bypass an active Google cooldown, so the app does not become stuck in a rapid-failure loop.
+Rove keeps the revision locally and retries the same pending upload without reading the game save again. It follows Google's requested retry time when supplied and otherwise uses increasing delays, capped at 15 minutes. Repeated clicks and connectivity events do not bypass an active Google cooldown, so the app does not become stuck in a rapid-failure loop.
 
 ## Local disk full
 
-Free local space before retrying. Cloud Saver stops unsafe writes; it does not delete the last valid revision.
+Free local space before retrying. Rove stops unsafe writes; it does not delete the last valid revision.
 
 ## Save file locked or unstable
 
-Let the game finish saving or close it. Cloud Saver requires two stable metadata checks and retries later rather than copying a changing file.
+Let the game finish saving or close it. Rove requires two stable metadata checks and retries later rather than copying a changing file.
 
 ## Permission denied
 
-Run Cloud Saver as the same Windows user that owns the save. Avoid protected system folders. Diagnostics sanitize personal paths.
+Run Rove as the same Windows user that owns the save. Avoid protected system folders. Diagnostics sanitize personal paths.
 
 ## Conflict shown
 
@@ -72,7 +72,7 @@ Open the game and choose local, remote, or both. No automatic policy overwrites 
 
 ## Legacy snapshots
 
-If a configured old vault contains snapshots, the Game page shows **Legacy local backups**. New legacy snapshots are disabled. Restore or explicitly remove the old entries; Cloud Saver does not silently delete them.
+If a configured old vault contains snapshots, the Game page shows **Legacy local backups**. New legacy snapshots are disabled. Restore or explicitly remove the old entries; Rove does not silently delete them.
 
 ## Expected resource use
 

@@ -1,6 +1,6 @@
-# Contributing to Cloud Saver
+# Contributing to Rove
 
-Cloud Saver is a Windows-focused Go, React, and Tauri application. Start with the [developer guide](docs/DEVELOPER_GUIDE.md) for architecture, persistence, APIs, verification, and current implementation boundaries.
+Rove is a Windows-focused Go, React, and Tauri application. Start with the [developer guide](docs/DEVELOPER_GUIDE.md) for architecture, persistence, APIs, verification, and current implementation boundaries.
 
 ## First local run
 

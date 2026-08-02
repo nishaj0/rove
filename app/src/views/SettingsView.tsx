@@ -177,7 +177,7 @@ export function SettingsView(props: SettingsViewProps) {
           </label>
           <label className="inline-check">
             <input type="checkbox" checked={settings.remoteCheckBeforeLaunch} onChange={(event) => onChange({ ...settings, remoteCheckBeforeLaunch: event.target.checked })} />
-            Check provider before Cloud Saver launch
+            Check provider before Rove launch
           </label>
           <label className="inline-check">
             <input type="checkbox" checked={settings.importantNotifications} disabled title="Native Windows toast delivery is not active yet" readOnly />

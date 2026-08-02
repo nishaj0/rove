@@ -38,7 +38,7 @@ func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 		}
 		systray.SetTooltip(branding.DisplayName)
 
-		openItem := systray.AddMenuItem("Open Cloud Saver", "Open desktop app")
+		openItem := systray.AddMenuItem("Open Rove", "Open desktop app")
 		stateItem := systray.AddMenuItem("State: starting", "Current protection state")
 		stateItem.Disable()
 		providerItem := systray.AddMenuItem("Provider: checking", "Cloud provider and pending uploads")
@@ -56,7 +56,7 @@ func (m *Manager) Run(statusUpdates <-chan Status, actions Actions) {
 		pauseGameItem := systray.AddMenuItem("Pause this game", "Pause the only tracked game currently running")
 		resumeItem := systray.AddMenuItem("Resume protection", "Resume paused protection work")
 		systray.AddSeparator()
-		exitItem := systray.AddMenuItem("Quit Cloud Saver", fmt.Sprintf("Exit %s", branding.DisplayName))
+		exitItem := systray.AddMenuItem("Quit Rove", fmt.Sprintf("Exit %s", branding.DisplayName))
 
 		currentStatus := Status{PlayingGames: nil}
 		renderStatus := func(s Status) {

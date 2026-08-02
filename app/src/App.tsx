@@ -2,8 +2,11 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
+import { APP_TAGLINE } from "./constants/branding";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
 import { SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
+import roveLogo from "./assets/rove-primary-horizontal.svg";
+import roveReversedLogo from "./assets/rove-reversed-horizontal.svg";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import {
   type AppUpdateState,
@@ -242,10 +245,10 @@ export default function App() {
   function toFriendlyError(e: unknown): string {
     const raw = e instanceof Error ? e.message : String(e);
     if (raw.toLowerCase().includes("failed to fetch")) {
-      return `Cannot reach backend service. If running from source, start backend with 'go run ./cmd/daemon --no-tray --debug'. If using the installed app, restart Cloud Saver and allow security prompts for cloud-saver-daemon.exe. Then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
+      return `Cannot reach Rove's background service. If running from source, start backend with 'go run ./cmd/daemon --no-tray --debug'. If using the installed app, restart Rove and allow its background service through security prompts. Then open ${BACKEND_DEBUG_INFO_URL} to confirm it is alive.`;
     }
     if (raw.toLowerCase().includes("json: unknown field")) {
-      return "The desktop interface and background service are from different versions. Quit Cloud Saver completely, restart it, and try again. Your existing settings have not been deleted.";
+      return "The Rove desktop interface and background service are from different versions. Quit Rove completely, restart it, and try again. Your existing settings have not been deleted.";
     }
     return raw;
   }
@@ -484,7 +487,7 @@ export default function App() {
     return games.find((game) => game.id === selectedGameId) ?? null;
   }, [games, selectedGameId]);
 
-  const nostalgiaDarkMode = settings.themeMode === "dark";
+  const isDarkTheme = settings.themeMode === "dark";
 
   const currentViewTitle = useMemo(() => {
     if (activeView === "game" && selectedGame) {
@@ -672,7 +675,7 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
-    if (!mergeOnImport && !window.confirm("Replace this save folder from the ZIP? Cloud Saver will create a Recovery Point first, and files absent from the ZIP will be removed.")) {
+    if (!mergeOnImport && !window.confirm("Replace this save folder from the ZIP? Rove will create a Recovery Point first, and files absent from the ZIP will be removed.")) {
       return;
     }
     setImportOperationState("working");
@@ -793,7 +796,7 @@ export default function App() {
       if (value) await enableAutostart(); else await disableAutostart();
       const actual = await isAutostartEnabled();
       setSettings((current) => ({ ...current, autostart: actual }));
-      setToast(actual ? "Cloud Saver will start silently with Windows" : "Windows startup disabled");
+      setToast(actual ? "Rove will start silently with Windows" : "Windows startup disabled");
     } catch (err) {
       setError(`Windows startup could not be changed: ${toFriendlyError(err)}`);
     }
@@ -813,9 +816,9 @@ export default function App() {
     try {
       const destination = await pickFolder();
       if (!destination) return;
-      if (!window.confirm(`Restore ${entry.name} into this empty folder?\n\n${destination}\n\nCloud Saver will verify the complete revision before publishing it.`)) return;
+      if (!window.confirm(`Restore ${entry.name} into this empty folder?\n\n${destination}\n\nRove will verify the complete revision before publishing it.`)) return;
       await api.restoreRecoveryLibrary(entry.syncId, destination);
-      setToast(`${entry.name} restored. Add the game to Cloud Saver to continue protecting it.`);
+      setToast(`${entry.name} restored. Add the game to Rove to continue protecting it.`);
       setRecoveryLibrary(await api.getRecoveryLibrary());
     } catch (err) {
       setError(toFriendlyError(err));
@@ -850,7 +853,7 @@ export default function App() {
     if (!selectedGame) {
       return;
     }
-    const confirmed = window.confirm("Restore this snapshot? Cloud Saver will save a pre-restore snapshot first.");
+    const confirmed = window.confirm("Restore this snapshot? Rove will save a pre-restore snapshot first.");
     if (!confirmed) {
       return;
     }
@@ -1006,11 +1009,11 @@ export default function App() {
   }
 
   return (
-    <div className="app-layout" data-theme={nostalgiaDarkMode ? "dark" : "light"}>
+    <div className="app-layout" data-theme={isDarkTheme ? "dark" : "light"}>
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <strong>Cloud//Saver</strong>
-          <span>save-state console</span>
+          <img className="sidebar-brand-logo" src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" />
+          <span>{APP_TAGLINE}</span>
         </div>
         <nav className="side-nav">
           {navItems.map((item) => {
@@ -1201,7 +1204,7 @@ export default function App() {
                 <h2 id="update-launch-title">Version {updateState.availableVersion} is available</h2>
               </div>
             </div>
-            <p>Cloud Saver can download the signed update in the background while your game launches. Installation will wait until every tracked game and protection job has finished.</p>
+            <p>Rove can download the signed update in the background while your game launches. Installation will wait until every tracked game and protection job has finished.</p>
             {updateState.notes ? <div className="update-notes">{updateState.notes}</div> : null}
             <div className="modal-actions">
               <button className="btn primary" autoFocus type="button" onClick={() => resolveLaunchUpdateChoice("download")}>Download and play</button>

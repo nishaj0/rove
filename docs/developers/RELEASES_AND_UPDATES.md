@@ -1,6 +1,6 @@
 # Application updates and release pipeline
 
-Cloud Saver updates directly from stable GitHub Releases. There is no VPS, custom update server, end-user key, or manual uninstall step.
+Rove updates directly from stable GitHub Releases. There is no VPS, custom update server, end-user key, or manual uninstall step.
 
 ## Runtime workflow
 
@@ -24,7 +24,7 @@ Application updates do not modify the game save folders or `%APPDATA%\CloudSaver
 
 Debug/source builds report `development` and cannot download or install releases. This prevents an installer from overwriting a contributor build or workspace. Frontend browser preview catches the absence of the native bridge and continues normally.
 
-The bundled daemon receives the same package version through Go linker flags in `scripts/stage-backend-daemon.mjs`. `GET /version` lets a release desktop detect a stale daemon. A mismatch gets one graceful restart through `/lifecycle/prepare-update`; Cloud Saver does not terminate an unknown process occupying its port.
+The bundled daemon receives the same package version through Go linker flags in `scripts/stage-backend-daemon.mjs`. `GET /version` lets a release desktop detect a stale daemon. A mismatch gets one graceful restart through `/lifecycle/prepare-update`; Rove does not terminate an unknown process occupying its port.
 
 ## Signing-key ceremony
 

@@ -1,6 +1,6 @@
-# Cloud Saver backend
+# Rove backend
 
-The Go daemon owns configuration, SQLite state, incremental save capture, local revisions, provider replication, recovery, game monitoring, the Windows tray, and the loopback API used by the Tauri desktop app.
+The Go daemon owns configuration, SQLite state, incremental save capture, local revisions, provider replication, recovery, game monitoring, the Windows tray, and the loopback API used by the Rove desktop app.
 
 The complete contributor documentation is in the [developer guide](../docs/DEVELOPER_GUIDE.md). Google Drive contributors should also read [Google Drive development](../docs/developers/GOOGLE_DRIVE_DEVELOPMENT.md).
 

@@ -1,4 +1,4 @@
-# Cloud Saver developer guide
+# Rove developer guide
 
 This guide covers the implemented Windows-focused, offline-first protection engine. Detailed references:
 
@@ -55,7 +55,7 @@ SQLite uses WAL and persists:
 
 The old log, backup-history, sync-baseline, conflict, and snapshot data remain readable.
 
-`settings.json` has an explicit schema version. Loading is field-tolerant: unknown fields are retained only by newer clients and ignored by older readers, missing fields receive migration defaults, and a field whose JSON type changed is reset without discarding unrelated games or encrypted provider credentials. Saves use a same-directory temporary file and atomic replacement, with the previous valid JSON retained as `settings.json.bak`. If the primary file is malformed, Cloud Saver preserves it as `settings.json.invalid-<timestamp>`, restores the backup when possible, and records a warning in Activity. Contributors must not fix migrations by deleting user settings.
+`settings.json` has an explicit schema version. Loading is field-tolerant: unknown fields are retained only by newer clients and ignored by older readers, missing fields receive migration defaults, and a field whose JSON type changed is reset without discarding unrelated games or encrypted provider credentials. Saves use a same-directory temporary file and atomic replacement, with the previous valid JSON retained as `settings.json.bak`. If the primary file is malformed, Rove preserves it as `settings.json.invalid-<timestamp>`, restores the backup when possible, and records a warning in Activity. Contributors must not fix migrations by deleting user settings.
 
 The `POST /settings` contract contains editable fields only. Provider connection details, OAuth diagnostic sources, device identity, games, and schema metadata remain daemon-owned. Known legacy envelope fields are accepted and ignored to tolerate a short UI/daemon version mismatch.
 

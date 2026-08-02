@@ -2,7 +2,7 @@
 
 ## Choose the save folder
 
-Add the folder containing actual progress files, not the installation folder unless the game stores saves there. Select the executable so Cloud Saver can detect play/exit and refuse unsafe restore.
+Add the folder containing actual progress files, not the installation folder unless the game stores saves there. Select the executable so Rove can detect play/exit and refuse unsafe restore.
 
 ## Choose a destination
 
@@ -20,11 +20,11 @@ No option requires a VPS, a user-managed server, or user-supplied API keys.
 4. For a cloud target, wait for **Last cloud upload** or check the pending count.
 5. Create a named Recovery Point before a risky mod, boss, or game update.
 
-Cloud Saver application updates are optional. If prompted before launching a game, **Download and play** starts the game normally and downloads the signed update in the background. Install it later after the game and protection work finish; no manual uninstall is needed.
+Rove application updates are optional. If prompted before launching a game, **Download and play** starts the game normally and downloads the signed update in the background. Install it later after the game and protection work finish; no manual uninstall is needed.
 
 ## Second computer
 
-Connect the same provider and use the Recovery Library to find the protected game. Restore to a new or empty save folder, then add that game/executable to Cloud Saver for ongoing monitoring. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
+Connect the same provider and use the Recovery Library to find the protected game. Restore to a new or empty save folder, then add that game/executable to Rove for ongoing monitoring. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
 
 ## Low-impact choice
 

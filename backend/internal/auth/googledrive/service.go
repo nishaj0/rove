@@ -118,12 +118,12 @@ func (s *Service) Connect(ctx context.Context) (models.GoogleDriveSettings, erro
 	server := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/callback" || r.URL.Query().Get("state") != state {
 			s.debugLog("callback_rejected", "callback path or state did not match")
-			http.Error(w, "Sign-in could not be verified. Return to Cloud Saver and try again.", http.StatusBadRequest)
+			http.Error(w, "Sign-in could not be verified. Return to Rove and try again.", http.StatusBadRequest)
 			return
 		}
 		if value := r.URL.Query().Get("error"); value != "" {
 			s.debugLog("callback_cancelled", "Google returned an OAuth error")
-			http.Error(w, "Google sign-in was cancelled. You can close this tab and return to Cloud Saver.", http.StatusBadRequest)
+			http.Error(w, "Google sign-in was cancelled. You can close this tab and return to Rove.", http.StatusBadRequest)
 			select {
 			case callback <- callbackResult{err: fmt.Errorf("Google sign-in cancelled: %s", value)}:
 			default:
@@ -151,14 +151,14 @@ func (s *Service) Connect(ctx context.Context) (models.GoogleDriveSettings, erro
 		select {
 		case finishErr := <-done:
 			if finishErr != nil {
-				http.Error(w, "Google authorization was received, but Cloud Saver could not finish the connection. Return to the app for details.", http.StatusInternalServerError)
+				http.Error(w, "Google authorization was received, but Rove could not finish the connection. Return to the app for details.", http.StatusInternalServerError)
 				return
 			}
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte("Google Drive is connected. You can close this tab and return to Cloud Saver."))
+			_, _ = w.Write([]byte("Google Drive is connected. You can close this tab and return to Rove."))
 		case <-r.Context().Done():
 		case <-time.After(90 * time.Second):
-			http.Error(w, "Cloud Saver timed out while finishing the connection. Return to the app and try again.", http.StatusGatewayTimeout)
+			http.Error(w, "Rove timed out while finishing the connection. Return to the app and try again.", http.StatusGatewayTimeout)
 		}
 	})}
 	go func() {

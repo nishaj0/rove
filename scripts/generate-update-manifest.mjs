@@ -28,7 +28,7 @@ const version = tagArg.slice(1);
 // Tauri's static updater protocol uses OS-architecture keys. NSIS describes
 // the bundled installer artifact, not the manifest platform.
 const tauriPlatform = "windows-x86_64";
-const releaseNotes = process.env.CLOUD_SAVER_RELEASE_NOTES?.trim() || `Cloud Saver ${version}. See the GitHub release for complete notes.`;
+const releaseNotes = process.env.CLOUD_SAVER_RELEASE_NOTES?.trim() || `Rove ${version}. See the GitHub release for complete notes.`;
 const assetUrl = `https://github.com/${repositoryArg}/releases/download/${tagArg}/${encodeURIComponent(archiveName)}`;
 const manifest = {
   version,

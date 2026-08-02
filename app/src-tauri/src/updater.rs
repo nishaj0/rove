@@ -315,7 +315,7 @@ pub async fn check_for_update(
             runtime.persisted.view.retryable = true;
             runtime.persisted.view.error_code = Some("update_check_failed".into());
             runtime.persisted.view.error = Some(format!(
-                "Cloud Saver could not check for updates. This never blocks game launch. ({err})"
+                "Rove could not check for updates. This never blocks game launch. ({err})"
             ));
         }
     }

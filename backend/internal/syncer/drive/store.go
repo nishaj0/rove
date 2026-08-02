@@ -1,5 +1,5 @@
 // Package drive implements syncer.RevisionStore on the Google Drive v3 API.
-// It owns only files created by Cloud Saver and requests drive.file exclusively.
+// It owns only files created by Rove and requests drive.file exclusively.
 package drive
 
 import (
@@ -38,7 +38,7 @@ var driveMediaOptions = []googleapi.MediaOption{
 	googleapi.ChunkRetryDeadline(driveChunkRetryDeadline),
 }
 
-// Store maps the immutable Cloud Saver revision layout to Drive folders/files.
+// Store maps the immutable Rove revision layout to Drive folders/files.
 type Store struct {
 	service *drive.Service
 	mu      sync.Mutex

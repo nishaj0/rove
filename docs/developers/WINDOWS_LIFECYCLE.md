@@ -2,7 +2,7 @@
 
 ## Startup
 
-Tauri initializes `tauri-plugin-autostart` and registers `Cloud Saver.exe --background`. On a background invocation, the bootstrap ensures the Go daemon is running, keeps the main window hidden, and exits. Settings queries native autostart state so a change made in Windows Startup Apps is reflected in the UI.
+Tauri initializes `tauri-plugin-autostart` and registers `Rove.exe --background`. On a background invocation, the bootstrap ensures the Go daemon is running, keeps the main window hidden, and exits. Settings queries native autostart state so a change made in Windows Startup Apps is reflected in the UI.
 
 The daemon acquires a per-user named mutex before service construction. A second daemon exits without creating another tray or worker set.
 

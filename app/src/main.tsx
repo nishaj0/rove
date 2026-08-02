@@ -26,10 +26,10 @@ class RootErrorBoundary extends React.Component<React.PropsWithChildren, RootErr
   render() {
     if (this.state.error) {
       return (
-        <div style={{ padding: "24px", color: "#fecaca", fontFamily: "Manrope, Segoe UI, sans-serif" }}>
+        <div style={{ padding: "24px", color: "#291c14", fontFamily: "Segoe UI, Tahoma, Arial, sans-serif", background: "#f8f3eb", minHeight: "100vh" }}>
           <h2 style={{ marginTop: 0 }}>{UI_ERROR_HEADING}</h2>
           <p style={{ marginBottom: "8px" }}>A runtime error occurred while rendering the app.</p>
-          <pre style={{ whiteSpace: "pre-wrap", background: "rgba(127, 29, 29, 0.35)", padding: "12px", borderRadius: "8px" }}>{this.state.error}</pre>
+          <pre style={{ whiteSpace: "pre-wrap", background: "#fed6ad", border: "1px solid #ab3e00", padding: "12px", borderRadius: "4px" }}>{this.state.error}</pre>
         </div>
       );
     }

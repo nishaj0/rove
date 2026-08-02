@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="850" height="205" viewBox="0 0 850 205">
+
+
+<g transform="translate(20 6) scale(0.96)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M64 170 C28 170 12 147 12 119 C12 88 34 66 65 65
+           C74 35 100 16 132 16 C170 16 197 40 203 74
+           C232 75 252 96 252 124 C252 151 232 170 205 170"
+        stroke="#DF6100" stroke-width="15"/>
+  <path d="M12 119 C12 150 30 170 64 170" stroke="#DF6100" stroke-width="15"/>
+  <rect x="50" y="108" width="42" height="10" rx="5" fill="#DF6100" stroke="none"/>
+  <rect x="66" y="92" width="10" height="42" rx="5" fill="#DF6100" stroke="none"/>
+  <circle cx="204" cy="102" r="7" fill="#DF6100" stroke="none"/>
+  <circle cx="220" cy="118" r="7" fill="#DF6100" stroke="none"/>
+  <circle cx="188" cy="118" r="7" fill="#DF6100" stroke="none"/>
+  <circle cx="204" cy="134" r="7" fill="#DF6100" stroke="none"/>
+  <path d="M122 173 V111 H101 L132 80 L163 111 H142 V173 Z" fill="#DF6100" stroke="none"/>
+</g><text x="325" y="150" font-family="Trebuchet MS, Arial Rounded MT Bold, Arial, sans-serif"
+font-size="118" font-weight="700" letter-spacing="-4" fill="#291C14">Rove</text>
+</svg>

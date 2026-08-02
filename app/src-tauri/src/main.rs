@@ -95,7 +95,7 @@ fn main() {
             if let Err(err) = ensure_backend_running(app.handle()) {
                 eprintln!("failed to ensure backend daemon is running: {err}");
                 *app.state::<DaemonBootstrapState>().0.lock().unwrap() = Some(format!(
-                    "Cloud Saver could not start a compatible background service: {err}. Your saves and settings were not changed."
+                    "Rove could not start a compatible background service: {err}. Your saves and settings were not changed."
                 ));
             }
             if std::env::args().any(|arg| arg == "--background") {
@@ -223,7 +223,7 @@ fn request_backend_restart() -> Result<(), String> {
     {
         Ok(())
     } else {
-        Err("the stale background service could not be restarted safely; close tracked games and restart Cloud Saver".into())
+        Err("the stale background service could not be restarted safely; close tracked games and restart Rove".into())
     }
 }
 

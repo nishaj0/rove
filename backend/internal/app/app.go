@@ -415,14 +415,19 @@ func openUI() error {
 func desktopAppExecutable() (string, bool) {
 	candidates := []string{
 		"cloud-saver-app.exe",
+		"Rove.exe",
 		"Cloud Saver.exe",
 		filepath.Join("..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+		filepath.Join("..", "app", "src-tauri", "target", "debug", "Rove.exe"),
 		filepath.Join("..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 		filepath.Join("..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+		filepath.Join("..", "app", "src-tauri", "target", "release", "Rove.exe"),
 		filepath.Join("..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
 		filepath.Join("app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+		filepath.Join("app", "src-tauri", "target", "debug", "Rove.exe"),
 		filepath.Join("app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 		filepath.Join("app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+		filepath.Join("app", "src-tauri", "target", "release", "Rove.exe"),
 		filepath.Join("app", "src-tauri", "target", "release", "Cloud Saver.exe"),
 	}
 
@@ -430,18 +435,25 @@ func desktopAppExecutable() (string, bool) {
 		exeDir := filepath.Dir(exePath)
 		candidates = append(candidates,
 			filepath.Join(exeDir, "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "Rove.exe"),
 			filepath.Join(exeDir, "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "Rove.exe"),
 			filepath.Join(exeDir, "..", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "..", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "Rove.exe"),
 			filepath.Join(exeDir, "..", "..", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "Rove.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "Rove.exe"),
 			filepath.Join(exeDir, "..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "debug", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "debug", "Rove.exe"),
 			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "debug", "Cloud Saver.exe"),
 			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "release", "cloud-saver-app.exe"),
+			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "release", "Rove.exe"),
 			filepath.Join(exeDir, "..", "..", "app", "src-tauri", "target", "release", "Cloud Saver.exe"),
 		)
 	}

@@ -644,7 +644,7 @@ func (e *Engine) PrepareLaunch(ctx context.Context, game models.Game) error {
 	if err := saveLocalManifestTo(e.logs, game.ID, remoteManifest); err != nil {
 		return err
 	}
-	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "recovery", Severity: "info", GameID: game.ID, Title: "Newer cloud save restored", Detail: "Cloud Saver applied the latest clean provider revision before launch."})
+	_ = e.logs.WriteActivity(models.ActivityEvent{Category: "recovery", Severity: "info", GameID: game.ID, Title: "Newer cloud save restored", Detail: "Rove applied the latest clean provider revision before launch."})
 	return nil
 }
 
@@ -1133,7 +1133,7 @@ func userProviderMessage(code string) string {
 	case "quota_full":
 		return "Provider storage is full. Local protection will continue until space is available."
 	case "rate_limited":
-		return "The provider asked Cloud Saver to slow down. Upload will retry automatically."
+		return "The provider asked Rove to slow down. Upload will retry automatically."
 	case "remote_data_problem":
 		return "Remote revision data is incomplete or invalid. Nothing was applied."
 	case "file_unstable":
@@ -1141,7 +1141,7 @@ func userProviderMessage(code string) string {
 	case "local_disk_full":
 		return "The local disk does not have enough free space for a safe revision."
 	case "permission_denied":
-		return "Cloud Saver cannot read or write one of the required save paths."
+		return "Rove cannot read or write one of the required save paths."
 	default:
 		return "Cloud upload is temporarily unavailable. The local revision is safe and retry is scheduled."
 	}

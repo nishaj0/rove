@@ -1,6 +1,6 @@
-# Cloud Saver testing
+# Rove testing
 
-Cloud Saver is tested in layers. Fast tests should run on every change; integration and release checks should run before merging or publishing an installer.
+Rove is tested in layers. Fast tests should run on every change; integration and release checks should run before merging or publishing an installer.
 
 ## Fast local paths
 

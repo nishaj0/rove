@@ -1,4 +1,4 @@
-# Cloud Saver documentation
+# Rove documentation
 
 ## For players
 
@@ -15,5 +15,6 @@
 - [Application updates and release pipeline](developers/RELEASES_AND_UPDATES.md)
 - [Windows startup, daemon, and tray](developers/WINDOWS_LIFECYCLE.md)
 - [Complete developer guide](DEVELOPER_GUIDE.md)
+- [Brand implementation guide](BRAND.md)
 
 The [project README](../README.md) contains the short overview and build commands.

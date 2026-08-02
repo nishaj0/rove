@@ -1,10 +1,10 @@
 # Google Drive development
 
-This guide is for contributors and release maintainers. Installed Cloud Saver users do not create projects, download OAuth JSON, or enter API credentials.
+This guide is for contributors and release maintainers. Installed Rove users do not create projects, download OAuth JSON, or enter API credentials.
 
 ## Architecture
 
-Cloud Saver uses a Google Desktop OAuth client, PKCE, a loopback callback, and the `drive.file` scope. The browser grants access, but the daemon completes the authorization-code exchange and persists the refresh token. A browser callback is successful only after the exchange and local persistence finish.
+Rove uses a Google Desktop OAuth client, PKCE, a loopback callback, and the `drive.file` scope. The browser grants access, but the daemon completes the authorization-code exchange and persists the refresh token. A browser callback is successful only after the exchange and local persistence finish.
 
 Google requires the matching Desktop client credential during token exchange even when PKCE is enabled. The credential cannot be treated as a server secret after it is distributed in a desktop executable. The project keeps it out of Git history and build logs, while user refresh tokens remain local and are protected with Windows DPAPI.
 
@@ -21,7 +21,7 @@ $env:GOCACHE="$PWD\.cache\go-build"
 go run ./cmd/daemon --no-tray --debug
 ```
 
-The JSON is parsed in memory. Cloud Saver does not copy it into settings, SQLite, or the application-data directory.
+The JSON is parsed in memory. Rove does not copy it into settings, SQLite, or the application-data directory.
 
 In a second terminal, install and run the desktop UI:
 
@@ -117,7 +117,7 @@ This was caused by an older UI payload mixing read-only OAuth diagnostics into p
 
 ### `redirect_uri_mismatch`
 
-Confirm that the downloaded JSON is a Desktop/installed application client rather than a Web application client. Cloud Saver uses a loopback callback selected by the daemon.
+Confirm that the downloaded JSON is a Desktop/installed application client rather than a Web application client. Rove uses a loopback callback selected by the daemon.
 
 ### Access blocked or the account is not allowed
 
@@ -125,13 +125,13 @@ Check the OAuth consent-screen publishing/testing state and its test-user list i
 
 ### Status still says `built_in` or `missing`
 
-The environment variable was not inherited by the running process, the JSON could not be read, or an older daemon is still bound to port `7331`. Stop existing Cloud Saver daemon processes, start one daemon from the configured terminal, and check status again.
+The environment variable was not inherited by the running process, the JSON could not be read, or an older daemon is still bound to port `7331`. Stop existing Rove daemon processes, start one daemon from the configured terminal, and check status again.
 
 ## Settings recovery during development
 
 Do not delete `%APPDATA%\CloudSaver\settings.json` to resolve an upgrade problem. The loader migrates missing fields, ignores unknown fields, repairs individually incompatible fields, and preserves unrelated games and encrypted credentials. Every replacement keeps the previous valid document as `settings.json.bak`.
 
-If JSON is malformed because of an interrupted or external write, Cloud Saver preserves the original as `settings.json.invalid-<timestamp>`, restores the backup when possible, and records **Settings repaired after update** in Activity. A schema produced by a newer unsupported application version is not overwritten by an older daemon.
+If JSON is malformed because of an interrupted or external write, Rove preserves the original as `settings.json.invalid-<timestamp>`, restores the backup when possible, and records **Settings repaired after update** in Activity. A schema produced by a newer unsupported application version is not overwritten by an older daemon.
 
 ## Security checklist
 

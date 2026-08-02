@@ -53,4 +53,4 @@ The current provider lists app-owned profile metadata. SQLite has cursor storage
 - Make every write idempotent.
 - Test interruption after object, manifest, device-head, and compatibility-head stages.
 - Test two devices, deletes/tombstones, same-path conflicts, missing objects, and corrupted downloads.
-- Never require a Cloud Saver VPS.
+- Never require a Rove VPS.
