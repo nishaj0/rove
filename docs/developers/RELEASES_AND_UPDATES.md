@@ -7,7 +7,7 @@ Rove updates directly from stable GitHub Releases. There is no VPS, custom updat
 The React client calls native Tauri commands in `app/src-tauri/src/updater.rs`:
 
 1. `update_status` restores the schema-versioned state from the application update cache.
-2. `check_for_update` uses the official Tauri updater parser against `https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json`.
+2. `check_for_update` uses the official Tauri updater parser against `https://github.com/nishaj0/rove/releases/latest/download/latest.json`.
 3. A successful check is cached for six hours. Startup and pre-launch calls reuse it; a check is bounded to three seconds.
 4. `download_update` streams the signed NSIS updater payload (`-setup.exe` in the current Tauri output, with archive compatibility) to a versioned `.part` file. A 45-second no-progress watchdog, ten-minute request limit, and three attempts bound failure.
 5. The completed archive is minisign-verified, SHA-256 recorded, synced, and atomically renamed. Only then does the state become `ready`.

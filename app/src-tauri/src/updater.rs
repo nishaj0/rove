@@ -23,7 +23,7 @@ use tauri_plugin_updater::{Update, UpdaterExt};
 use crate::{backend_running, ensure_backend_running, BACKEND_API_ADDR};
 
 const UPDATE_ENDPOINT: &str =
-    "https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json";
+    "https://github.com/nishaj0/rove/releases/latest/download/latest.json";
 // Tauri static updater manifests identify Windows by OS and architecture. The
 // installer format belongs to the release asset, not to this platform key.
 const UPDATE_TARGET: &str = "windows-x86_64";
