@@ -13,8 +13,8 @@ const game = (id: string, name: string): Game => ({
 
 function renderView(overrides: Partial<React.ComponentProps<typeof GamesView>> = {}) {
   const props: React.ComponentProps<typeof GamesView> = {
-    games: [game("one", "One Game"), game("two", "Two Game")], newName: "", newPath: "", newExecutablePath: "", newCoverImageData: "",
-    onNewNameChange: vi.fn(), onBrowseSaveFolder: vi.fn(), onBrowseExecutable: vi.fn(), onNewCoverImageChange: vi.fn(), onAddGame: vi.fn().mockResolvedValue(true), onOpenGame: vi.fn(), initials: (name) => name.slice(0, 2).toUpperCase(), ...overrides,
+    games: [game("one", "One Game"), game("two", "Two Game")], newName: "", newPath: "", newExecutablePath: "", newCoverImageData: "", newVersion: "",
+    onNewNameChange: vi.fn(), onBrowseSaveFolder: vi.fn(), onBrowseExecutable: vi.fn(), onNewCoverImageChange: vi.fn(), onNewVersionChange: vi.fn(), onAddGame: vi.fn().mockResolvedValue(true), onOpenGame: vi.fn(), initials: (name) => name.slice(0, 2).toUpperCase(), ...overrides,
   };
   return { ...render(<GamesView {...props} />), props };
 }
