@@ -70,7 +70,7 @@ The dialog must remain plain-text only: release notes are rendered as text, neve
 
 `.github/workflows/release-windows.yml` runs for version tags and rejects anything except stable `vX.Y.Z` for the updater channel. It then:
 
-1. synchronizes the package JSON, package lock, Tauri config, Cargo package, frontend fallback, and linked daemon version;
+1. synchronizes the package JSON, package lock, Tauri config, Cargo package, and linked daemon version;
 2. runs TypeScript and backend build checks;
 3. validates OAuth and updater signing configuration;
 4. builds the NSIS bundle with `createUpdaterArtifacts` and Tauri signing variables;
@@ -81,6 +81,28 @@ The dialog must remain plain-text only: release notes are rendered as text, neve
 9. confirms every required draft asset exists, then publishes the release last.
 
 Publishing last prevents clients from observing a manifest whose archive or signature is missing. Do not manually replace `latest.json` without regenerating it from the exact signed archive.
+
+## Local release preflight
+
+Run the non-publishing release preflight before pushing a production tag. It requires Node.js 24, validates every version-sync target without changing files, type-checks and builds the frontend, builds the backend, and compiles the native shell:
+
+```powershell
+.\scripts\release-preflight.ps1 -Version v0.1.0
+```
+
+Use the exact stable tag you intend to publish. This default check confirms that each version target can be synchronized without mutating your worktree, matching CI's version-sync step.
+
+To also build the signed installer and validate its updater manifest/signature, supply non-production local release credentials in the current PowerShell session and opt in explicitly:
+
+```powershell
+$env:CLOUD_SAVER_GOOGLE_CLIENT_ID = "..."
+$env:CLOUD_SAVER_GOOGLE_CLIENT_SECRET = "..."
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content -Raw "C:\secure\cloud-saver-updater.key"
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = Get-Content -Raw "C:\secure\cloud-saver-updater-password.txt"
+.\scripts\release-preflight.ps1 -Version v0.1.0 -Bundle
+```
+
+The bundled check additionally requires all committed version metadata to already match the requested tag, so it cannot generate an installer whose embedded version differs from its updater manifest. It writes ignored local artifacts, `latest.json`, and `release-checksums.txt`; it never creates, uploads, edits, or publishes a GitHub Release. The complete workflow cannot run locally because it depends on GitHub's protected `PROD` environment, generated release notes, and draft/publish API steps. `act` is not a suitable substitute: this workflow requires the `windows-2025` runner.
 
 ### Maintainer checklist
 

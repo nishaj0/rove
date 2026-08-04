@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const argv = process.argv.slice(2);
 const checkOnly = argv.includes("--check");
+const dryRun = argv.includes("--dry-run");
 const explicitVersionArg = argv.find((arg) => !arg.startsWith("--"));
 const sourceVersion =
   explicitVersionArg ?? process.env.CLOUD_SAVER_VERSION ?? process.env.GITHUB_REF_NAME ?? "";
@@ -25,7 +26,14 @@ function normalizeVersion(input) {
 }
 
 function readText(filePath) {
-  return fs.readFileSync(filePath, "utf8");
+  try {
+    return fs.readFileSync(filePath, "utf8");
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      exitWithError(`required version target is missing: ${path.relative(rootDir, filePath)}`);
+    }
+    throw error;
+  }
 }
 
 function writeText(filePath, content) {
@@ -51,6 +59,8 @@ function updateJsonVersion(filePath, version) {
     return;
   }
 
+  if (dryRun) return;
+
   payload.version = version;
   writeJson(filePath, payload);
 }
@@ -72,28 +82,9 @@ function updateCargoVersion(filePath, version) {
     return;
   }
 
+  if (dryRun) return;
+
   const updated = content.replace(versionPattern, `version = "${version}"`);
-  writeText(filePath, updated);
-}
-
-function updateFallbackVersionConstant(filePath, version) {
-  const content = readText(filePath);
-  const pattern = /^export const FALLBACK_APP_VERSION = "([^"]+)";$/m;
-  const match = content.match(pattern);
-
-  if (!match) {
-    exitWithError(`could not find FALLBACK_APP_VERSION in ${path.relative(rootDir, filePath)}`);
-  }
-
-  const current = match[1];
-  if (checkOnly) {
-    if (current !== version) {
-      exitWithError(`${path.relative(rootDir, filePath)} has fallback '${current}', expected '${version}'`);
-    }
-    return;
-  }
-
-  const updated = content.replace(pattern, `export const FALLBACK_APP_VERSION = "${version}";`);
   writeText(filePath, updated);
 }
 
@@ -107,17 +98,18 @@ if (packageLock.packages?.[""]) {
   if (checkOnly && packageLock.packages[""].version !== normalizedVersion) {
     exitWithError(`app/package-lock.json root package has version '${packageLock.packages[""].version}', expected '${normalizedVersion}'`);
   }
-  if (!checkOnly) {
+  if (!checkOnly && !dryRun) {
     packageLock.packages[""].version = normalizedVersion;
     writeJson(path.join(rootDir, "app", "package-lock.json"), packageLock);
   }
 }
 updateJsonVersion(path.join(rootDir, "app", "src-tauri", "tauri.conf.json"), normalizedVersion);
 updateCargoVersion(path.join(rootDir, "app", "src-tauri", "Cargo.toml"), normalizedVersion);
-updateFallbackVersionConstant(path.join(rootDir, "app", "src", "constants", "updates.ts"), normalizedVersion);
 
 if (checkOnly) {
   console.log(`[sync-version] all version targets already match ${normalizedVersion}`);
+} else if (dryRun) {
+  console.log(`[sync-version] validated version targets for ${normalizedVersion} without writing files`);
 } else {
   console.log(`[sync-version] synchronized version targets to ${normalizedVersion}`);
 }

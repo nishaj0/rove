@@ -430,9 +430,9 @@
     "semantic_hash": "a30cb05cac58ecaa95a250cd4e6492fc"
   },
   "scripts/sync-version.mjs": {
-    "mtime": 1785495475.6465948,
-    "ast_hash": "cbfc65a4fb1a6d51fa7c35d76083f98b",
-    "semantic_hash": "cbfc65a4fb1a6d51fa7c35d76083f98b"
+    "mtime": 1785873010.0276701,
+    "ast_hash": "e0da424e1a817e7e28cf4912b6c9fb8e",
+    "semantic_hash": ""
   },
   ".agents/skills/nostalgia-design/DESIGN.md": {
     "mtime": 1784322559.7416742,
@@ -520,8 +520,8 @@
     "semantic_hash": ""
   },
   "docs/developers/RELEASES_AND_UPDATES.md": {
-    "mtime": 1785672094.4935873,
-    "ast_hash": "7269a7f628bf8c842e2df3538966af97",
+    "mtime": 1785872931.4397569,
+    "ast_hash": "72dafbc909262bfebe5e6851e697894b",
     "semantic_hash": ""
   },
   "docs/developers/WINDOWS_LIFECYCLE.md": {
@@ -580,8 +580,8 @@
     "semantic_hash": "bfdfa70ec14b9b77e4619c449f6cf1a0"
   },
   "app/src/views/GamesView.test.tsx": {
-    "mtime": 1785665515.5816374,
-    "ast_hash": "ba0e0e95e0bfbe9e5127992b93617e76",
+    "mtime": 1785674830.3016136,
+    "ast_hash": "06902bdb313e8106780d6fba215bbd7c",
     "semantic_hash": ""
   },
   "app/src/views/HomeView.test.tsx": {
@@ -687,6 +687,11 @@
   "app/src/assets/rove-reversed-horizontal.svg": {
     "mtime": 1785654886.0019262,
     "ast_hash": "c94d82644b92122bdab5a6c7b562ca1d",
+    "semantic_hash": ""
+  },
+  "scripts/release-preflight.ps1": {
+    "mtime": 1785872907.967289,
+    "ast_hash": "cad53cb9197cce49f741af9d9cece938",
     "semantic_hash": ""
   }
 }

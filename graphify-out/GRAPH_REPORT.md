@@ -1,16 +1,16 @@
-# Graph Report - cloud-saver  (2026-08-02)
+# Graph Report - rove  (2026-08-05)
 
 ## Corpus Check
-- 127 files · ~78,500 words
+- 128 files · ~79,157 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2072 nodes · 4567 edges · 174 communities (145 shown, 29 thin omitted)
-- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 434 edges (avg confidence: 0.8)
+- 2187 nodes · 4978 edges · 187 communities (151 shown, 36 thin omitted)
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 434 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `37f4ddcf`
+- Built from commit: `27c55be8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -124,6 +124,12 @@
 - [[_COMMUNITY_Community 123|Community 123]]
 - [[_COMMUNITY_Community 124|Community 124]]
 - [[_COMMUNITY_Community 125|Community 125]]
+- [[_COMMUNITY_Community 126|Community 126]]
+- [[_COMMUNITY_Community 127|Community 127]]
+- [[_COMMUNITY_Community 128|Community 128]]
+- [[_COMMUNITY_Community 129|Community 129]]
+- [[_COMMUNITY_Community 130|Community 130]]
+- [[_COMMUNITY_Community 131|Community 131]]
 - [[_COMMUNITY_Community 139|Community 139]]
 - [[_COMMUNITY_Community 140|Community 140]]
 - [[_COMMUNITY_Community 141|Community 141]]
@@ -154,28 +160,29 @@
 - [[_COMMUNITY_Community 171|Community 171]]
 - [[_COMMUNITY_Community 172|Community 172]]
 - [[_COMMUNITY_Community 173|Community 173]]
+- [[_COMMUNITY_Community 174|Community 174]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Engine` - 92 edges
+1. `Engine` - 93 edges
 2. `String` - 40 edges
-3. `Protection Engine New` - 40 edges
-4. `Store` - 39 edges
+3. `Store` - 40 edges
+4. `Protection Engine New` - 40 edges
 5. `writeJSON()` - 39 edges
-6. `writeErr()` - 33 edges
-7. `Service` - 32 edges
-8. `manifest` - 32 edges
-9. `New()` - 30 edges
-10. `writeErr()` - 30 edges
+6. `writeErr()` - 34 edges
+7. `Service` - 33 edges
+8. `manifest` - 33 edges
+9. `Manager` - 30 edges
+10. `Monitor` - 30 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Windows release workflow` --calls--> `Signed update manifest generator`  [EXTRACTED]
   .github/workflows/release-windows.yml → scripts/generate-update-manifest.mjs
 - `Windows release workflow` --calls--> `Version synchronization script`  [EXTRACTED]
   .github/workflows/release-windows.yml → scripts/sync-version.mjs
+- `Immutable revision manifest` --semantically_similar_to--> `Revision`  [INFERRED] [semantically similar]
+  backend/internal/syncer/folder.go → backend/internal/models/models.go
 - `Synced folder provider` --implements--> `Provider replication`  [EXTRACTED]
   README.md → docs/developers/ARCHITECTURE.md
-- `Daemon Shutdown Request` --calls--> `Update Lifecycle Safety Gate`  [EXTRACTED]
-  app/src-tauri/src/updater.rs → backend/internal/api/handlers_lifecycle.go
 - `Backend API Client` --calls--> `Local HTTP API Server`  [EXTRACTED]
   app/src/api.ts → backend/internal/api/server.go
 
@@ -187,42 +194,42 @@
 - **Google Drive protection integration** — googledrive_service, googledrive_httpclient, drive_store, backend_internal_syncer_store_revisionstore [EXTRACTED 1.00]
 - **Signed Windows release pipeline** — github_workflows_release_windows_workflow, scripts_sync_version_script, scripts_generate_update_manifest_script, scripts_setup_updater_signing_script [INFERRED 0.85]
 
-## Communities (174 total, 29 thin omitted)
+## Communities (187 total, 36 thin omitted)
 
 ### Community 0 - "Core Backend Application"
-Cohesion: 0.12
-Nodes (29): writeJSONAtomic(), syncer/store.go, Context, Duration, GameProfile, Manifest, PlaytimeLedger, ReadCloser (+21 more)
+Cohesion: 0.05
+Nodes (128): Application New, Open SQLite Log Store, Protection Engine New, TestConcurrentProviderHeadIsPreservedForReview(), TestConfigurationChangedRefreshesProtectionTargetAndProviderState(), applyManifest(), changedPaths(), cloneManifest() (+120 more)
 
 ### Community 1 - "Sync Engine Operations"
-Cohesion: 0.18
-Nodes (7): AddMenuItem(), AddMenuItemCheckbox(), MenuItem, newMenuItem(), AddMenuItem(), AddMenuItemCheckbox(), newMenuItem()
+Cohesion: 0.15
+Nodes (14): AddMenuItem(), AddMenuItemCheckbox(), MenuItem, newMenuItem(), AddMenuItem(), AddMenuItemCheckbox(), AddSeparator(), init() (+6 more)
 
 ### Community 3 - "Google Drive Integration"
-Cohesion: 0.06
-Nodes (43): desktopAppExecutable(), New(), openUI(), resolveExecutableCandidate(), Application, Options, desktopAppExecutable(), CancelFunc (+35 more)
+Cohesion: 0.10
+Nodes (25): desktopAppExecutable(), New(), openUI(), resolveExecutableCandidate(), Application, Options, desktopAppExecutable(), CancelFunc (+17 more)
 
 ### Community 4 - "Desktop Updater"
-Cohesion: 0.07
+Cohesion: 0.08
 Nodes (42): drive/store.go, Client, Context, Duration, File, GameProfile, Manifest, Mutex (+34 more)
 
 ### Community 5 - "Frontend Dependencies"
-Cohesion: 0.08
-Nodes (74): candidate_is_not_newer(), check_for_update(), clear_candidate(), complete_staged_download(), decode_base64_string(), discard_candidate_files(), discard_downloaded_update(), download_to_staging_file() (+66 more)
+Cohesion: 0.09
+Nodes (77): candidate_is_not_newer(), check_for_update(), clear_candidate(), complete_staged_download(), decode_base64_string(), discard_candidate_files(), discard_downloaded_update(), download_to_staging_file() (+69 more)
 
 ### Community 6 - "Google Drive Auth"
 Cohesion: 0.08
 Nodes (45): BackupPolicy, Manager, Game, SyncPolicy, Settings Manager, decodeSettingsFields(), defaultBackupPolicy(), defaultPath() (+37 more)
 
 ### Community 7 - "Frontend App State"
-Cohesion: 0.08
-Nodes (37): protect(), unprotect(), googledrive/service.go, accountEmail(), Client, Context, Manager, Mutex (+29 more)
+Cohesion: 0.07
+Nodes (40): protect(), unprotect(), googledrive/service.go, accountEmail(), Client, Context, Manager, Mutex (+32 more)
 
 ### Community 8 - "Logging & Protection"
 Cohesion: 0.11
 Nodes (17): ActivityEvent, boolInt(), createdTime(), formatTime(), Store, ProviderHealth, RecoveryPoint, Revision (+9 more)
 
 ### Community 9 - "Frontend API Client"
-Cohesion: 0.11
+Cohesion: 0.14
 Nodes (43): Add game with policy, Save Revision, Time, Capture local revision, Create recovery point job, Run protection job, Immutable revision manifest, Unprotect refresh token with DPAPI (+35 more)
 
 ### Community 10 - "Configuration & Models"
@@ -254,19 +261,19 @@ Cohesion: 0.15
 Nodes (17): Service, computeSaveSignature(), New(), shouldIgnore(), autobackup/service.go, computeSaveSignature(), Bool, Context (+9 more)
 
 ### Community 17 - "Auto Backup Service"
-Cohesion: 0.21
+Cohesion: 0.20
 Nodes (14): gameResponse, normalizeCoverImageData(), decodeJSON(), Server, BackupPolicy, Game, GameProtectionStatus, Request (+6 more)
 
 ### Community 18 - "Game Monitor"
 Cohesion: 0.11
-Nodes (10): Bool, Manager, ProviderHealth, RWMutex, Status, SyncJob, FolderStore, Engine (+2 more)
+Nodes (10): Bool, ProviderHealth, RWMutex, Status, SyncJob, Time, FolderStore, dirtyGame (+2 more)
 
 ### Community 19 - "Design System"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (32): apply_platform_process_flags(), backend_http_request(), backend_running(), backend_version(), daemon_bootstrap_error(), DaemonBootstrapState, ensure_backend_running(), is_autostart_enabled() (+24 more)
 
 ### Community 20 - "Game API Handlers"
-Cohesion: 0.19
+Cohesion: 0.17
 Nodes (8): Time, Actions, Status, Manager, New(), Actions, Status, New()
 
 ### Community 21 - "Tauri Entry Point"
@@ -274,15 +281,15 @@ Cohesion: 0.11
 Nodes (18): compilerOptions, allowImportingTsExtensions, jsx, lib, module, moduleResolution, noEmit, resolveJsonModule (+10 more)
 
 ### Community 22 - "User FAQ"
-Cohesion: 0.28
-Nodes (13): New(), writeJSON(), statusWriter, Server, Engine, Game, Manager, Monitor (+5 more)
+Cohesion: 0.15
+Nodes (19): TestSettingsSaveAcceptsPartialUpdate(), TestSettingsSaveIgnoresLegacyGoogleDriveStatusFields(), New(), writeJSON(), statusWriter, T, TestSettingsSaveAcceptsPartialUpdate(), TestSettingsSaveIgnoresLegacyGoogleDriveStatusFields() (+11 more)
 
 ### Community 23 - "React Dependencies"
 Cohesion: 0.17
-Nodes (19): Single-Instance Daemon Bootstrap, Backup Import Export Handler, Game Management Handler, Google Drive OAuth Handler, Legacy Snapshot Handler, Local HTTP API Server, Loopback API Access Control, Protection and Recovery Handler (+11 more)
+Nodes (19): Daemon Shutdown Request, Single-Instance Daemon Bootstrap, Backup Import Export Handler, Game Management Handler, Google Drive OAuth Handler, Legacy Snapshot Handler, Local HTTP API Server, Loopback API Access Control (+11 more)
 
 ### Community 24 - "TypeScript Config"
-Cohesion: 0.10
+Cohesion: 0.09
 Nodes (25): Adaptive game monitor, Explicit conflict review, Local content-addressed vault, Architecture and Cloud Sync workflow, Architecture and protection workflow, Capture, Legacy boundary, Offline queue (+17 more)
 
 ### Community 25 - "System Tray"
@@ -290,8 +297,8 @@ Cohesion: 0.39
 Nodes (5): writeErr(), Server, Request, ResponseWriter, writeJSON()
 
 ### Community 26 - "API Status Handlers"
-Cohesion: 0.23
-Nodes (15): argv, checkOnly, exitWithError(), explicitVersionArg, normalizedVersion, normalizeVersion(), packageLock, readJson() (+7 more)
+Cohesion: 0.21
+Nodes (16): argv, checkOnly, dryRun, exitWithError(), explicitVersionArg, normalizedVersion, normalizeVersion(), packageLock (+8 more)
 
 ### Community 27 - "Daemon Handlers"
 Cohesion: 0.17
@@ -302,8 +309,8 @@ Cohesion: 0.16
 Nodes (23): autoBackupFolderName(), extractArchive(), generatedAutoBackupFilename(), generatedExportFilename(), File, Game, New(), resolveExportDestinationPath() (+15 more)
 
 ### Community 29 - "API Diagnostics"
-Cohesion: 0.16
-Nodes (33): Context, Time, WithCaptureLimit(), captureLimitKey, applyManifest(), changedPaths(), cloneManifest(), copyFile() (+25 more)
+Cohesion: 0.13
+Nodes (17): Bool, Context, Duration, Manager, RWMutex, Store, Time, New() (+9 more)
 
 ### Community 30 - "Windows Credential Protection"
 Cohesion: 0.34
@@ -314,7 +321,7 @@ Cohesion: 0.14
 Nodes (13): args, cliPath, force, password, passwordPath, privateKeyPath, publicKey, publicKeyPath (+5 more)
 
 ### Community 32 - "System Tray Windows"
-Cohesion: 0.14
+Cohesion: 0.15
 Nodes (17): description, identifier, permissions, $schema, windows, description, identifier, permissions (+9 more)
 
 ### Community 33 - "Version Sync Scripts"
@@ -326,35 +333,35 @@ Cohesion: 0.17
 Nodes (11): appPackage, args, backendDir, linkerValues, oauthJSONPath, outputBinary, resourcesDir, result (+3 more)
 
 ### Community 35 - "Agent Configuration"
-Cohesion: 0.17
-Nodes (12): Backend API Client, Backend Response Normalizers, Application Controller, DEFAULT_SETTINGS, Native File Picker, Daemon Shutdown Request, Signed Update Verification, Native Update Manager (+4 more)
+Cohesion: 0.18
+Nodes (11): Backend API Client, Backend Response Normalizers, Application Controller, DEFAULT_SETTINGS, Native File Picker, Signed Update Verification, Native Update Manager, Tauri Update Bridge (+3 more)
 
 ### Community 36 - "Nostalgia Design Docs"
-Cohesion: 0.15
-Nodes (15): classifyProviderError(), Duration, Time, providerRetryAfter(), retryDelay(), TestStructuredProviderRateLimitClassification(), userProviderMessage(), ProviderState (+7 more)
+Cohesion: 0.18
+Nodes (15): classifyProviderError(), Duration, providerRetryAfter(), retryDelay(), TestStructuredProviderRateLimitClassification(), userProviderMessage(), ProviderState, classifyLocalError() (+7 more)
 
 ### Community 37 - "Updater Signing Scripts"
 Cohesion: 0.18
 Nodes (10): archive, archivePath, [bundleArg, tagArg, repositoryArg], bundleDir, checkOnly, files, manifest, outputPath (+2 more)
 
 ### Community 38 - "Frontend Controllers"
-Cohesion: 0.21
-Nodes (12): isLoopbackOrigin(), localhostOnly(), TestIsLoopbackOrigin(), TestLocalhostOnlyRejectsNonLoopbackClients(), TestLoopbackCORSSetsHeadersAndRejectsForeignOrigins(), withLoopbackCORS(), Handler, isLoopbackOrigin() (+4 more)
+Cohesion: 0.23
+Nodes (11): isLoopbackOrigin(), localhostOnly(), TestIsLoopbackOrigin(), TestLocalhostOnlyRejectsNonLoopbackClients(), TestLoopbackCORSSetsHeadersAndRejectsForeignOrigins(), withLoopbackCORS(), Handler, isLoopbackOrigin() (+3 more)
 
 ### Community 39 - "Tauri Capabilities"
 Cohesion: 0.17
 Nodes (7): GameProtectionStatus, RecoveryPoint, T, lenMust(), StorageSummary, StorageUsage, lenMust()
 
 ### Community 40 - "User Guide"
-Cohesion: 0.09
-Nodes (24): App(), BackupOperationState, navItems, NavSnapshot, View, viewTitle, DialogFilter, OpenDialogOptions (+16 more)
+Cohesion: 0.10
+Nodes (20): App(), BackupOperationState, navItems, NavSnapshot, View, viewTitle, ActivityEvent, AppUpdateState (+12 more)
 
 ### Community 41 - "Backend Staging Scripts"
 Cohesion: 0.22
 Nodes (8): compilerOptions, allowSyntheticDefaultImports, composite, module, moduleResolution, skipLibCheck, include, vite.config.ts
 
 ### Community 42 - "Tray Status"
-Cohesion: 0.33
+Cohesion: 0.29
 Nodes (5): nullableEmail(), Server, Request, ResponseWriter, nullableEmail()
 
 ### Community 43 - "System Tray API"
@@ -370,12 +377,12 @@ Cohesion: 0.29
 Nodes (3): Game, BackupViewProps, GamesViewProps
 
 ### Community 46 - "Tray Windows Implementation"
-Cohesion: 0.22
+Cohesion: 0.24
 Nodes (7): baseName(), tokenizePathHint(), recoveryLibraryEntry, baseName(), RecoveryPoint, Time, tokenizePathHint()
 
 ### Community 47 - "System Tray Docs"
-Cohesion: 0.21
-Nodes (10): Server, Request, ResponseWriter, Server, Request, ResponseWriter, Server, Request (+2 more)
+Cohesion: 0.31
+Nodes (7): Server, Request, ResponseWriter, Server, Request, ResponseWriter, writeErr()
 
 ### Community 48 - "System Tray Menu Items"
 Cohesion: 0.33
@@ -390,20 +397,20 @@ Cohesion: 0.33
 Nodes (7): TestPrepareUpdateRejectsUnavailableShutdown(), TestPrepareUpdateRequiresPOST(), TestPrepareUpdateRespondsBeforeShutdownCallback(), T, TestPrepareUpdateRejectsUnavailableShutdown(), TestPrepareUpdateRequiresPOST(), TestPrepareUpdateRespondsBeforeShutdownCallback()
 
 ### Community 51 - "Releases & Updates Docs"
-Cohesion: 0.50
-Nodes (3): Server, Request, ResponseWriter
+Cohesion: 0.25
+Nodes (7): Current Cloud Sync model, Development, Documentation, Repository, Rove, Security, Sync destinations
 
 ### Community 52 - "Project README"
-Cohesion: 0.19
-Nodes (32): Open SQLite Log Store, Protection Engine New, TestConfigurationChangedRefreshesProtectionTargetAndProviderState(), applyManifest(), cloneManifest(), copyFile(), copyFileAtomic(), deletedPaths() (+24 more)
+Cohesion: 0.36
+Nodes (7): DialogFilter, OpenDialogOptions, OpenDialogResult, openSinglePath(), pickExecutable(), pickFolder(), pickZipFile()
 
 ### Community 53 - "Data Normalizers"
-Cohesion: 0.50
-Nodes (3): Server, Request, ResponseWriter
+Cohesion: 0.29
+Nodes (6): Always-On Guidance, Codex Note, graphify, Graphify for Codex, Keeping the Graph Fresh, Precise Graph Queries
 
 ### Community 54 - "Google Drive API Handlers"
-Cohesion: 0.21
-Nodes (10): DEFAULT_BACKUP_POLICY, DEFAULT_SETTINGS, DEFAULT_SYNC_POLICY, newDefaultSyncPolicy(), Settings, SyncConflict, SyncJob, SyncPolicy (+2 more)
+Cohesion: 0.27
+Nodes (8): RecoveryLibraryEntry, Status, StorageSummary, GameDetailView(), formatBytes(), HomeView(), HomeViewProps, status
 
 ### Community 55 - "Frontend Types"
 Cohesion: 0.50
@@ -426,8 +433,8 @@ Cohesion: 0.50
 Nodes (4): Nostalgia dark mode, Nostalgia design system, Nostalgia light mode, Every panel is a window
 
 ### Community 60 - "Getting Started Docs"
-Cohesion: 0.21
-Nodes (23): applyFromStore(), copyReaderAtomic(), copyReaderAtomicVerified(), Context, Manifest, Reader, Result, RevisionStore (+15 more)
+Cohesion: 0.50
+Nodes (3): Server, Request, ResponseWriter
 
 ### Community 61 - "Copilot Instructions"
 Cohesion: 0.67
@@ -438,11 +445,11 @@ Cohesion: 0.67
 Nodes (3): Application Run, Network change watcher, Run Windows tray
 
 ### Community 63 - "Backup Export/Import API"
-Cohesion: 0.40
+Cohesion: 0.33
 Nodes (3): Context, Watch(), Watch()
 
 ### Community 64 - "Snapshot API"
-Cohesion: 0.40
+Cohesion: 0.33
 Nodes (3): Context, Watch(), Watch()
 
 ### Community 65 - "Network Constants"
@@ -454,23 +461,23 @@ Cohesion: 0.23
 Nodes (11): Local-first protection, Cloud Saver, Current Cloud Sync model, Current protection model, Development, Documentation, Protection targets, Repository (+3 more)
 
 ### Community 76 - "Release Pipeline"
-Cohesion: 0.11
-Nodes (28): ErrorPayload, ActivityEvent, BackupExportRequest, BackupExportResponse, BackupHistoryEntry, BackupImportRequest, BackupPolicy, DebugInfo (+20 more)
+Cohesion: 0.10
+Nodes (30): DEFAULT_BACKUP_POLICY, DEFAULT_SETTINGS, DEFAULT_SYNC_POLICY, ErrorPayload, BackupExportRequest, BackupExportResponse, BackupHistoryEntry, BackupImportRequest (+22 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.22
-Nodes (5): point, iconBytesToFilePath(), SetIcon(), SetTemplateIcon(), wndClassEx
+Cohesion: 0.27
+Nodes (12): menuItemInfo, point, addSeparator(), iconBytesToFilePath(), nativeLoop(), quit(), registerSystray(), SetIcon() (+4 more)
 
 ### Community 92 - "Community 92"
-Cohesion: 0.24
-Nodes (10): addOrUpdateMenuItem(), MenuItem, hideMenuItem(), iconBytesToFilePath(), SetIcon(), SetTemplateIcon(), showMenuItem(), addOrUpdateMenuItem() (+2 more)
+Cohesion: 0.22
+Nodes (11): addOrUpdateMenuItem(), MenuItem, hideMenuItem(), iconBytesToFilePath(), SetIcon(), SetTemplateIcon(), SetTooltip(), showMenuItem() (+3 more)
 
 ### Community 93 - "Community 93"
-Cohesion: 0.16
-Nodes (31): asBoolean(), asCloudProvider(), asConflictPolicy(), asNumber(), asProtectionTarget(), asString(), asThemeMode(), isRecord() (+23 more)
+Cohesion: 0.21
+Nodes (26): asBoolean(), asCloudProvider(), asConflictPolicy(), asNumber(), asProtectionTarget(), asString(), asThemeMode(), isRecord() (+18 more)
 
 ### Community 94 - "Community 94"
-Cohesion: 0.09
+Cohesion: 0.08
 Nodes (22): Accessibility, Brand, Buttons, Charts, Colors, Component-Level Rules, Dark mode (opt-in), Expected Behavior (+14 more)
 
 ### Community 95 - "Community 95"
@@ -478,23 +485,23 @@ Cohesion: 0.11
 Nodes (13): fallbackStyle(), GameCover(), GameCoverProps, seed(), react, RootErrorBoundary, RootErrorBoundaryState, Game (+5 more)
 
 ### Community 96 - "Community 96"
-Cohesion: 0.08
+Cohesion: 0.07
 Nodes (25): Authentication required, Conflict shown, Do I need a Google API key?, Do I uninstall Cloud Saver before updating?, Do I uninstall Rove before updating?, Does Cloud Saver require a server or VPS?, Does Rove require a server or VPS?, Expected resource use (+17 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.11
-Nodes (12): Register(), Run(), systrayMenuItemSelected(), systrayTrayDoubleClicked(), nativeLoop(), registerSystray(), Register(), Run() (+4 more)
+Cohesion: 0.16
+Nodes (6): Register(), Run(), systrayMenuItemSelected(), systrayTrayDoubleClicked(), nativeLoop(), registerSystray()
 
 ### Community 98 - "Community 98"
 Cohesion: 0.11
 Nodes (17): Access blocked or the account is not allowed, Architecture, Browser succeeds but the app reports failure, `client_secret is missing`, Configuration precedence, Confirm the active configuration, GitHub release configuration, Google Drive development (+9 more)
 
 ### Community 99 - "Community 99"
-Cohesion: 0.14
-Nodes (11): RWMutex, SetTooltip(), protect(), unprotect(), GUID, Handle, menuItemInfo, notifyIconData (+3 more)
+Cohesion: 0.21
+Nodes (5): RWMutex, GUID, Handle, notifyIconData, winTray
 
 ### Community 100 - "Community 100"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (13): Buttons, Chart window, Color Tokens, Component Specs, Do/Don't Quick Reference, Nostalgia Design Tokens (Reference), Opacity variants (Body, per mode), Shape / Border / Shadow Tokens (+5 more)
 
 ### Community 101 - "Community 101"
@@ -502,32 +509,32 @@ Cohesion: 0.18
 Nodes (10): Actions, Bool, Status, Manager, loadTrayIcon(), New(), AddSeparator(), addSeparator() (+2 more)
 
 ### Community 102 - "Community 102"
-Cohesion: 0.26
+Cohesion: 0.24
 Nodes (13): Activity and diagnostics, Application updates, Cloud Saver user guide, Conflicts, First setup, Launching, Offline behavior, Pause controls (+5 more)
 
 ### Community 103 - "Community 103"
-Cohesion: 0.20
-Nodes (12): gameProfile(), Context, Game, GameProfile, PlaytimeLedger, Result, Revision, RevisionStore (+4 more)
+Cohesion: 0.17
+Nodes (13): gameProfile(), Context, Game, GameProfile, Manager, PlaytimeLedger, Result, Revision (+5 more)
 
 ### Community 104 - "Community 104"
-Cohesion: 0.30
+Cohesion: 0.27
 Nodes (11): APIs, Cloud Saver developer guide, Current implementation boundaries, Google Drive OAuth diagnostics, Invariants, Job stages, Performance, Persistence (+3 more)
 
 ### Community 105 - "Community 105"
-Cohesion: 0.20
+Cohesion: 0.27
 Nodes (9): API, Credits, Features, Linux, macOS, Platform notes, The Webview example, Try the example app! (+1 more)
 
 ### Community 106 - "Community 106"
 Cohesion: 0.22
-Nodes (9): bundle, active, createUpdaterArtifacts, resources, windows, installMode, nsis, resources/backend (+1 more)
+Nodes (9): bundle, active, createUpdaterArtifacts, targets, windows, installMode, nsis, nsis (+1 more)
 
 ### Community 107 - "Community 107"
 Cohesion: 0.20
-Nodes (10): targets, nsis, bundle, active, createUpdaterArtifacts, icon, targets, windows (+2 more)
+Nodes (10): resources, resources/backend, bundle, active, createUpdaterArtifacts, icon, resources, windows (+2 more)
 
 ### Community 108 - "Community 108"
-Cohesion: 0.38
-Nodes (5): TestSettingsSaveAcceptsPartialUpdate(), TestSettingsSaveIgnoresLegacyGoogleDriveStatusFields(), T, TestSettingsSaveAcceptsPartialUpdate(), TestSettingsSaveIgnoresLegacyGoogleDriveStatusFields()
+Cohesion: 0.50
+Nodes (3): Server, Request, ResponseWriter
 
 ### Community 109 - "Community 109"
 Cohesion: 0.60
@@ -535,34 +542,34 @@ Nodes (3): Server, Request, ResponseWriter
 
 ### Community 110 - "Community 110"
 Cohesion: 0.22
-Nodes (8): Application updates and release pipeline, Development behavior, Maintainer checklist, Release notes and documentation maintenance, Rollback, Runtime workflow, Signing-key ceremony, Stable release publication
+Nodes (9): Application updates and release pipeline, Development behavior, Local release preflight, Maintainer checklist, Release notes and documentation maintenance, Rollback, Runtime workflow, Signing-key ceremony (+1 more)
 
 ### Community 111 - "Community 111"
-Cohesion: 0.22
-Nodes (8): app, security, windows, identifier, productName, $schema, csp, version
+Cohesion: 0.18
+Nodes (13): app, security, windows, build, beforeBuildCommand, beforeDevCommand, devUrl, frontendDist (+5 more)
 
 ### Community 112 - "Community 112"
 Cohesion: 0.25
 Nodes (8): plugins, updater, endpoints, pubkey, windows, installMode, https://github.com/nishaj0/game-cloud-saver/releases/latest/download/latest.json, endpoints
 
 ### Community 113 - "Community 113"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (7): After reinstalling Windows or the game, Conflicts, Corruption and missing objects, Local-only limitation, Recovery and safe restore, Restoring tracked games, ZIP replacement
 
 ### Community 114 - "Community 114"
-Cohesion: 0.14
-Nodes (10): InfoTooltip(), api, PauseScope, ProtectionTarget, ThemeMode, DebugConsoleView(), DebugConsoleViewProps, formatUpdateBytes() (+2 more)
+Cohesion: 0.12
+Nodes (12): InfoTooltip(), api, LogEntry, PauseScope, ProtectionTarget, Settings, ThemeMode, DebugConsoleView() (+4 more)
 
 ### Community 115 - "Community 115"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (6): Connectivity, Game monitoring, Shutdown, Startup, Tray, Windows startup, daemon, and tray
 
 ### Community 116 - "Community 116"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (7): Choose a destination, Choose the save folder, Covers, versions, and playtime, Getting started, Low-impact choice, Recommended first run, Second computer
 
 ### Community 117 - "Community 117"
-Cohesion: 0.29
+Cohesion: 0.25
 Nodes (6): coding style, comments, frontend style, project context, repository instructions, verification
 
 ### Community 118 - "Community 118"
@@ -570,11 +577,11 @@ Cohesion: 0.29
 Nodes (6): Always-On Guidance, Codex Note, graphify, Graphify for Codex, Keeping the Graph Fresh, Precise Graph Queries
 
 ### Community 119 - "Community 119"
-Cohesion: 0.48
+Cohesion: 0.39
 Nodes (6): Cloud Saver backend, Important API groups, Protection model, Rove backend, Run locally, Tests
 
 ### Community 120 - "Community 120"
-Cohesion: 0.33
+Cohesion: 0.29
 Nodes (5): Adding a provider, Folder layout, Google Drive, Provider interface, Publication contract
 
 ### Community 121 - "Community 121"
@@ -582,8 +589,8 @@ Cohesion: 0.40
 Nodes (5): build, beforeBuildCommand, beforeDevCommand, devUrl, frontendDist
 
 ### Community 122 - "Community 122"
-Cohesion: 0.40
-Nodes (5): build, beforeBuildCommand, beforeDevCommand, devUrl, frontendDist
+Cohesion: 0.50
+Nodes (3): Server, Request, ResponseWriter
 
 ### Community 123 - "Community 123"
 Cohesion: 0.40
@@ -594,7 +601,7 @@ Cohesion: 0.60
 Nodes (4): Before submitting changes, Contributing to Cloud Saver, Contributing to Rove, First local run
 
 ### Community 125 - "Community 125"
-Cohesion: 0.60
+Cohesion: 0.47
 Nodes (4): Cloud Saver documentation, For contributors, For players, Rove documentation
 
 ### Community 156 - "Community 156"
@@ -603,10 +610,10 @@ Nodes (9): addRecursive(), CancelFunc, Game, Mutex, New(), Watcher, Manager, add
 
 ### Community 160 - "Community 160"
 Cohesion: 0.27
-Nodes (7): T, ExtractDataURL(), pngImagesFromICO(), scaleDown(), SourceForDataURL(), TestExtractDataURLRejectsMissingAndNonExecutableFiles(), Image
+Nodes (8): T, ErrorMessage(), ExtractDataURL(), pngImagesFromICO(), scaleDown(), SourceForDataURL(), TestExtractDataURLRejectsMissingAndNonExecutableFiles(), Image
 
 ### Community 161 - "Community 161"
-Cohesion: 0.48
+Cohesion: 0.39
 Nodes (6): Cloud Saver testing, Contract checklist for new endpoints, Fast local paths, Higher-level verification still expected before release, Rove testing, Test paths
 
 ### Community 162 - "Community 162"
@@ -614,40 +621,40 @@ Cohesion: 0.60
 Nodes (4): TestDecodeJSONRejectsUnknownFields(), TestHandlerVersionAndMethodBoundary(), TestWriteJSONUsesJSONContentType(), T
 
 ### Community 163 - "Community 163"
-Cohesion: 0.67
+Cohesion: 0.60
 Nodes (3): T, TestSettingsUpdateApplyDoesNotMutateTrustedFields(), TestSettingsUpdateApplyPreservesOmittedEditableFields()
 
 ### Community 171 - "Community 171"
-Cohesion: 0.33
-Nodes (10): TestConcurrentProviderHeadIsPreservedForReview(), changedPaths(), manifestsEqual(), Sync Folder Revision Store, Store, Provider-neutral reconciliation, Guarded revision replication, Restore immutable revision (+2 more)
+Cohesion: 0.50
+Nodes (3): Before submitting changes, Contributing to Rove, First local run
 
 ### Community 172 - "Community 172"
 Cohesion: 0.40
 Nodes (8): T, mustReadEqual(), mustWrite(), TestFolderReconcileTransfersUpdatesDeletesAndConflicts(), mustReadEqual(), mustWrite(), TestFolderReconcileTransfersUpdatesDeletesAndConflicts(), TestPlaytimeLedgersMergeByDeviceAndRoundTrip()
 
 ### Community 173 - "Community 173"
-Cohesion: 0.25
+Cohesion: 0.22
 Nodes (7): Approved desktop assets, Asset changes, Product terminology, Rebrand compatibility, Rove brand implementation, Tagline, Tokens and typography
 
 ## Knowledge Gaps
-- **430 isolated node(s):** `PreToolUse`, `PreToolUse`, `$schema`, `plugin`, `@opencode-ai/plugin` (+425 more)
+- **419 isolated node(s):** `PreToolUse`, `PreToolUse`, `@opencode-ai/plugin`, `dev`, `ui:dev` (+414 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **29 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **36 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Engine` connect `Game Monitor` to `Core Backend Application`, `Google Drive Integration`, `Nostalgia Design Docs`, `Community 103`, `Tauri Capabilities`, `Tauri Configuration`, `Project README`, `User FAQ`, `React Dependencies`, `Windows Credential Protection`?**
-  _High betweenness centrality (0.126) - this node is a cross-community bridge._
+- **Why does `Engine` connect `Game Monitor` to `Core Backend Application`, `Google Drive Integration`, `Nostalgia Design Docs`, `Community 103`, `Tauri Capabilities`, `Tauri Configuration`, `User FAQ`, `React Dependencies`, `Windows Credential Protection`?**
+  _High betweenness centrality (0.127) - this node is a cross-community bridge._
 - **Why does `Local HTTP API Server` connect `React Dependencies` to `Agent Configuration`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
 - **Why does `Backend API Client` connect `Agent Configuration` to `React Dependencies`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
 - **Are the 28 inferred relationships involving `Protection Engine New` (e.g. with `NewFolderStore()` and `TestConcurrentProviderHeadIsPreservedForReview()`) actually correct?**
   _`Protection Engine New` has 28 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 34 inferred relationships involving `writeJSON()` (e.g. with `.handleActivity()` and `.handleBackupExport()`) actually correct?**
   _`writeJSON()` has 34 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `PreToolUse`, `PreToolUse`, `$schema` to the rest of the system?**
-  _443 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `PreToolUse`, `PreToolUse`, `@opencode-ai/plugin` to the rest of the system?**
+  _432 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Core Backend Application` be split into smaller, more focused modules?**
-  _Cohesion score 0.11564625850340136 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.051696690406367825 - nodes in this community are weakly interconnected._
