@@ -2,18 +2,19 @@
 
 use std::{
     net::{SocketAddr, TcpStream},
-    path::PathBuf,
     process::Command,
     sync::Mutex,
     time::Duration,
 };
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use tauri_plugin_autostart::ManagerExt;
 
 mod updater;
 
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
+#[cfg(target_os = "windows")]
+use std::path::PathBuf;
 
 #[cfg(not(debug_assertions))]
 use std::io::{Read, Write};
@@ -48,17 +49,180 @@ fn is_autostart_enabled(app: tauri::AppHandle) -> Result<bool, String> {
 #[derive(Default)]
 struct DaemonBootstrapState(Mutex<Option<String>>);
 
+#[derive(Default)]
+struct LaunchGameState(Mutex<Option<String>>);
+
 #[tauri::command]
 fn daemon_bootstrap_error(state: tauri::State<'_, DaemonBootstrapState>) -> Option<String> {
     state.0.lock().unwrap().clone()
 }
 
+#[tauri::command]
+fn take_launch_game(state: tauri::State<'_, LaunchGameState>) -> Option<String> {
+    state.0.lock().unwrap().take()
+}
+
+#[tauri::command]
+fn create_game_shortcut(game_id: String, game_name: String) -> Result<String, String> {
+    let game_id =
+        valid_game_id(&game_id).ok_or_else(|| "invalid game shortcut request".to_string())?;
+
+    #[cfg(target_os = "windows")]
+    {
+        let target =
+            std::env::current_exe().map_err(|err| format!("could not find Rove: {err}"))?;
+        let desktop = std::env::var_os("USERPROFILE")
+            .map(PathBuf::from)
+            .map(|path| path.join("Desktop"))
+            .filter(|path| path.is_dir())
+            .ok_or_else(|| "could not find your Desktop folder".to_string())?;
+        let shortcut = desktop.join(format!("{} — Rove.lnk", shortcut_file_stem(&game_name)));
+        let working_dir = target
+            .parent()
+            .ok_or_else(|| "could not resolve Rove's folder".to_string())?;
+        create_windows_shortcut(&target, working_dir, &shortcut, &game_id)?;
+        return Ok(shortcut.display().to_string());
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = game_name;
+        Err("Rove game shortcuts are currently available on Windows only".into())
+    }
+}
+
+fn valid_game_id(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty()
+        || trimmed.len() > 128
+        || !trimmed
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_')
+    {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+fn launch_game_arg(args: &[String]) -> Option<String> {
+    args.windows(2)
+        .find(|pair| pair[0] == "--launch-game")
+        .and_then(|pair| valid_game_id(&pair[1]))
+}
+
+fn shortcut_file_stem(game_name: &str) -> String {
+    let sanitized: String = game_name
+        .trim()
+        .chars()
+        .map(|character| {
+            if matches!(
+                character,
+                '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*'
+            ) || character.is_control()
+            {
+                '_'
+            } else {
+                character
+            }
+        })
+        .collect();
+    let trimmed =
+        sanitized.trim_matches(|character: char| character == '.' || character.is_whitespace());
+    if trimmed.is_empty() {
+        "Game".to_string()
+    } else {
+        trimmed.chars().take(100).collect()
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn powershell_literal(value: &std::path::Path) -> String {
+    format!("'{}'", value.display().to_string().replace('\'', "''"))
+}
+
+#[cfg(target_os = "windows")]
+fn create_windows_shortcut(
+    target: &std::path::Path,
+    working_dir: &std::path::Path,
+    shortcut: &std::path::Path,
+    game_id: &str,
+) -> Result<(), String> {
+    let arguments = format!("--launch-game {game_id}");
+    let arguments_literal = format!("'{}'", arguments.replace('\'', "''"));
+    let script = format!(
+        "$shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut({}); $shortcut.TargetPath = {}; $shortcut.Arguments = {}; $shortcut.WorkingDirectory = {}; $shortcut.IconLocation = {}; $shortcut.Save()",
+        powershell_literal(shortcut),
+        powershell_literal(target),
+        arguments_literal,
+        powershell_literal(working_dir),
+        powershell_literal(target),
+    );
+    let mut command = Command::new("powershell.exe");
+    command.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
+    apply_platform_process_flags(&mut command);
+    let output = command
+        .output()
+        .map_err(|err| format!("could not create Rove shortcut: {err}"))?;
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "could not create Rove shortcut: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{launch_game_arg, shortcut_file_stem};
+
+    #[test]
+    fn reads_only_a_valid_game_launch_argument() {
+        let args = vec![
+            "Rove.exe".to_string(),
+            "--launch-game".to_string(),
+            "game_123-abc".to_string(),
+        ];
+        assert_eq!(launch_game_arg(&args).as_deref(), Some("game_123-abc"));
+        assert_eq!(
+            launch_game_arg(&["Rove.exe".to_string(), "--launch-game".to_string()]),
+            None
+        );
+        assert_eq!(
+            launch_game_arg(&[
+                "Rove.exe".to_string(),
+                "--launch-game".to_string(),
+                "../bad".to_string()
+            ]),
+            None
+        );
+    }
+
+    #[test]
+    fn creates_safe_shortcut_file_names() {
+        assert_eq!(shortcut_file_stem("  Wolf: A/B?  "), "Wolf_ A_B_");
+        assert_eq!(shortcut_file_stem("..."), "Game");
+    }
+}
+
 fn main() {
+    let startup_args: Vec<String> = std::env::args().collect();
+    let startup_launch_game = launch_game_arg(&startup_args);
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             set_autostart,
             is_autostart_enabled,
             daemon_bootstrap_error,
+			take_launch_game,
+			create_game_shortcut,
             updater::update_status,
             updater::check_for_update,
             updater::download_update,
@@ -70,12 +234,17 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(DaemonBootstrapState::default())
+		.manage(LaunchGameState(Mutex::new(startup_launch_game)))
         .plugin(
             tauri_plugin_single_instance::Builder::new()
                 .callback(|app, argv, _cwd| {
                     if argv.iter().any(|arg| arg == "--background") {
                         return;
                     }
+				if let Some(game_id) = launch_game_arg(&argv) {
+					*app.state::<LaunchGameState>().0.lock().unwrap() = Some(game_id.clone());
+					let _ = app.emit("rove://launch-game", game_id);
+				}
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.show();
                         let _ = window.unminimize();

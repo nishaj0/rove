@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ImagePlus, MonitorUp, Palette } from "lucide-react";
+import { ImagePlus, Link2, MonitorUp, Palette } from "lucide-react";
 import { GameCover } from "../components/GameCover";
 import { newDefaultSyncPolicy } from "../constants/defaults";
 import type { Game, PauseScope, RecoveryPoint, Revision, SnapshotSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "../types";
@@ -19,6 +19,7 @@ type GameDetailViewProps = {
   legacySnapshots: SnapshotSummary[];
   onBack: () => void;
   onPlay: () => void;
+  onCreateShortcut: () => void;
   onProtect: () => void;
   onDelete: () => void;
   onBrowseExportPath: () => void;
@@ -47,7 +48,7 @@ export function GameDetailView(props: GameDetailViewProps) {
   const {
     game, exportPath, importPath, mergeOnImport, exportOperationState,
     exportOperationMessage, importOperationState, importOperationMessage,
-    revisions, recoveryPoints, storageUsage, legacySnapshots, onBack, onPlay, onProtect, onDelete,
+    revisions, recoveryPoints, storageUsage, legacySnapshots, onBack, onPlay, onCreateShortcut, onProtect, onDelete,
     onBrowseExportPath, onBrowseImportPath, onMergeChange, onExportBackup,
     onImportBackup, onSavePolicy, onPause, onResume, onCreateRecoveryPoint,
     onRestoreRevision, onDeleteRecoveryPoint, onRestoreLegacySnapshot,
@@ -92,6 +93,7 @@ export function GameDetailView(props: GameDetailViewProps) {
         </div>
         <div className="detail-actions">
           <button className="btn primary" onClick={onPlay} type="button">Play with pre-check</button>
+          <button className="btn" onClick={onCreateShortcut} type="button"><Link2 aria-hidden="true" size={15} />Create Rove shortcut</button>
           <button className="btn" onClick={onProtect} disabled={Boolean(active)} type="button">{active ? `${syncJob?.stage?.replace(/_/g, " ")} ${syncJob?.progress ?? 0}%` : "Sync now"}</button>
           <button className="btn" onClick={onCreateRecoveryPoint} disabled={Boolean(active)} type="button">Create Recovery Point</button>
           <button className="btn danger" onClick={onDelete} type="button">Remove Game</button>

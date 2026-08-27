@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
@@ -351,6 +352,8 @@ export default function App() {
       });
       setStatus(nextStatus);
       setRecoveryLibrary(nextRecoveryLibrary);
+      const launchGameID = await invoke<string | null>("take_launch_game").catch(() => null);
+      if (launchGameID) void launchGameFromShortcut(launchGameID);
       if (daemonBootstrapError) setError(daemonBootstrapError);
     } catch (e) {
       const daemonBootstrapError = await invoke<string | null>("daemon_bootstrap_error").catch(() => null);
@@ -360,6 +363,16 @@ export default function App() {
 
   useEffect(() => {
     void loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    void listen<string>("rove://launch-game", (event) => {
+      void launchGameFromShortcut(event.payload);
+    }).then((dispose) => { unlisten = dispose; }).catch(() => {
+      // Browser preview has no Tauri event bridge.
+    });
+    return () => unlisten?.();
   }, []);
 
   useEffect(() => {
@@ -730,6 +743,26 @@ export default function App() {
     } catch (err) {
       setError(toFriendlyError(err));
       return false;
+    }
+  }
+
+  async function launchGameFromShortcut(gameID: string) {
+    try {
+      const result = await api.playGame({ gameId: gameID });
+      setToast(result.status === "already_running" ? "Game is already running" : "Game launched through Rove");
+      await refreshGamesData();
+    } catch (err) {
+      setError(`Rove shortcut could not launch the game: ${toFriendlyError(err)}`);
+    }
+  }
+
+  async function onCreateRoveShortcut() {
+    if (!selectedGame) return;
+    try {
+      const path = await invoke<string>("create_game_shortcut", { gameId: selectedGame.id, gameName: selectedGame.name });
+      setToast(`Rove shortcut created: ${path}`);
+    } catch (err) {
+      setError(`Could not create Rove shortcut: ${toFriendlyError(err)}`);
     }
   }
 
@@ -1154,6 +1187,7 @@ export default function App() {
             mergeOnImport={mergeOnImport}
             onBack={() => pushNavigation("games")}
             onPlay={() => void onPlaySelectedGame()}
+            onCreateShortcut={() => void onCreateRoveShortcut()}
             onProtect={() => void onSyncSelectedGame()}
             onDelete={() => void onDeleteSelectedGame()}
             onBrowseExportPath={() => void onBrowseExportPath()}
