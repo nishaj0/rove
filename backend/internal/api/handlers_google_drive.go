@@ -13,16 +13,19 @@ func (s *Server) handleGoogleDriveStatus(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if s.googleDrive == nil {
-		writeJSON(w, http.StatusOK, map[string]any{"connected": false, "accountEmail": nil})
+		writeJSON(w, http.StatusOK, map[string]any{"connected": false, "accountEmail": nil, "ready": false})
 		return
 	}
 	status := s.googleDrive.Status()
+	ready, configurationError := s.googleDrive.Ready()
 	writeJSON(w, http.StatusOK, map[string]any{
 		"connected":             status.Connected,
 		"accountEmail":          nullableEmail(status.AccountEmail),
 		"reconnectRequired":     status.ReconnectRequired,
 		"oauthClientSource":     s.googleDrive.ClientIDSource(),
 		"oauthCredentialSource": s.googleDrive.CredentialSource(),
+		"ready":                 ready,
+		"configurationError":    configurationError,
 	})
 }
 
@@ -46,6 +49,12 @@ func (s *Server) handleGoogleDriveConnect(w http.ResponseWriter, r *http.Request
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
+	if s.engine != nil {
+		// A fresh token makes previously safe, queued local revisions eligible
+		// immediately; do not wait for a Windows network-change event.
+		s.engine.ConfigurationChanged()
+	}
+	ready, configurationError := s.googleDrive.Ready()
 	_ = s.logs.Write("info", "google_drive", "Google Drive account connected using "+s.googleDrive.ClientIDSource()+" OAuth client configuration")
 	writeJSON(w, http.StatusOK, map[string]any{
 		"connected":             status.Connected,
@@ -53,6 +62,8 @@ func (s *Server) handleGoogleDriveConnect(w http.ResponseWriter, r *http.Request
 		"reconnectRequired":     false,
 		"oauthClientSource":     s.googleDrive.ClientIDSource(),
 		"oauthCredentialSource": s.googleDrive.CredentialSource(),
+		"ready":                 ready,
+		"configurationError":    configurationError,
 	})
 }
 

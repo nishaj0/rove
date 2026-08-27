@@ -814,7 +814,7 @@ func (e *Engine) resumePending(now time.Time) {
 		if job.State == "paused" && e.uploadsPaused(job.GameID) {
 			continue
 		}
-		if job.State == "failed" && (job.ErrorCode == "authentication_required" || job.ErrorCode == "quota_full") {
+		if job.State == "failed" && (job.ErrorCode == "authentication_required" || job.ErrorCode == "oauth_configuration_required" || job.ErrorCode == "quota_full") {
 			continue
 		}
 		select {
@@ -1270,6 +1270,8 @@ func classifyProviderError(err error) (code string, state models.ProviderState, 
 			return providerErr.Code, models.ProviderRateLimited, "Retry later", providerErr.Retryable
 		case "permission_denied":
 			return providerErr.Code, models.ProviderRemoteProblem, "Review provider access", providerErr.Retryable
+		case "oauth_configuration_required":
+			return providerErr.Code, models.ProviderAuthRequired, "Update Rove", false
 		case "offline":
 			return providerErr.Code, models.ProviderOffline, "Retry connection", providerErr.Retryable
 		default:
@@ -1281,6 +1283,8 @@ func classifyProviderError(err error) (code string, state models.ProviderState, 
 	switch {
 	case errors.Is(err, context.DeadlineExceeded), errors.As(err, &netErr), strings.Contains(message, "network"), strings.Contains(message, "connection"), strings.Contains(message, "offline"):
 		return "offline", models.ProviderOffline, "Retry connection", true
+	case strings.Contains(message, "client_secret"), strings.Contains(message, "client secret"), strings.Contains(message, "google_oauth_configuration_required"):
+		return "oauth_configuration_required", models.ProviderAuthRequired, "Update Rove", false
 	case strings.Contains(message, "401"), strings.Contains(message, "unauthorized"), strings.Contains(message, "invalid_grant"), strings.Contains(message, "authentication"):
 		return "authentication_required", models.ProviderAuthRequired, "Reconnect provider", false
 	case strings.Contains(message, "quota"), strings.Contains(message, "storagequota"):
@@ -1308,6 +1312,8 @@ func userProviderMessage(code string) string {
 		return "This device is offline. The local revision is safe and will upload automatically after reconnection."
 	case "authentication_required":
 		return "Provider sign-in is required. Local sync will continue."
+	case "oauth_configuration_required":
+		return "This Rove build cannot authenticate with Google Drive. Install an updated build, then reconnect Google Drive."
 	case "quota_full":
 		return "Provider storage is full. Local sync will continue until space is available."
 	case "rate_limited":

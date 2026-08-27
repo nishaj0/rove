@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ImagePlus, Link2, MonitorUp, Palette } from "lucide-react";
 import { GameCover } from "../components/GameCover";
 import { newDefaultSyncPolicy } from "../constants/defaults";
-import type { Game, PauseScope, RecoveryPoint, Revision, SnapshotSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "../types";
+import type { Game, PauseScope, ProviderHealth, RecoveryPoint, Revision, SnapshotSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "../types";
 
 type GameDetailViewProps = {
   game: Game | null;
@@ -40,6 +40,7 @@ type GameDetailViewProps = {
   safeDateTime: (value: string) => string;
   formatBytes: (bytes: number) => string;
   syncJob: SyncJob | null;
+  provider?: ProviderHealth;
   syncConflicts: SyncConflict[];
   onResolveSyncConflict: (id: string, action: "local" | "remote" | "both") => void;
 };
@@ -53,7 +54,7 @@ export function GameDetailView(props: GameDetailViewProps) {
     onImportBackup, onSavePolicy, onPause, onResume, onCreateRecoveryPoint,
     onRestoreRevision, onDeleteRecoveryPoint, onRestoreLegacySnapshot,
     onDeleteLegacySnapshot, onUpdateCover, formatPlaytime,
-    safeDateTime, formatBytes, syncJob, syncConflicts, onResolveSyncConflict,
+    safeDateTime, formatBytes, syncJob, provider, syncConflicts, onResolveSyncConflict,
   } = props;
   const [policy, setPolicy] = useState<SyncPolicy>(game?.protectionPolicy ?? newDefaultSyncPolicy());
   const [saving, setSaving] = useState(false);
@@ -112,6 +113,7 @@ export function GameDetailView(props: GameDetailViewProps) {
           <div><span>Pending uploads</span><strong>{health.pendingCount} · {formatBytes(health.pendingBytes)}</strong></div>
         </div>
         {syncJob?.error ? <p className="banner error">{syncJob.error}</p> : null}
+        {!syncJob?.error && provider?.state === "authentication_required" && provider.message ? <p className="banner error" role="alert">{provider.message}</p> : null}
       </section>
 
       <section className="panel" data-window-title="CLOUD.SYNC.POLICY">

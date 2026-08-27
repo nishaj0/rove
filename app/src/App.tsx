@@ -101,6 +101,7 @@ function NavIcon({ view }: { view: View }) {
 export default function App() {
   const [activeView, setActiveView] = useState<View>("home");
   const [selectedGameId, setSelectedGameId] = useState("");
+	const gamesRefreshSequence = useRef(0);
 
   const navHistoryRef = useRef<NavSnapshot[]>([{ view: "home", selectedGameId: "" }]);
   const navCursorRef = useRef(0);
@@ -258,8 +259,8 @@ export default function App() {
   }
 
   async function refreshGamesData() {
+    const sequence = ++gamesRefreshSequence.current;
     try {
-      setError("");
       const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary, nextStorageSummary] = await Promise.all([
         api.getGames(),
         api.getStatus(),
@@ -267,12 +268,16 @@ export default function App() {
         api.getRecoveryLibrary().catch(() => recoveryLibrary),
         api.getStorageSummary().catch(() => storageSummary),
       ]);
+      // Do not let an older in-flight response overwrite newer process state.
+      if (sequence !== gamesRefreshSequence.current) return;
+      setError("");
       setGames(nextGames);
       setStatus(nextStatus);
       setSyncJobs(nextJobs);
       setRecoveryLibrary(nextRecoveryLibrary);
       setStorageSummary(nextStorageSummary);
     } catch (e) {
+      if (sequence !== gamesRefreshSequence.current) return;
       setError(toFriendlyError(e));
     }
   }
@@ -430,6 +435,13 @@ export default function App() {
         window.clearInterval(timer);
       }
     };
+  }, [activeView]);
+
+  useEffect(() => {
+    if (activeView !== "home" && activeView !== "games" && activeView !== "game") return;
+    const refreshOnFocus = () => void refreshGamesData();
+    window.addEventListener("focus", refreshOnFocus);
+    return () => window.removeEventListener("focus", refreshOnFocus);
   }, [activeView]);
 
   useEffect(() => {
@@ -890,6 +902,7 @@ export default function App() {
     try {
       const status = await api.connectGoogleDrive();
       setSettings((s) => ({ ...s, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
+		await refreshGamesData();
       setToast("Google Drive connected. Save Settings to use it for Cloud Sync.");
     } catch (err) {
       setError(`Google Drive could not be connected: ${toFriendlyError(err)}`);
@@ -1216,6 +1229,7 @@ export default function App() {
             safeDateTime={safeDateTime}
             formatBytes={formatBytes}
             syncJob={syncJobs.find((job) => job.gameId === selectedGameId) ?? null}
+			provider={status?.provider}
             syncConflicts={syncConflicts}
             onResolveSyncConflict={(id, action) => void onResolveSyncConflict(id, action)}
           />

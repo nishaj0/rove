@@ -18,9 +18,13 @@ import (
 )
 
 const (
-	idlePollInterval     = 10 * time.Second
+	// Keep the idle interval short enough to observe games which launch and
+	// crash before their first long background scan.
+	idlePollInterval     = 2 * time.Second
 	activePollInterval   = 2 * time.Second
 	defaultFlushInterval = 15 * time.Second
+	launchProbeInterval  = 250 * time.Millisecond
+	launchProbeWindow    = 10 * time.Second
 	// guard against unrealistic jumps to avoid overcounting playtime on clock skew/sleep.
 	maxClockGap = 60 * time.Second
 )
@@ -46,11 +50,13 @@ type Monitor struct {
 	logs             *logstore.Store
 	onRunningChanged func([]string)
 	onError          func(error)
+	snapshotFn       func() map[string]bool
 
 	pollInterval  time.Duration
 	flushInterval time.Duration
 
 	mu         sync.RWMutex
+	pollMu     sync.Mutex
 	sessions   map[string]*session
 	runningIDs map[string]struct{}
 	started    atomic.Bool
@@ -63,6 +69,7 @@ func New(cfg *config.Manager, logs *logstore.Store, onRunningChanged func([]stri
 		logs:             logs,
 		onRunningChanged: onRunningChanged,
 		onError:          onError,
+		snapshotFn:       nil,
 		pollInterval:     idlePollInterval,
 		flushInterval:    defaultFlushInterval,
 		sessions:         make(map[string]*session),
@@ -80,7 +87,7 @@ func (m *Monitor) Start(ctx context.Context) {
 	go func() {
 		for {
 			m.mu.RLock()
-			interval := idlePollInterval
+			interval := m.pollInterval
 			if len(m.runningIDs) > 0 {
 				interval = activePollInterval
 			}
@@ -111,6 +118,25 @@ func (m *Monitor) ForcePoll() {
 		return
 	}
 	m.pollOnce(time.Now())
+}
+
+// ProbeLaunch quickly samples a just-started executable until it is observed.
+// This closes the gap where cmd.exe returns before Windows has created the
+// game's process and the normal idle poll would otherwise miss a short crash.
+func (m *Monitor) ProbeLaunch(gameID string) {
+	if strings.TrimSpace(gameID) == "" || !m.started.Load() {
+		return
+	}
+	go func() {
+		deadline := time.Now().Add(launchProbeWindow)
+		for {
+			m.ForcePoll()
+			if m.IsRunning(gameID) || time.Now().After(deadline) || !m.started.Load() {
+				return
+			}
+			time.Sleep(launchProbeInterval)
+		}
+	}()
 }
 
 // reports whether a specific game is currently detected as running.
@@ -146,8 +172,14 @@ func (m *Monitor) RunningIDs() []string {
 
 // updates sessions from process snapshots and schedules playtime flushes.
 func (m *Monitor) pollOnce(now time.Time) {
+	m.pollMu.Lock()
+	defer m.pollMu.Unlock()
 	games := m.cfg.Get().Games
-	runningByExecutable := m.snapshotRunningExecutables()
+	snapshot := m.snapshotFn
+	if snapshot == nil {
+		snapshot = m.snapshotRunningExecutables
+	}
+	runningByExecutable := snapshot()
 	tracked := make(map[string]models.Game, len(games))
 	for _, game := range games {
 		tracked[game.ID] = game
@@ -179,8 +211,10 @@ func (m *Monitor) pollOnce(now time.Time) {
 			m.sessions[game.ID] = s
 		}
 
-		if s.running && running {
+		if s.running {
 			// accumulate elapsed time only for sane deltas between poll ticks.
+			// Count the final observed interval as well: a process may disappear
+			// between polls because it crashed or exited normally.
 			delta := now.Sub(s.lastTick)
 			if delta > 0 && delta <= maxClockGap {
 				s.pendingSeconds += int64(delta.Seconds())

@@ -77,8 +77,22 @@ func (s *Service) Status() models.GoogleDriveSettings {
 	value.EncryptedRefreshToken = ""
 	return value
 }
+
+// Ready reports whether this daemon has the OAuth client configuration needed
+// to exchange the stored refresh token. A stored account alone is not enough.
+func (s *Service) Ready() (bool, string) {
+	if s.configErr != nil {
+		return false, "Google Drive OAuth configuration is invalid in this Rove build."
+	}
+	if s.clientID == "" || s.clientSecret == "" {
+		return false, "This Rove build is missing its Google Drive OAuth credential. Install an updated Rove build, then reconnect Google Drive."
+	}
+	return true, ""
+}
+
 func (s *Service) Available() bool {
-	return s.clientID != "" && s.clientSecret != "" && s.configErr == nil
+	ready, _ := s.Ready()
+	return ready
 }
 func (s *Service) ClientIDSource() string   { return s.clientSource }
 func (s *Service) CredentialSource() string { return s.secretSource }
@@ -249,6 +263,9 @@ func (s *Service) Disconnect(ctx context.Context) error {
 }
 
 func (s *Service) HTTPClient(ctx context.Context) (*http.Client, error) {
+	if ready, reason := s.Ready(); !ready {
+		return nil, errors.New("google_oauth_configuration_required: " + reason)
+	}
 	settings := s.cfg.Get()
 	if !settings.GoogleDrive.Connected || settings.GoogleDrive.EncryptedRefreshToken == "" {
 		return nil, errors.New("Google Drive is not connected")

@@ -209,7 +209,7 @@ func (s *Server) handleGamePlay(w http.ResponseWriter, r *http.Request) {
 		_ = cmd.Process.Release()
 	}
 	if s.monitor != nil {
-		s.monitor.ForcePoll()
+		s.monitor.ProbeLaunch(game.ID)
 	}
 	_ = s.logs.Write("info", "games", "launched game: "+game.Name)
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "launched"})

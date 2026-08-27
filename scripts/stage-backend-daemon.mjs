@@ -28,6 +28,10 @@ if (oauthJSONPath && (!oauthClientID || !oauthClientSecret)) {
   oauthSource = "oauth_json";
 }
 
+if (!oauthClientSecret) {
+  throw new Error("CLOUD_SAVER_GOOGLE_CLIENT_SECRET (or CLOUD_SAVER_GOOGLE_OAUTH_JSON) is required to build a packaged Rove application.");
+}
+
 const args = ["build"];
 const linkerValues = [];
 linkerValues.push(`-X=cloud-saver/backend/internal/branding.Version=${String(appPackage.version).trim()}`);

@@ -23,7 +23,7 @@ func TestWriteJSONUsesJSONContentType(t *testing.T) {
 	t.Parallel()
 	response := httptest.NewRecorder()
 	writeJSON(response, http.StatusAccepted, map[string]string{"status": "queued"})
-	if response.Code != http.StatusAccepted || response.Header().Get("Content-Type") != "application/json" {
+	if response.Code != http.StatusAccepted || response.Header().Get("Content-Type") != "application/json" || response.Header().Get("Cache-Control") != "no-store" {
 		t.Fatalf("unexpected response metadata: %d %#v", response.Code, response.Header())
 	}
 	var payload map[string]string

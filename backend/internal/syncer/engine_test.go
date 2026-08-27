@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -181,6 +182,17 @@ func TestStructuredProviderRateLimitClassification(t *testing.T) {
 	}
 	if got := providerRetryAfter(err); got != retryAfter {
 		t.Fatalf("expected %s Retry-After, got %s", retryAfter, got)
+	}
+}
+
+func TestOAuthConfigurationFailureIsNotReportedAsOffline(t *testing.T) {
+	t.Parallel()
+	code, state, action, retryable := classifyProviderError(errors.New(`oauth2: "invalid_request" "client_secret is missing."`))
+	if code != "oauth_configuration_required" || state != models.ProviderAuthRequired || action != "Update Rove" || retryable {
+		t.Fatalf("unexpected OAuth configuration classification: code=%q state=%q action=%q retryable=%t", code, state, action, retryable)
+	}
+	if message := userProviderMessage(code); !strings.Contains(message, "updated build") {
+		t.Fatalf("expected an actionable build message, got %q", message)
 	}
 }
 

@@ -25,6 +25,7 @@ describe("frontend API client", () => {
     await expect(api.getGames()).resolves.toEqual([expect.objectContaining({ id: "g1", name: "Game" })]);
     expect(fetchMock).toHaveBeenCalledWith("http://127.0.0.1:7331/games", expect.objectContaining({
       headers: { "Content-Type": "application/json" },
+	  cache: "no-store",
     }));
   });
 

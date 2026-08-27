@@ -30,13 +30,13 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1787863541.7143805,
-    "ast_hash": "305d99437937ff2e84bef7d4637cf05e",
+    "mtime": 1787864685.1007662,
+    "ast_hash": "461678c666e2be9aaf2765a75fca033b",
     "semantic_hash": ""
   },
   "app/src/api.ts": {
-    "mtime": 1785664921.1186695,
-    "ast_hash": "1a9af4f288ee45533e3f6bffe9e2d5b9",
+    "mtime": 1787864682.760522,
+    "ast_hash": "b139255f081cc86a236656881d4c23d8",
     "semantic_hash": ""
   },
   "app/src/api/parsers.ts": {
@@ -75,8 +75,8 @@
     "semantic_hash": "8879be98bf5075703e1b9bfdfbca355e"
   },
   "app/src/types.ts": {
-    "mtime": 1787863509.8862157,
-    "ast_hash": "31c13948f5cee5c0cd8248cd5822a988",
+    "mtime": 1787864457.0150764,
+    "ast_hash": "1ffc74ac7068529253fa0b9104b0ddcd",
     "semantic_hash": ""
   },
   "app/src/update.ts": {
@@ -95,8 +95,8 @@
     "semantic_hash": "87678637e9be425de6b0fa3dee1e06be"
   },
   "app/src/views/GameDetailView.tsx": {
-    "mtime": 1787863541.7158906,
-    "ast_hash": "30acf23138639ee38801667854e3cdb4",
+    "mtime": 1787864506.0744524,
+    "ast_hash": "428ecbe63ecf66c5ff999b47a9030dfe",
     "semantic_hash": ""
   },
   "app/src/views/GamesView.tsx": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "app/src/views/SettingsView.tsx": {
-    "mtime": 1785665623.7253845,
-    "ast_hash": "3ac3e7d2a89a92b580203f0e070e7e53",
+    "mtime": 1787864488.1629217,
+    "ast_hash": "a7bfabf9e9eacdc37ce3807821d317cd",
     "semantic_hash": ""
   },
   "app/src/vite-env.d.ts": {
@@ -155,14 +155,14 @@
     "semantic_hash": "d8cbc6e08dc3d4c416a797cb58e11f3f"
   },
   "backend/internal/api/handlers_games.go": {
-    "mtime": 1787863437.9919226,
-    "ast_hash": "039b4bbf919993d4787acc188fd8bb44",
+    "mtime": 1787864353.1496184,
+    "ast_hash": "7b236c493689092a3cbd2704a6d550d2",
     "semantic_hash": ""
   },
   "backend/internal/api/handlers_google_drive.go": {
-    "mtime": 1785492438.0285122,
-    "ast_hash": "49adca84a3d78577d24f2eee163fa2ab",
-    "semantic_hash": "49adca84a3d78577d24f2eee163fa2ab"
+    "mtime": 1787864442.2676623,
+    "ast_hash": "680dbc333e453ede40eb187168f466ff",
+    "semantic_hash": ""
   },
   "backend/internal/api/handlers_lifecycle.go": {
     "mtime": 1785659146.3522139,
@@ -210,8 +210,8 @@
     "semantic_hash": "33f5d837e172468983c09a9789d406c5"
   },
   "backend/internal/api/server.go": {
-    "mtime": 1785664859.237385,
-    "ast_hash": "0055ba3006306c540d53eb401061792a",
+    "mtime": 1787864355.7254117,
+    "ast_hash": "cf845217a6bf3ce1559f0d530a217af6",
     "semantic_hash": ""
   },
   "backend/internal/app/app.go": {
@@ -225,8 +225,8 @@
     "semantic_hash": "836aeafbfa07f86abd3d879c2fce1416"
   },
   "backend/internal/auth/googledrive/service.go": {
-    "mtime": 1785655878.4268572,
-    "ast_hash": "eeb243cb69b389bfd88110efe6f5fa71",
+    "mtime": 1787864442.265431,
+    "ast_hash": "5b5603689e0f5de623fd925492ebed4c",
     "semantic_hash": ""
   },
   "backend/internal/auth/googledrive/service_test.go": {
@@ -265,8 +265,8 @@
     "semantic_hash": "2224f6ccdc9b5f7d74fd0d9b4b0334e4"
   },
   "backend/internal/gamemon/monitor.go": {
-    "mtime": 1787863640.9206588,
-    "ast_hash": "abaa592d25695e846a004d7d6f43a243",
+    "mtime": 1787864649.6326363,
+    "ast_hash": "e19041d5fff944722ca0f7e940183a4f",
     "semantic_hash": ""
   },
   "backend/internal/logstore/protection.go": {
@@ -350,14 +350,14 @@
     "semantic_hash": "4d99bb1c9d07c316abcfed62e709979b"
   },
   "backend/internal/syncer/engine.go": {
-    "mtime": 1785666344.562698,
-    "ast_hash": "2eaefa762d22d41508bce93c1c24b362",
+    "mtime": 1787864442.269679,
+    "ast_hash": "478730976a2e721cda2cf3844ab4c0ec",
     "semantic_hash": ""
   },
   "backend/internal/syncer/engine_test.go": {
-    "mtime": 1785494238.027739,
-    "ast_hash": "74af598387de2ee7a72088fa30b3f829",
-    "semantic_hash": "74af598387de2ee7a72088fa30b3f829"
+    "mtime": 1787864634.8230755,
+    "ast_hash": "a52e50cac14a83a1d860f1e9961375a9",
+    "semantic_hash": ""
   },
   "backend/internal/syncer/folder.go": {
     "mtime": 1785659143.9645097,
@@ -425,9 +425,9 @@
     "semantic_hash": "b27426c93c4834c9ff4a1c0810e87a7a"
   },
   "scripts/stage-backend-daemon.mjs": {
-    "mtime": 1785495474.369974,
-    "ast_hash": "a30cb05cac58ecaa95a250cd4e6492fc",
-    "semantic_hash": "a30cb05cac58ecaa95a250cd4e6492fc"
+    "mtime": 1787864488.1639216,
+    "ast_hash": "c01c46ab5de906ad9e51f304706da172",
+    "semantic_hash": ""
   },
   "scripts/sync-version.mjs": {
     "mtime": 1785873010.0276701,
@@ -565,9 +565,9 @@
     "semantic_hash": "32b67963417a30cb80544e0b2a56a98d"
   },
   "app/src/api.test.ts": {
-    "mtime": 1785502554.4976468,
-    "ast_hash": "4a999ccd1916d34348c9e2138fc8557b",
-    "semantic_hash": "4a999ccd1916d34348c9e2138fc8557b"
+    "mtime": 1787864706.3270874,
+    "ast_hash": "2f2f0b5019b8059b824570631102d593",
+    "semantic_hash": ""
   },
   "app/src/api/parsers.test.ts": {
     "mtime": 1785502553.2515795,
@@ -600,9 +600,9 @@
     "semantic_hash": "df149afc3d67d7f4ba101d92eec8ad6a"
   },
   "backend/internal/api/server_test.go": {
-    "mtime": 1785502676.852205,
-    "ast_hash": "a72fe6db09709b44c5360a1954348aa2",
-    "semantic_hash": "a72fe6db09709b44c5360a1954348aa2"
+    "mtime": 1787864706.3250866,
+    "ast_hash": "1aa6fca580e2cb5004258c9446d990d5",
+    "semantic_hash": ""
   },
   "backend/internal/backup/zip_test.go": {
     "mtime": 1785502678.2188604,
@@ -692,6 +692,11 @@
   "scripts/release-preflight.ps1": {
     "mtime": 1785872907.967289,
     "ast_hash": "cad53cb9197cce49f741af9d9cece938",
+    "semantic_hash": ""
+  },
+  "backend/internal/gamemon/monitor_test.go": {
+    "mtime": 1787864793.0230856,
+    "ast_hash": "a6c311b28bde4a68d568554eb3033603",
     "semantic_hash": ""
   }
 }

@@ -1736,7 +1736,7 @@
       "label": "api",
       "file_type": "code",
       "source_file": "app/src/api.ts",
-      "source_location": "L70",
+      "source_location": "L71",
       "id": "src_api_api",
       "community": 114,
       "norm_label": "api"
@@ -2107,7 +2107,7 @@
       "source_file": "app/src/constants/network.ts",
       "source_location": "L1",
       "id": "constants_network",
-      "community": 40,
+      "community": 76,
       "norm_label": "network.ts"
     },
     {
@@ -2188,7 +2188,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L1",
       "id": "src_nativedialog",
-      "community": 40,
+      "community": 39,
       "norm_label": "nativedialog.ts"
     },
     {
@@ -2197,7 +2197,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L3",
       "id": "src_nativedialog_dialogfilter",
-      "community": 40,
+      "community": 39,
       "norm_label": "dialogfilter"
     },
     {
@@ -2206,7 +2206,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L8",
       "id": "src_nativedialog_opendialogoptions",
-      "community": 40,
+      "community": 39,
       "norm_label": "opendialogoptions"
     },
     {
@@ -2215,7 +2215,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L16",
       "id": "src_nativedialog_opendialogresult",
-      "community": 40,
+      "community": 39,
       "norm_label": "opendialogresult"
     },
     {
@@ -2224,7 +2224,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L18",
       "id": "src_nativedialog_opensinglepath",
-      "community": 40,
+      "community": 39,
       "norm_label": "opensinglepath()"
     },
     {
@@ -2233,7 +2233,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L29",
       "id": "src_nativedialog_pickfolder",
-      "community": 40,
+      "community": 39,
       "norm_label": "pickfolder()"
     },
     {
@@ -2242,7 +2242,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L38",
       "id": "src_nativedialog_pickexecutable",
-      "community": 40,
+      "community": 39,
       "norm_label": "pickexecutable()"
     },
     {
@@ -2251,7 +2251,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L47",
       "id": "src_nativedialog_pickzipfile",
-      "community": 40,
+      "community": 39,
       "norm_label": "pickzipfile()"
     },
     {
@@ -2339,7 +2339,7 @@
       "label": "SyncPolicy",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L16",
+      "source_location": "L18",
       "id": "src_types_syncpolicy",
       "community": 76,
       "norm_label": "syncpolicy"
@@ -2348,7 +2348,7 @@
       "label": "ServiceControlState",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L23",
+      "source_location": "L25",
       "id": "src_types_servicecontrolstate",
       "community": 76,
       "norm_label": "servicecontrolstate"
@@ -2357,7 +2357,7 @@
       "label": "ProviderHealth",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L31",
+      "source_location": "L33",
       "id": "src_types_providerhealth",
       "community": 76,
       "norm_label": "providerhealth"
@@ -2366,7 +2366,7 @@
       "label": "GameProtectionStatus",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "id": "src_types_gameprotectionstatus",
       "community": 76,
       "norm_label": "gameprotectionstatus"
@@ -2375,7 +2375,7 @@
       "label": "BackupPolicy",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L56",
+      "source_location": "L58",
       "id": "src_types_backuppolicy",
       "community": 76,
       "norm_label": "backuppolicy"
@@ -2384,7 +2384,7 @@
       "label": "BackupHistoryEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L63",
+      "source_location": "L65",
       "id": "src_types_backuphistoryentry",
       "community": 76,
       "norm_label": "backuphistoryentry"
@@ -2393,7 +2393,7 @@
       "label": "SnapshotSummary",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L73",
+      "source_location": "L75",
       "id": "src_types_snapshotsummary",
       "community": 76,
       "norm_label": "snapshotsummary"
@@ -2402,7 +2402,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L82",
+      "source_location": "L84",
       "id": "src_types_game",
       "community": 95,
       "norm_label": "game"
@@ -2411,7 +2411,7 @@
       "label": "Settings",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L99",
+      "source_location": "L101",
       "id": "src_types_settings",
       "community": 76,
       "norm_label": "settings"
@@ -2420,7 +2420,7 @@
       "label": "SettingsUpdate",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L129",
+      "source_location": "L131",
       "id": "src_types_settingsupdate",
       "community": 76,
       "norm_label": "settingsupdate"
@@ -2429,7 +2429,7 @@
       "label": "Status",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L154",
+      "source_location": "L156",
       "id": "src_types_status",
       "community": 54,
       "norm_label": "status"
@@ -2438,7 +2438,7 @@
       "label": "SyncJob",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L170",
+      "source_location": "L172",
       "id": "src_types_syncjob",
       "community": 76,
       "norm_label": "syncjob"
@@ -2447,7 +2447,7 @@
       "label": "Revision",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L191",
+      "source_location": "L193",
       "id": "src_types_revision",
       "community": 76,
       "norm_label": "revision"
@@ -2456,7 +2456,7 @@
       "label": "RecoveryPoint",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L205",
+      "source_location": "L207",
       "id": "src_types_recoverypoint",
       "community": 76,
       "norm_label": "recoverypoint"
@@ -2465,25 +2465,25 @@
       "label": "ActivityEvent",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L215",
+      "source_location": "L217",
       "id": "src_types_activityevent",
-      "community": 76,
+      "community": 40,
       "norm_label": "activityevent"
     },
     {
       "label": "RecoveryLibraryEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L227",
+      "source_location": "L229",
       "id": "src_types_recoverylibraryentry",
-      "community": 76,
+      "community": 54,
       "norm_label": "recoverylibraryentry"
     },
     {
       "label": "StorageUsage",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L245",
+      "source_location": "L247",
       "id": "src_types_storageusage",
       "community": 76,
       "norm_label": "storageusage"
@@ -2492,16 +2492,16 @@
       "label": "StorageSummary",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L254",
+      "source_location": "L256",
       "id": "src_types_storagesummary",
-      "community": 76,
+      "community": 54,
       "norm_label": "storagesummary"
     },
     {
       "label": "SyncConflict",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L263",
+      "source_location": "L265",
       "id": "src_types_syncconflict",
       "community": 76,
       "norm_label": "syncconflict"
@@ -2510,16 +2510,16 @@
       "label": "LogEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L273",
+      "source_location": "L275",
       "id": "src_types_logentry",
-      "community": 76,
+      "community": 114,
       "norm_label": "logentry"
     },
     {
       "label": "DebugInfo",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L281",
+      "source_location": "L283",
       "id": "src_types_debuginfo",
       "community": 76,
       "norm_label": "debuginfo"
@@ -2528,7 +2528,7 @@
       "label": "BackupExportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L294",
+      "source_location": "L296",
       "id": "src_types_backupexportrequest",
       "community": 76,
       "norm_label": "backupexportrequest"
@@ -2537,7 +2537,7 @@
       "label": "BackupExportResponse",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L299",
+      "source_location": "L301",
       "id": "src_types_backupexportresponse",
       "community": 76,
       "norm_label": "backupexportresponse"
@@ -2546,7 +2546,7 @@
       "label": "BackupImportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L304",
+      "source_location": "L306",
       "id": "src_types_backupimportrequest",
       "community": 76,
       "norm_label": "backupimportrequest"
@@ -2555,7 +2555,7 @@
       "label": "PlayGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L311",
+      "source_location": "L313",
       "id": "src_types_playgamerequest",
       "community": 76,
       "norm_label": "playgamerequest"
@@ -2564,7 +2564,7 @@
       "label": "SyncGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L316",
+      "source_location": "L318",
       "id": "src_types_syncgamerequest",
       "community": 76,
       "norm_label": "syncgamerequest"
@@ -2573,7 +2573,7 @@
       "label": "SnapshotCreateResponse",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L320",
+      "source_location": "L322",
       "id": "src_types_snapshotcreateresponse",
       "community": 76,
       "norm_label": "snapshotcreateresponse"
@@ -2710,7 +2710,7 @@
       "source_file": "app/src/views/ActivityView.tsx",
       "source_location": "L1",
       "id": "views_activityview",
-      "community": 54,
+      "community": 40,
       "norm_label": "activityview.tsx"
     },
     {
@@ -2719,7 +2719,7 @@
       "source_file": "app/src/views/ActivityView.tsx",
       "source_location": "L3",
       "id": "views_activityview_activityviewprops",
-      "community": 54,
+      "community": 40,
       "norm_label": "activityviewprops"
     },
     {
@@ -2728,7 +2728,7 @@
       "source_file": "app/src/views/ActivityView.tsx",
       "source_location": "L11",
       "id": "views_activityview_activityview",
-      "community": 54,
+      "community": 40,
       "norm_label": "activityview()"
     },
     {
@@ -2825,7 +2825,7 @@
       "label": "GameDetailView()",
       "file_type": "code",
       "source_file": "app/src/views/GameDetailView.tsx",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "views_gamedetailview_gamedetailview",
       "community": 54,
       "norm_label": "gamedetailview()"
@@ -2969,7 +2969,7 @@
       "label": "formatUpdateBytes()",
       "file_type": "code",
       "source_file": "app/src/views/SettingsView.tsx",
-      "source_location": "L217",
+      "source_location": "L218",
       "id": "views_settingsview_formatupdatebytes",
       "community": 114,
       "norm_label": "formatupdatebytes()"
@@ -3437,7 +3437,7 @@
       "label": ".handleGameProtectionPolicy()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L217",
+      "source_location": "L218",
       "id": "api_server_handlegameprotectionpolicy",
       "community": 17,
       "norm_label": ".handlegameprotectionpolicy()"
@@ -3446,7 +3446,7 @@
       "label": ".handleGameSync()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L239",
+      "source_location": "L240",
       "id": "api_server_handlegamesync",
       "community": 17,
       "norm_label": ".handlegamesync()"
@@ -3455,7 +3455,7 @@
       "label": ".handleGameCover()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L269",
+      "source_location": "L270",
       "id": "api_server_handlegamecover",
       "community": 17,
       "norm_label": ".handlegamecover()"
@@ -3464,7 +3464,7 @@
       "label": ".handleGameBackupPolicy()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L326",
+      "source_location": "L327",
       "id": "api_server_handlegamebackuppolicy",
       "community": 17,
       "norm_label": ".handlegamebackuppolicy()"
@@ -3473,7 +3473,7 @@
       "label": ".handleGamePair()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L367",
+      "source_location": "L368",
       "id": "api_server_handlegamepair",
       "community": 17,
       "norm_label": ".handlegamepair()"
@@ -3482,7 +3482,7 @@
       "label": ".toGameResponses()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L389",
+      "source_location": "L390",
       "id": "api_server_togameresponses",
       "community": 17,
       "norm_label": ".togameresponses()"
@@ -3491,7 +3491,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L389",
+      "source_location": "L390",
       "id": "backend_internal_api_handlers_games_go_game",
       "community": 17,
       "norm_label": "game"
@@ -3500,7 +3500,7 @@
       "label": ".displayedPlaytime()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L417",
+      "source_location": "L418",
       "id": "api_server_displayedplaytime",
       "community": 17,
       "norm_label": ".displayedplaytime()"
@@ -3509,7 +3509,7 @@
       "label": ".toGameResponse()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L424",
+      "source_location": "L425",
       "id": "api_server_togameresponse",
       "community": 17,
       "norm_label": ".togameresponse()"
@@ -3518,7 +3518,7 @@
       "label": "Time",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L424",
+      "source_location": "L425",
       "id": "backend_internal_api_handlers_games_go_time",
       "community": 17,
       "norm_label": "time"
@@ -3527,7 +3527,7 @@
       "label": "normalizeCoverImageData()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L446",
+      "source_location": "L447",
       "id": "api_handlers_games_normalizecoverimagedata",
       "community": 17,
       "norm_label": "normalizecoverimagedata()"
@@ -3537,7 +3537,7 @@
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_google_drive.go",
       "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_api_handlers_google_drive_go",
+      "id": "api_handlers_google_drive",
       "community": 42,
       "norm_label": "handlers_google_drive.go"
     },
@@ -3581,7 +3581,7 @@
       "label": ".handleGoogleDriveConnect()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_google_drive.go",
-      "source_location": "L29",
+      "source_location": "L32",
       "id": "api_server_handlegoogledriveconnect",
       "community": 42,
       "norm_label": ".handlegoogledriveconnect()"
@@ -3590,7 +3590,7 @@
       "label": ".handleGoogleDriveDisconnect()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_google_drive.go",
-      "source_location": "L59",
+      "source_location": "L70",
       "id": "api_server_handlegoogledrivedisconnect",
       "community": 42,
       "norm_label": ".handlegoogledrivedisconnect()"
@@ -3599,7 +3599,7 @@
       "label": "nullableEmail()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_google_drive.go",
-      "source_location": "L79",
+      "source_location": "L90",
       "id": "api_handlers_google_drive_nullableemail",
       "community": 42,
       "norm_label": "nullableemail()"
@@ -4253,15 +4253,6 @@
       "norm_label": "testloopbackcorssetsheadersandrejectsforeignorigins()"
     },
     {
-      "label": "server.go",
-      "file_type": "code",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "community": 22,
-      "norm_label": "server.go"
-    },
-    {
       "label": "Server",
       "file_type": "code",
       "source_file": "backend/internal/api/server.go",
@@ -4348,7 +4339,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L54",
       "id": "api_server_handler",
-      "community": 38,
+      "community": 22,
       "norm_label": ".handler()"
     },
     {
@@ -4357,7 +4348,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L54",
       "id": "backend_internal_api_server_go_handler",
-      "community": 38,
+      "community": 22,
       "norm_label": "handler"
     },
     {
@@ -4400,7 +4391,7 @@
       "label": "writeErr()",
       "file_type": "code",
       "source_file": "backend/internal/api/server.go",
-      "source_location": "L129",
+      "source_location": "L132",
       "id": "api_server_writeerr",
       "community": 25,
       "norm_label": "writeerr()"
@@ -4409,16 +4400,16 @@
       "label": ".withDebugRequestLogs()",
       "file_type": "code",
       "source_file": "backend/internal/api/server.go",
-      "source_location": "L133",
+      "source_location": "L136",
       "id": "api_server_withdebugrequestlogs",
-      "community": 38,
+      "community": 22,
       "norm_label": ".withdebugrequestlogs()"
     },
     {
       "label": "statusWriter",
       "file_type": "code",
       "source_file": "backend/internal/api/server.go",
-      "source_location": "L150",
+      "source_location": "L153",
       "id": "api_statuswriter",
       "community": 22,
       "norm_label": "statuswriter"
@@ -4427,7 +4418,7 @@
       "label": ".WriteHeader()",
       "file_type": "code",
       "source_file": "backend/internal/api/server.go",
-      "source_location": "L155",
+      "source_location": "L158",
       "id": "api_statuswriter_writeheader",
       "community": 22,
       "norm_label": ".writeheader()"
@@ -4437,7 +4428,7 @@
       "file_type": "code",
       "source_file": "backend/internal/api/server_test.go",
       "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
+      "id": "api_server_test",
       "community": 162,
       "norm_label": "server_test.go"
     },
@@ -4712,15 +4703,6 @@
       "norm_label": "unprotect()"
     },
     {
-      "label": "service.go",
-      "file_type": "code",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "community": 7,
-      "norm_label": "service.go"
-    },
-    {
       "label": "Service",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
@@ -4793,10 +4775,19 @@
       "norm_label": "googledrivesettings"
     },
     {
+      "label": ".Ready()",
+      "file_type": "code",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L83",
+      "id": "googledrive_service_ready",
+      "community": 7,
+      "norm_label": ".ready()"
+    },
+    {
       "label": ".Available()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L80",
+      "source_location": "L93",
       "id": "googledrive_service_available",
       "community": 7,
       "norm_label": ".available()"
@@ -4805,7 +4796,7 @@
       "label": ".ClientIDSource()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L83",
+      "source_location": "L97",
       "id": "googledrive_service_clientidsource",
       "community": 7,
       "norm_label": ".clientidsource()"
@@ -4814,7 +4805,7 @@
       "label": ".CredentialSource()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L84",
+      "source_location": "L98",
       "id": "googledrive_service_credentialsource",
       "community": 7,
       "norm_label": ".credentialsource()"
@@ -4823,7 +4814,7 @@
       "label": ".Connect()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L86",
+      "source_location": "L100",
       "id": "googledrive_service_connect",
       "community": 7,
       "norm_label": ".connect()"
@@ -4832,7 +4823,7 @@
       "label": "Context",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L86",
+      "source_location": "L100",
       "id": "backend_internal_auth_googledrive_service_go_context",
       "community": 7,
       "norm_label": "context"
@@ -4841,7 +4832,7 @@
       "label": ".finishConnection()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L196",
+      "source_location": "L210",
       "id": "googledrive_service_finishconnection",
       "community": 7,
       "norm_label": ".finishconnection()"
@@ -4850,7 +4841,7 @@
       "label": "Config",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L196",
+      "source_location": "L210",
       "id": "config",
       "community": 7,
       "norm_label": "config"
@@ -4859,7 +4850,7 @@
       "label": ".Disconnect()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L233",
+      "source_location": "L247",
       "id": "googledrive_service_disconnect",
       "community": 7,
       "norm_label": ".disconnect()"
@@ -4868,7 +4859,7 @@
       "label": ".HTTPClient()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L251",
+      "source_location": "L265",
       "id": "googledrive_service_httpclient",
       "community": 7,
       "norm_label": ".httpclient()"
@@ -4877,7 +4868,7 @@
       "label": "Client",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L251",
+      "source_location": "L265",
       "id": "backend_internal_auth_googledrive_service_go_client",
       "community": 7,
       "norm_label": "client"
@@ -4886,7 +4877,7 @@
       "label": ".oauthConfig()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L265",
+      "source_location": "L282",
       "id": "googledrive_service_oauthconfig",
       "community": 7,
       "norm_label": ".oauthconfig()"
@@ -4895,7 +4886,7 @@
       "label": "callbackResult",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L276",
+      "source_location": "L293",
       "id": "googledrive_callbackresult",
       "community": 7,
       "norm_label": "callbackresult"
@@ -4904,7 +4895,7 @@
       "label": ".debugLog()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L282",
+      "source_location": "L299",
       "id": "googledrive_service_debuglog",
       "community": 7,
       "norm_label": ".debuglog()"
@@ -4913,7 +4904,7 @@
       "label": ".warningLog()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L292",
+      "source_location": "L309",
       "id": "googledrive_service_warninglog",
       "community": 7,
       "norm_label": ".warninglog()"
@@ -4922,7 +4913,7 @@
       "label": ".errorLog()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L302",
+      "source_location": "L319",
       "id": "googledrive_service_errorlog",
       "community": 7,
       "norm_label": ".errorlog()"
@@ -4931,7 +4922,7 @@
       "label": ".safeDiagnostic()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L312",
+      "source_location": "L329",
       "id": "googledrive_service_safediagnostic",
       "community": 7,
       "norm_label": ".safediagnostic()"
@@ -4940,7 +4931,7 @@
       "label": "oauthJSON",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L329",
+      "source_location": "L346",
       "id": "googledrive_oauthjson",
       "community": 7,
       "norm_label": "oauthjson"
@@ -4949,7 +4940,7 @@
       "label": "oauthJSONClient",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L330",
+      "source_location": "L347",
       "id": "oauthjsonclient",
       "community": 7,
       "norm_label": "oauthjsonclient"
@@ -4958,7 +4949,7 @@
       "label": "oauthJSONClient",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L334",
+      "source_location": "L351",
       "id": "googledrive_oauthjsonclient",
       "community": 7,
       "norm_label": "oauthjsonclient"
@@ -4967,7 +4958,7 @@
       "label": "loadClientConfiguration()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L339",
+      "source_location": "L356",
       "id": "googledrive_service_loadclientconfiguration",
       "community": 7,
       "norm_label": "loadclientconfiguration()"
@@ -4976,7 +4967,7 @@
       "label": "newVerifier()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L386",
+      "source_location": "L403",
       "id": "googledrive_service_newverifier",
       "community": 7,
       "norm_label": "newverifier()"
@@ -4985,7 +4976,7 @@
       "label": "randomURLToken()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L387",
+      "source_location": "L404",
       "id": "googledrive_service_randomurltoken",
       "community": 7,
       "norm_label": "randomurltoken()"
@@ -4994,7 +4985,7 @@
       "label": "openSystemBrowser()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L394",
+      "source_location": "L411",
       "id": "googledrive_service_opensystembrowser",
       "community": 7,
       "norm_label": "opensystembrowser()"
@@ -5003,7 +4994,7 @@
       "label": "accountEmail()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L397",
+      "source_location": "L414",
       "id": "googledrive_service_accountemail",
       "community": 7,
       "norm_label": "accountemail()"
@@ -5012,7 +5003,7 @@
       "label": "reconnectTransport",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L409",
+      "source_location": "L426",
       "id": "googledrive_reconnecttransport",
       "community": 7,
       "norm_label": "reconnecttransport"
@@ -5021,7 +5012,7 @@
       "label": "RoundTripper",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L410",
+      "source_location": "L427",
       "id": "backend_internal_auth_googledrive_service_go_roundtripper",
       "community": 7,
       "norm_label": "roundtripper"
@@ -5030,7 +5021,7 @@
       "label": ".RoundTrip()",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L414",
+      "source_location": "L431",
       "id": "googledrive_reconnecttransport_roundtrip",
       "community": 7,
       "norm_label": ".roundtrip()"
@@ -5039,7 +5030,7 @@
       "label": "Request",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L414",
+      "source_location": "L431",
       "id": "backend_internal_auth_googledrive_service_go_request",
       "community": 7,
       "norm_label": "request"
@@ -5048,7 +5039,7 @@
       "label": "Response",
       "file_type": "code",
       "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L414",
+      "source_location": "L431",
       "id": "backend_internal_auth_googledrive_service_go_response",
       "community": 7,
       "norm_label": "response"
@@ -6053,19 +6044,19 @@
       "norm_label": "t"
     },
     {
-      "label": "monitor.go",
+      "label": "Monitor",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "source_location": "L48",
+      "id": "gamemon_monitor",
       "community": 29,
-      "norm_label": "monitor.go"
+      "norm_label": "monitor"
     },
     {
       "label": "session",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L29",
+      "source_location": "L33",
       "id": "gamemon_session",
       "community": 29,
       "norm_label": "session"
@@ -6074,7 +6065,7 @@
       "label": "Time",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L31",
+      "source_location": "L35",
       "id": "backend_internal_gamemon_monitor_go_time",
       "community": 29,
       "norm_label": "time"
@@ -6083,25 +6074,16 @@
       "label": "flushOp",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
+      "source_location": "L41",
       "id": "gamemon_flushop",
       "community": 29,
       "norm_label": "flushop"
     },
     {
-      "label": "Monitor",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L44",
-      "id": "gamemon_monitor",
-      "community": 29,
-      "norm_label": "monitor"
-    },
-    {
       "label": "Manager",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L45",
+      "source_location": "L49",
       "id": "backend_internal_gamemon_monitor_go_manager",
       "community": 29,
       "norm_label": "manager"
@@ -6110,7 +6092,7 @@
       "label": "Store",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L46",
+      "source_location": "L50",
       "id": "backend_internal_gamemon_monitor_go_store",
       "community": 29,
       "norm_label": "store"
@@ -6119,7 +6101,7 @@
       "label": "Duration",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L50",
+      "source_location": "L55",
       "id": "backend_internal_gamemon_monitor_go_duration",
       "community": 29,
       "norm_label": "duration"
@@ -6128,16 +6110,25 @@
       "label": "RWMutex",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L53",
+      "source_location": "L58",
       "id": "backend_internal_gamemon_monitor_go_rwmutex",
       "community": 29,
       "norm_label": "rwmutex"
     },
     {
+      "label": "Mutex",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L59",
+      "id": "backend_internal_gamemon_monitor_go_mutex",
+      "community": 29,
+      "norm_label": "mutex"
+    },
+    {
       "label": "Bool",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L56",
+      "source_location": "L62",
       "id": "backend_internal_gamemon_monitor_go_bool",
       "community": 29,
       "norm_label": "bool"
@@ -6146,7 +6137,7 @@
       "label": "New()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L60",
+      "source_location": "L66",
       "id": "gamemon_monitor_new",
       "community": 29,
       "norm_label": "new()"
@@ -6155,7 +6146,7 @@
       "label": ".Start()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L74",
+      "source_location": "L81",
       "id": "gamemon_monitor_start",
       "community": 29,
       "norm_label": ".start()"
@@ -6164,7 +6155,7 @@
       "label": "Context",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L74",
+      "source_location": "L81",
       "id": "backend_internal_gamemon_monitor_go_context",
       "community": 29,
       "norm_label": "context"
@@ -6173,7 +6164,7 @@
       "label": ".SetOnRunningChanged()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L102",
+      "source_location": "L109",
       "id": "gamemon_monitor_setonrunningchanged",
       "community": 29,
       "norm_label": ".setonrunningchanged()"
@@ -6182,16 +6173,25 @@
       "label": ".ForcePoll()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L109",
+      "source_location": "L116",
       "id": "gamemon_monitor_forcepoll",
       "community": 29,
       "norm_label": ".forcepoll()"
     },
     {
+      "label": ".ProbeLaunch()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L126",
+      "id": "gamemon_monitor_probelaunch",
+      "community": 29,
+      "norm_label": ".probelaunch()"
+    },
+    {
       "label": ".IsRunning()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L117",
+      "source_location": "L143",
       "id": "gamemon_monitor_isrunning",
       "community": 29,
       "norm_label": ".isrunning()"
@@ -6200,7 +6200,7 @@
       "label": ".PendingSeconds()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L125",
+      "source_location": "L151",
       "id": "gamemon_monitor_pendingseconds",
       "community": 29,
       "norm_label": ".pendingseconds()"
@@ -6209,7 +6209,7 @@
       "label": ".RunningIDs()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L136",
+      "source_location": "L162",
       "id": "gamemon_monitor_runningids",
       "community": 29,
       "norm_label": ".runningids()"
@@ -6218,7 +6218,7 @@
       "label": ".pollOnce()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L148",
+      "source_location": "L174",
       "id": "gamemon_monitor_pollonce",
       "community": 29,
       "norm_label": ".pollonce()"
@@ -6227,7 +6227,7 @@
       "label": ".flushAll()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L228",
+      "source_location": "L262",
       "id": "gamemon_monitor_flushall",
       "community": 29,
       "norm_label": ".flushall()"
@@ -6236,7 +6236,7 @@
       "label": ".flushOps()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L244",
+      "source_location": "L278",
       "id": "gamemon_monitor_flushops",
       "community": 29,
       "norm_label": ".flushops()"
@@ -6245,7 +6245,7 @@
       "label": ".snapshotRunningExecutables()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L263",
+      "source_location": "L297",
       "id": "gamemon_monitor_snapshotrunningexecutables",
       "community": 29,
       "norm_label": ".snapshotrunningexecutables()"
@@ -6254,7 +6254,7 @@
       "label": "normalizePath()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L300",
+      "source_location": "L334",
       "id": "gamemon_monitor_normalizepath",
       "community": 29,
       "norm_label": "normalizepath()"
@@ -6263,10 +6263,37 @@
       "label": "sameSet()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L309",
+      "source_location": "L343",
       "id": "gamemon_monitor_sameset",
       "community": 29,
       "norm_label": "sameset()"
+    },
+    {
+      "label": "monitor_test.go",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L1",
+      "id": "gamemon_monitor_test",
+      "community": 29,
+      "norm_label": "monitor_test.go"
+    },
+    {
+      "label": "TestPollOnceFlushesTheFinalObservedPlaytimeOnExit()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L13",
+      "id": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
+      "community": 29,
+      "norm_label": "testpollonceflushesthefinalobservedplaytimeonexit()"
+    },
+    {
+      "label": "T",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L13",
+      "id": "backend_internal_gamemon_monitor_test_go_t",
+      "community": 29,
+      "norm_label": "t"
     },
     {
       "label": "protection.go",
@@ -7997,13 +8024,13 @@
       "norm_label": "response"
     },
     {
-      "label": "engine.go",
+      "label": "Engine",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "source_location": "L39",
+      "id": "syncer_engine",
       "community": 18,
-      "norm_label": "engine.go"
+      "norm_label": "engine"
     },
     {
       "label": "syncTrigger",
@@ -8011,7 +8038,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L25",
       "id": "syncer_synctrigger",
-      "community": 18,
+      "community": 23,
       "norm_label": "synctrigger"
     },
     {
@@ -8029,7 +8056,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L31",
       "id": "syncer_dirtygame",
-      "community": 18,
+      "community": 52,
       "norm_label": "dirtygame"
     },
     {
@@ -8038,17 +8065,8 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L32",
       "id": "backend_internal_syncer_engine_go_time",
-      "community": 18,
+      "community": 52,
       "norm_label": "time"
-    },
-    {
-      "label": "Engine",
-      "file_type": "code",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L39",
-      "id": "syncer_engine",
-      "community": 18,
-      "norm_label": "engine"
     },
     {
       "label": "Manager",
@@ -8056,7 +8074,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L40",
       "id": "backend_internal_syncer_engine_go_manager",
-      "community": 18,
+      "community": 36,
       "norm_label": "manager"
     },
     {
@@ -8065,7 +8083,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L41",
       "id": "backend_internal_syncer_engine_go_store",
-      "community": 18,
+      "community": 30,
       "norm_label": "store"
     },
     {
@@ -8119,7 +8137,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L59",
       "id": "backend_internal_syncer_engine_go_context",
-      "community": 18,
+      "community": 36,
       "norm_label": "context"
     },
     {
@@ -8137,7 +8155,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L68",
       "id": "syncer_engine_new",
-      "community": 18,
+      "community": 36,
       "norm_label": "new()"
     },
     {
@@ -8155,7 +8173,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L95",
       "id": "syncer_engine_start",
-      "community": 18,
+      "community": 30,
       "norm_label": ".start()"
     },
     {
@@ -8164,7 +8182,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L125",
       "id": "syncer_engine_stop",
-      "community": 18,
+      "community": 30,
       "norm_label": ".stop()"
     },
     {
@@ -8173,7 +8191,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L135",
       "id": "syncer_engine_resume",
-      "community": 18,
+      "community": 30,
       "norm_label": ".resume()"
     },
     {
@@ -8182,7 +8200,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L146",
       "id": "syncer_engine_globalcontrol",
-      "community": 18,
+      "community": 30,
       "norm_label": ".globalcontrol()"
     },
     {
@@ -8191,7 +8209,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L146",
       "id": "backend_internal_syncer_engine_go_servicecontrolstate",
-      "community": 18,
+      "community": 30,
       "norm_label": "servicecontrolstate"
     },
     {
@@ -8200,7 +8218,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L155",
       "id": "syncer_engine_gamecontrol",
-      "community": 18,
+      "community": 30,
       "norm_label": ".gamecontrol()"
     },
     {
@@ -8209,7 +8227,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L170",
       "id": "syncer_engine_normalizecontrol",
-      "community": 18,
+      "community": 30,
       "norm_label": "normalizecontrol()"
     },
     {
@@ -8218,7 +8236,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L182",
       "id": "syncer_engine_setservicecontrol",
-      "community": 18,
+      "community": 30,
       "norm_label": ".setservicecontrol()"
     },
     {
@@ -8254,7 +8272,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L245",
       "id": "syncer_engine_waitforlocalprotection",
-      "community": 18,
+      "community": 36,
       "norm_label": ".waitforlocalprotection()"
     },
     {
@@ -8263,7 +8281,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L245",
       "id": "backend_internal_syncer_engine_go_revision",
-      "community": 18,
+      "community": 16,
       "norm_label": "revision"
     },
     {
@@ -8362,7 +8380,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L440",
       "id": "syncer_engine_resolveconflict",
-      "community": 0,
+      "community": 18,
       "norm_label": ".resolveconflict()"
     },
     {
@@ -8371,7 +8389,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L440",
       "id": "backend_internal_syncer_engine_go_game",
-      "community": 18,
+      "community": 16,
       "norm_label": "game"
     },
     {
@@ -8443,7 +8461,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L517",
       "id": "syncer_engine_cloudprofiles",
-      "community": 18,
+      "community": 36,
       "norm_label": ".cloudprofiles()"
     },
     {
@@ -8452,7 +8470,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L517",
       "id": "backend_internal_syncer_engine_go_gameprofile",
-      "community": 18,
+      "community": 36,
       "norm_label": "gameprofile"
     },
     {
@@ -8461,7 +8479,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L535",
       "id": "syncer_engine_restoreandtrack",
-      "community": 18,
+      "community": 36,
       "norm_label": ".restoreandtrack()"
     },
     {
@@ -8470,7 +8488,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L582",
       "id": "syncer_engine_restorecloudprofile",
-      "community": 18,
+      "community": 36,
       "norm_label": ".restorecloudprofile()"
     },
     {
@@ -8488,7 +8506,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L679",
       "id": "syncer_engine_preparelaunch",
-      "community": 18,
+      "community": 36,
       "norm_label": ".preparelaunch()"
     },
     {
@@ -8497,7 +8515,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L726",
       "id": "syncer_engine_restorelocalrevision",
-      "community": 18,
+      "community": 16,
       "norm_label": ".restorelocalrevision()"
     },
     {
@@ -8506,7 +8524,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L739",
       "id": "syncer_engine_loop",
-      "community": 18,
+      "community": 30,
       "norm_label": ".loop()"
     },
     {
@@ -8515,7 +8533,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L755",
       "id": "syncer_engine_scheduledue",
-      "community": 18,
+      "community": 30,
       "norm_label": ".scheduledue()"
     },
     {
@@ -8524,7 +8542,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L808",
       "id": "syncer_engine_resumepending",
-      "community": 18,
+      "community": 30,
       "norm_label": ".resumepending()"
     },
     {
@@ -8533,7 +8551,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L829",
       "id": "syncer_engine_runonce",
-      "community": 18,
+      "community": 16,
       "norm_label": ".runonce()"
     },
     {
@@ -8542,7 +8560,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "syncer_engine_capturelocal",
-      "community": 18,
+      "community": 16,
       "norm_label": ".capturelocal()"
     },
     {
@@ -8551,7 +8569,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "backend_internal_syncer_engine_go_result",
-      "community": 18,
+      "community": 16,
       "norm_label": "result"
     },
     {
@@ -8560,7 +8578,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L998",
       "id": "syncer_engine_gameprofile",
-      "community": 18,
+      "community": 16,
       "norm_label": "gameprofile()"
     },
     {
@@ -8569,7 +8587,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "syncer_engine_publishprofile",
-      "community": 18,
+      "community": 16,
       "norm_label": ".publishprofile()"
     },
     {
@@ -8578,7 +8596,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "profilestore",
-      "community": 18,
+      "community": 16,
       "norm_label": "profilestore"
     },
     {
@@ -8587,7 +8605,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "backend_internal_syncer_engine_go_revisionstore",
-      "community": 18,
+      "community": 16,
       "norm_label": "revisionstore"
     },
     {
@@ -8605,7 +8623,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "syncer_engine_setplaytimeledgers",
-      "community": 18,
+      "community": 16,
       "norm_label": ".setplaytimeledgers()"
     },
     {
@@ -8614,7 +8632,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "backend_internal_syncer_engine_go_playtimeledger",
-      "community": 18,
+      "community": 16,
       "norm_label": "playtimeledger"
     },
     {
@@ -8623,7 +8641,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1088",
       "id": "syncer_engine_setrecoveredplaytime",
-      "community": 18,
+      "community": 36,
       "norm_label": ".setrecoveredplaytime()"
     },
     {
@@ -8632,7 +8650,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1099",
       "id": "syncer_engine_mergeplaytimeledgers",
-      "community": 18,
+      "community": 16,
       "norm_label": "mergeplaytimeledgers()"
     },
     {
@@ -8641,7 +8659,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1114",
       "id": "syncer_engine_portablepathhint",
-      "community": 18,
+      "community": 16,
       "norm_label": "portablepathhint()"
     },
     {
@@ -8650,7 +8668,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1141",
       "id": "syncer_engine_reasondetails",
-      "community": 18,
+      "community": 16,
       "norm_label": "reasondetails()"
     },
     {
@@ -8659,7 +8677,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1156",
       "id": "syncer_engine_uploadspaused",
-      "community": 18,
+      "community": 30,
       "norm_label": ".uploadspaused()"
     },
     {
@@ -8695,7 +8713,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1209",
       "id": "syncer_engine_retryjob",
-      "community": 18,
+      "community": 16,
       "norm_label": ".retryjob()"
     },
     {
@@ -8704,7 +8722,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1231",
       "id": "syncer_engine_retrydelay",
-      "community": 18,
+      "community": 16,
       "norm_label": "retrydelay()"
     },
     {
@@ -8713,7 +8731,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1231",
       "id": "backend_internal_syncer_engine_go_duration",
-      "community": 18,
+      "community": 16,
       "norm_label": "duration"
     },
     {
@@ -8722,7 +8740,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1247",
       "id": "syncer_engine_classifylocalerror",
-      "community": 18,
+      "community": 16,
       "norm_label": "classifylocalerror()"
     },
     {
@@ -8731,7 +8749,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1261",
       "id": "syncer_engine_classifyprovidererror",
-      "community": 18,
+      "community": 16,
       "norm_label": "classifyprovidererror()"
     },
     {
@@ -8740,68 +8758,68 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1261",
       "id": "providerstate",
-      "community": 18,
+      "community": 16,
       "norm_label": "providerstate"
     },
     {
       "label": "providerRetryAfter()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1297",
+      "source_location": "L1301",
       "id": "syncer_engine_providerretryafter",
-      "community": 18,
+      "community": 16,
       "norm_label": "providerretryafter()"
     },
     {
       "label": "userProviderMessage()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1305",
+      "source_location": "L1309",
       "id": "syncer_engine_userprovidermessage",
-      "community": 18,
+      "community": 16,
       "norm_label": "userprovidermessage()"
     },
     {
       "label": ".noteProviderAttempt()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1328",
+      "source_location": "L1334",
       "id": "syncer_engine_noteproviderattempt",
-      "community": 18,
+      "community": 52,
       "norm_label": ".noteproviderattempt()"
     },
     {
       "label": ".noteProviderFailure()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1336",
+      "source_location": "L1342",
       "id": "syncer_engine_noteproviderfailure",
-      "community": 18,
+      "community": 16,
       "norm_label": ".noteproviderfailure()"
     },
     {
       "label": ".noteProviderRetryAt()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1346",
+      "source_location": "L1352",
       "id": "syncer_engine_noteproviderretryat",
-      "community": 18,
+      "community": 52,
       "norm_label": ".noteproviderretryat()"
     },
     {
       "label": ".noteProviderSuccess()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1356",
+      "source_location": "L1362",
       "id": "syncer_engine_noteprovidersuccess",
-      "community": 18,
+      "community": 52,
       "norm_label": ".noteprovidersuccess()"
     },
     {
       "label": ".refreshHealth()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1368",
+      "source_location": "L1374",
       "id": "syncer_engine_refreshhealth",
       "community": 18,
       "norm_label": ".refreshhealth()"
@@ -8810,25 +8828,25 @@
       "label": ".persistHealth()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1387",
+      "source_location": "L1393",
       "id": "syncer_engine_persisthealth",
-      "community": 18,
+      "community": 52,
       "norm_label": ".persisthealth()"
     },
     {
       "label": ".noteProtectionComplete()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1396",
+      "source_location": "L1402",
       "id": "syncer_engine_noteprotectioncomplete",
-      "community": 18,
+      "community": 16,
       "norm_label": ".noteprotectioncomplete()"
     },
     {
       "label": ".finishJob()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1408",
+      "source_location": "L1414",
       "id": "syncer_engine_finishjob",
       "community": 18,
       "norm_label": ".finishjob()"
@@ -8837,7 +8855,7 @@
       "label": ".storeJob()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1417",
+      "source_location": "L1423",
       "id": "syncer_engine_storejob",
       "community": 18,
       "norm_label": ".storejob()"
@@ -8846,7 +8864,7 @@
       "label": ".storeJobMemory()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1422",
+      "source_location": "L1428",
       "id": "syncer_engine_storejobmemory",
       "community": 18,
       "norm_label": ".storejobmemory()"
@@ -8855,7 +8873,7 @@
       "label": ".job()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1435",
+      "source_location": "L1441",
       "id": "syncer_engine_job",
       "community": 18,
       "norm_label": ".job()"
@@ -8864,7 +8882,7 @@
       "label": ".updateJob()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1450",
+      "source_location": "L1456",
       "id": "syncer_engine_updatejob",
       "community": 18,
       "norm_label": ".updatejob()"
@@ -8873,16 +8891,16 @@
       "label": ".setRunning()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1465",
+      "source_location": "L1471",
       "id": "syncer_engine_setrunning",
-      "community": 18,
+      "community": 30,
       "norm_label": ".setrunning()"
     },
     {
       "label": ".signalStatus()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1472",
+      "source_location": "L1478",
       "id": "syncer_engine_signalstatus",
       "community": 18,
       "norm_label": ".signalstatus()"
@@ -8891,7 +8909,7 @@
       "label": ".SortedRunningGames()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1479",
+      "source_location": "L1485",
       "id": "syncer_engine_sortedrunninggames",
       "community": 18,
       "norm_label": ".sortedrunninggames()"
@@ -8901,7 +8919,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L1",
-      "id": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "id": "syncer_engine_test",
       "community": 11,
       "norm_label": "engine_test.go"
     },
@@ -8909,7 +8927,7 @@
       "label": "TestEngineLocalFirstRecoveryPointAndExactRestore()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "syncer_engine_test_testenginelocalfirstrecoverypointandexactrestore",
       "community": 11,
       "norm_label": "testenginelocalfirstrecoverypointandexactrestore()"
@@ -8918,7 +8936,7 @@
       "label": "T",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "backend_internal_syncer_engine_test_go_t",
       "community": 11,
       "norm_label": "t"
@@ -8927,7 +8945,7 @@
       "label": "TestEngineKeepsLocalRevisionWhenProviderIsOffline()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L83",
+      "source_location": "L84",
       "id": "syncer_engine_test_testenginekeepslocalrevisionwhenproviderisoffline",
       "community": 11,
       "norm_label": "testenginekeepslocalrevisionwhenproviderisoffline()"
@@ -8936,7 +8954,7 @@
       "label": "TestConfigurationChangedRefreshesProtectionTargetAndProviderState()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L131",
+      "source_location": "L132",
       "id": "syncer_engine_test_testconfigurationchangedrefreshesprotectiontargetandproviderstate",
       "community": 11,
       "norm_label": "testconfigurationchangedrefreshesprotectiontargetandproviderstate()"
@@ -8945,16 +8963,25 @@
       "label": "TestStructuredProviderRateLimitClassification()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L169",
+      "source_location": "L170",
       "id": "syncer_engine_test_teststructuredproviderratelimitclassification",
       "community": 11,
       "norm_label": "teststructuredproviderratelimitclassification()"
     },
     {
+      "label": "TestOAuthConfigurationFailureIsNotReportedAsOffline()",
+      "file_type": "code",
+      "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L188",
+      "id": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
+      "community": 11,
+      "norm_label": "testoauthconfigurationfailureisnotreportedasoffline()"
+    },
+    {
       "label": "TestRecoveryLibraryRestorePublishesOnlyVerifiedRevision()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L187",
+      "source_location": "L199",
       "id": "syncer_engine_test_testrecoverylibraryrestorepublishesonlyverifiedrevision",
       "community": 11,
       "norm_label": "testrecoverylibraryrestorepublishesonlyverifiedrevision()"
@@ -8963,7 +8990,7 @@
       "label": "TestConcurrentProviderHeadIsPreservedForReview()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L251",
+      "source_location": "L263",
       "id": "syncer_engine_test_testconcurrentproviderheadispreservedforreview",
       "community": 11,
       "norm_label": "testconcurrentproviderheadispreservedforreview()"
@@ -8972,7 +8999,7 @@
       "label": "testProtectionEnvironment()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L345",
+      "source_location": "L357",
       "id": "syncer_engine_test_testprotectionenvironment",
       "community": 11,
       "norm_label": "testprotectionenvironment()"
@@ -8981,7 +9008,7 @@
       "label": "Manager",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L345",
+      "source_location": "L357",
       "id": "backend_internal_syncer_engine_test_go_manager",
       "community": 11,
       "norm_label": "manager"
@@ -8990,7 +9017,7 @@
       "label": "Store",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L345",
+      "source_location": "L357",
       "id": "backend_internal_syncer_engine_test_go_store",
       "community": 11,
       "norm_label": "store"
@@ -8999,7 +9026,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L345",
+      "source_location": "L357",
       "id": "backend_internal_syncer_engine_test_go_game",
       "community": 11,
       "norm_label": "game"
@@ -9008,7 +9035,7 @@
       "label": "waitForJob()",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L363",
+      "source_location": "L375",
       "id": "syncer_engine_test_waitforjob",
       "community": 11,
       "norm_label": "waitforjob()"
@@ -9017,7 +9044,7 @@
       "label": "Engine",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L363",
+      "source_location": "L375",
       "id": "backend_internal_syncer_engine_test_go_engine",
       "community": 11,
       "norm_label": "engine"
@@ -9026,7 +9053,7 @@
       "label": "SyncJob",
       "file_type": "code",
       "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L363",
+      "source_location": "L375",
       "id": "backend_internal_syncer_engine_test_go_syncjob",
       "community": 11,
       "norm_label": "syncjob"
@@ -9379,7 +9406,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_syncer_folder_test_go",
-      "community": 23,
+      "community": 11,
       "norm_label": "folder_test.go"
     },
     {
@@ -9388,7 +9415,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L13",
       "id": "syncer_folder_test_testplaytimeledgersmergebydeviceandroundtrip",
-      "community": 23,
+      "community": 11,
       "norm_label": "testplaytimeledgersmergebydeviceandroundtrip()"
     },
     {
@@ -9397,7 +9424,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L13",
       "id": "backend_internal_syncer_folder_test_go_t",
-      "community": 23,
+      "community": 11,
       "norm_label": "t"
     },
     {
@@ -9406,7 +9433,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L31",
       "id": "syncer_folder_test_testfolderreconciletransfersupdatesdeletesandconflicts",
-      "community": 23,
+      "community": 11,
       "norm_label": "testfolderreconciletransfersupdatesdeletesandconflicts()"
     },
     {
@@ -9415,7 +9442,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L121",
       "id": "syncer_folder_test_mustwrite",
-      "community": 23,
+      "community": 11,
       "norm_label": "mustwrite()"
     },
     {
@@ -9424,7 +9451,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L130",
       "id": "syncer_folder_test_mustreadequal",
-      "community": 23,
+      "community": 11,
       "norm_label": "mustreadequal()"
     },
     {
@@ -10171,7 +10198,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_watcher_watcher_go",
-      "community": 16,
+      "community": 3,
       "norm_label": "watcher.go"
     },
     {
@@ -10180,7 +10207,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L16",
       "id": "watcher_manager",
-      "community": 16,
+      "community": 3,
       "norm_label": "manager"
     },
     {
@@ -10189,7 +10216,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L17",
       "id": "backend_internal_watcher_watcher_go_mutex",
-      "community": 16,
+      "community": 3,
       "norm_label": "mutex"
     },
     {
@@ -10198,7 +10225,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L18",
       "id": "watcher",
-      "community": 16,
+      "community": 3,
       "norm_label": "watcher"
     },
     {
@@ -10207,7 +10234,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L19",
       "id": "backend_internal_watcher_watcher_go_cancelfunc",
-      "community": 16,
+      "community": 3,
       "norm_label": "cancelfunc"
     },
     {
@@ -10216,7 +10243,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L23",
       "id": "watcher_watcher_new",
-      "community": 16,
+      "community": 3,
       "norm_label": "new()"
     },
     {
@@ -10225,7 +10252,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L27",
       "id": "watcher_manager_reload",
-      "community": 16,
+      "community": 3,
       "norm_label": ".reload()"
     },
     {
@@ -10234,7 +10261,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L27",
       "id": "backend_internal_watcher_watcher_go_game",
-      "community": 16,
+      "community": 3,
       "norm_label": "game"
     },
     {
@@ -10243,7 +10270,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L90",
       "id": "watcher_manager_close",
-      "community": 16,
+      "community": 3,
       "norm_label": ".close()"
     },
     {
@@ -10252,7 +10279,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L102",
       "id": "watcher_watcher_addrecursive",
-      "community": 16,
+      "community": 3,
       "norm_label": "addrecursive()"
     },
     {
@@ -11222,7 +11249,7 @@
       "label": "args",
       "file_type": "code",
       "source_file": "scripts/stage-backend-daemon.mjs",
-      "source_location": "L31",
+      "source_location": "L35",
       "id": "scripts_stage_backend_daemon_args",
       "community": 34,
       "norm_label": "args"
@@ -11231,7 +11258,7 @@
       "label": "linkerValues",
       "file_type": "code",
       "source_file": "scripts/stage-backend-daemon.mjs",
-      "source_location": "L32",
+      "source_location": "L36",
       "id": "scripts_stage_backend_daemon_linkervalues",
       "community": 34,
       "norm_label": "linkervalues"
@@ -11240,7 +11267,7 @@
       "label": "result",
       "file_type": "code",
       "source_file": "scripts/stage-backend-daemon.mjs",
-      "source_location": "L44",
+      "source_location": "L48",
       "id": "scripts_stage_backend_daemon_result",
       "community": 34,
       "norm_label": "result"
@@ -13334,6 +13361,69 @@
       "norm_label": "corruption and missing objects"
     },
     {
+      "label": "handlers_google_drive.go",
+      "file_type": "code",
+      "source_file": "backend/internal/api/handlers_google_drive.go",
+      "source_location": "L1",
+      "community": 42,
+      "norm_label": "handlers_google_drive.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_api_handlers_google_drive_go"
+    },
+    {
+      "label": "server.go",
+      "file_type": "code",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L1",
+      "community": 22,
+      "norm_label": "server.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_api_server_go"
+    },
+    {
+      "label": "server_test.go",
+      "file_type": "code",
+      "source_file": "backend/internal/api/server_test.go",
+      "source_location": "L1",
+      "community": 162,
+      "norm_label": "server_test.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_api_server_test_go"
+    },
+    {
+      "label": "service.go",
+      "file_type": "code",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L1",
+      "community": 7,
+      "norm_label": "service.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go"
+    },
+    {
+      "label": "monitor.go",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L1",
+      "community": 29,
+      "norm_label": "monitor.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go"
+    },
+    {
+      "label": "engine.go",
+      "file_type": "code",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1",
+      "community": 16,
+      "norm_label": "engine.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go"
+    },
+    {
+      "label": "engine_test.go",
+      "file_type": "code",
+      "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L1",
+      "community": 11,
+      "norm_label": "engine_test.go",
+      "id": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go"
+    },
+    {
       "label": "LaunchOrigin",
       "file_type": "code",
       "source_file": "app/src/types.ts",
@@ -13577,15 +13667,6 @@
       "id": "api_handlers_debug"
     },
     {
-      "label": "handlers_google_drive.go",
-      "file_type": "code",
-      "source_file": "backend/internal/api/handlers_google_drive.go",
-      "source_location": "L1",
-      "community": 42,
-      "norm_label": "handlers_google_drive.go",
-      "id": "api_handlers_google_drive"
-    },
-    {
       "label": "handlers_lifecycle.go",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_lifecycle.go",
@@ -13674,15 +13755,6 @@
       "community": 38,
       "norm_label": "middleware_test.go",
       "id": "api_middleware_test"
-    },
-    {
-      "label": "server_test.go",
-      "file_type": "code",
-      "source_file": "backend/internal/api/server_test.go",
-      "source_location": "L1",
-      "community": 162,
-      "norm_label": "server_test.go",
-      "id": "api_server_test"
     },
     {
       "label": "dpapi_windows.go",
@@ -13892,15 +13964,6 @@
       "id": "drive_store_test"
     },
     {
-      "label": "engine_test.go",
-      "file_type": "code",
-      "source_file": "backend/internal/syncer/engine_test.go",
-      "source_location": "L1",
-      "community": 11,
-      "norm_label": "engine_test.go",
-      "id": "syncer_engine_test"
-    },
-    {
       "label": "folder.go",
       "file_type": "code",
       "source_file": "backend/internal/syncer/folder.go",
@@ -13914,7 +13977,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
-      "community": 23,
+      "community": 11,
       "norm_label": "folder_test.go",
       "id": "syncer_folder_test"
     },
@@ -13950,7 +14013,7 @@
       "file_type": "code",
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
-      "community": 16,
+      "community": 3,
       "norm_label": "watcher.go",
       "id": "watcher_watcher"
     },
@@ -16022,7 +16085,7 @@
       "source_file": "app/src/constants/defaults.ts",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 6,
+      "community": 35,
       "norm_label": "default_settings",
       "id": "app_src_constants_defaults_default_settings"
     },
@@ -17418,7 +17481,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 0,
+      "community": 3,
       "norm_label": "application new",
       "id": "backend_internal_app_app_new"
     },
@@ -17936,7 +17999,7 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 6,
+      "community": 23,
       "norm_label": "monitor.go",
       "id": "backend_internal_gamemon_monitor"
     },
@@ -18040,7 +18103,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 0,
+      "community": 11,
       "norm_label": "open sqlite log store",
       "id": "backend_internal_logstore_sqlite_open"
     },
@@ -18540,7 +18603,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 6,
+      "community": 23,
       "norm_label": "engine.go",
       "id": "backend_internal_syncer_engine"
     },
@@ -18564,7 +18627,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L164",
       "_origin": "ast",
-      "community": 18,
+      "community": 30,
       "norm_label": "normalizecontrol()",
       "id": "backend_internal_syncer_engine_normalizecontrol"
     },
@@ -18584,7 +18647,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L923",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "gameprofile()",
       "id": "backend_internal_syncer_engine_gameprofile"
     },
@@ -18594,7 +18657,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L936",
       "_origin": "ast",
-      "community": 6,
+      "community": 23,
       "norm_label": "portablepathhint()",
       "id": "backend_internal_syncer_engine_portablepathhint"
     },
@@ -18604,7 +18667,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L963",
       "_origin": "ast",
-      "community": 18,
+      "community": 23,
       "norm_label": "reasondetails()",
       "id": "backend_internal_syncer_engine_reasondetails"
     },
@@ -18614,7 +18677,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1053",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "retrydelay()",
       "id": "backend_internal_syncer_engine_retrydelay"
     },
@@ -18624,7 +18687,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1069",
       "_origin": "ast",
-      "community": 18,
+      "community": 23,
       "norm_label": "classifylocalerror()",
       "id": "backend_internal_syncer_engine_classifylocalerror"
     },
@@ -18634,7 +18697,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1083",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "classifyprovidererror()",
       "id": "backend_internal_syncer_engine_classifyprovidererror"
     },
@@ -18644,7 +18707,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1119",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "providerretryafter()",
       "id": "backend_internal_syncer_engine_providerretryafter"
     },
@@ -18654,7 +18717,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1127",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "userprovidermessage()",
       "id": "backend_internal_syncer_engine_userprovidermessage"
     },
@@ -18694,7 +18757,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L131",
       "_origin": "ast",
-      "community": 0,
+      "community": 11,
       "norm_label": "testconfigurationchangedrefreshesprotectiontargetandproviderstate()",
       "id": "backend_internal_syncer_engine_test_testconfigurationchangedrefreshesprotectiontargetandproviderstate"
     },
@@ -18704,7 +18767,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L169",
       "_origin": "ast",
-      "community": 18,
+      "community": 16,
       "norm_label": "teststructuredproviderratelimitclassification()",
       "id": "backend_internal_syncer_engine_test_teststructuredproviderratelimitclassification"
     },
@@ -18724,7 +18787,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L251",
       "_origin": "ast",
-      "community": 0,
+      "community": 11,
       "norm_label": "testconcurrentproviderheadispreservedforreview()",
       "id": "backend_internal_syncer_engine_test_testconcurrentproviderheadispreservedforreview"
     },
@@ -18824,7 +18887,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L374",
       "_origin": "ast",
-      "community": 18,
+      "community": 0,
       "norm_label": "withcapturelimit()",
       "id": "backend_internal_syncer_folder_withcapturelimit"
     },
@@ -19034,7 +19097,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 23,
+      "community": 11,
       "norm_label": "folder_test.go",
       "id": "backend_internal_syncer_folder_test"
     },
@@ -19044,7 +19107,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 23,
+      "community": 11,
       "norm_label": "testfolderreconciletransfersupdatesdeletesandconflicts()",
       "id": "backend_internal_syncer_folder_test_testfolderreconciletransfersupdatesdeletesandconflicts"
     },
@@ -19054,7 +19117,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 23,
+      "community": 11,
       "norm_label": "mustwrite()",
       "id": "backend_internal_syncer_folder_test_mustwrite"
     },
@@ -19064,7 +19127,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L111",
       "_origin": "ast",
-      "community": 23,
+      "community": 11,
       "norm_label": "mustreadequal()",
       "id": "backend_internal_syncer_folder_test_mustreadequal"
     },
@@ -19320,7 +19383,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 16,
+      "community": 3,
       "norm_label": "watcher.go",
       "id": "backend_internal_watcher_watcher"
     },
@@ -19330,7 +19393,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L23",
       "_origin": "ast",
-      "community": 16,
+      "community": 3,
       "norm_label": "new()",
       "id": "backend_internal_watcher_watcher_new"
     },
@@ -19340,7 +19403,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 16,
+      "community": 3,
       "norm_label": "addrecursive()",
       "id": "backend_internal_watcher_watcher_addrecursive"
     },
@@ -19657,7 +19720,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "native update manager",
       "id": "app_src_tauri_updater_update_manager"
     },
@@ -19670,7 +19733,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "signed update verification",
       "id": "app_src_tauri_updater_signed_update_verification"
     },
@@ -19683,7 +19746,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "daemon shutdown request",
       "id": "app_src_tauri_updater_daemon_shutdown_request"
     },
@@ -19696,7 +19759,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "tauri update bridge",
       "id": "app_src_update_tauri_update_bridge"
     },
@@ -19709,7 +19772,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "backend api client",
       "id": "app_src_api_backend_api_client"
     },
@@ -19722,7 +19785,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "backend response normalizers",
       "id": "app_src_api_response_normalizers"
     },
@@ -19735,7 +19798,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "native file picker",
       "id": "app_src_native_dialog_native_file_picker"
     },
@@ -19748,7 +19811,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "application controller",
       "id": "app_src_app_application_controller"
     },
@@ -19761,7 +19824,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "game protection and recovery ui",
       "id": "app_src_views_game_detail_protection_and_recovery_ui"
     },
@@ -19774,7 +19837,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "provider and update settings ui",
       "id": "app_src_views_settings_provider_and_update_ui"
     },
@@ -19787,7 +19850,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 35,
       "norm_label": "recovery library ui",
       "id": "app_src_views_home_recovery_library_ui"
     },
@@ -19800,7 +19863,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "single-instance daemon bootstrap",
       "id": "backend_cmd_daemon_single_instance_daemon"
     },
@@ -19813,7 +19876,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "local http api server",
       "id": "backend_internal_api_local_http_server"
     },
@@ -19826,7 +19889,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "loopback api access control",
       "id": "backend_internal_api_loopback_access_control"
     },
@@ -19839,7 +19902,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "game management handler",
       "id": "backend_internal_api_game_management_handler"
     },
@@ -19852,7 +19915,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "protection and recovery handler",
       "id": "backend_internal_api_protection_recovery_handler"
     },
@@ -19865,7 +19928,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "backup import export handler",
       "id": "backend_internal_api_backup_import_export_handler"
     },
@@ -19878,7 +19941,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "legacy snapshot handler",
       "id": "backend_internal_api_legacy_snapshot_handler"
     },
@@ -19891,7 +19954,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "google drive oauth handler",
       "id": "backend_internal_api_google_drive_oauth_handler"
     },
@@ -19904,7 +19967,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "update lifecycle safety gate",
       "id": "backend_internal_api_update_lifecycle_gate"
     },
@@ -19917,7 +19980,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "settings update handler",
       "id": "backend_internal_api_settings_handler"
     },
@@ -19930,7 +19993,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "sync queue and conflict handler",
       "id": "backend_internal_api_sync_handler"
     },
@@ -19943,7 +20006,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "activity and log store",
       "id": "backend_internal_logstore_store"
     },
@@ -19956,7 +20019,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "backup archive service",
       "id": "backend_internal_backup_service"
     },
@@ -19969,7 +20032,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "google drive authentication service",
       "id": "backend_internal_googledriveauth_service"
     },
@@ -19982,7 +20045,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 23,
       "norm_label": "cross-device recovery library",
       "id": "backend_internal_api_recovery_library"
     },
@@ -20125,7 +20188,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 0,
       "norm_label": "save revision",
       "id": "backend_internal_logstore_protection_saverevision"
     },
@@ -20151,7 +20214,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 0,
       "norm_label": "run protection job",
       "id": "backend_internal_syncer_engine_runonce"
     },
@@ -20164,7 +20227,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 0,
       "norm_label": "capture local revision",
       "id": "backend_internal_syncer_engine_capturelocal"
     },
@@ -20177,7 +20240,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 9,
+      "community": 0,
       "norm_label": "create recovery point job",
       "id": "backend_internal_syncer_engine_createrecoverypoint"
     },
@@ -29813,6 +29876,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "views_gamedetailview",
+      "target": "src_types_providerhealth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32586,7 +32660,7 @@
       "source_location": "L79",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_handlers_google_drive_go",
+      "source": "api_handlers_google_drive",
       "target": "api_handlers_google_drive_nullableemail"
     },
     {
@@ -32817,7 +32891,7 @@
       "source_location": "L79",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "api_handlers_google_drive",
+      "source": "d_myprojects_cloud_saver_backend_internal_api_handlers_google_drive_go",
       "target": "api_handlers_google_drive_nullableemail"
     },
     {
@@ -35175,66 +35249,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
-      "source_location": "L112",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "api_server_decodejson"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "api_server_new"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L129",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "api_server_writeerr"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L123",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "api_server_writejson"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L150",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "api_statuswriter"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
-      "source_location": "L20",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
-      "target": "backend_internal_api_server_go_api_server"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server.go",
       "source_location": "L36",
       "weight": 1.0,
       "context": "return_type",
@@ -35321,9 +35335,9 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "backend_internal_api_server_go_api_server",
-      "target": "backend_internal_api_server_go_api_server"
+      "target": "backend_internal_api_server_go_api_server",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -35444,6 +35458,16 @@
       "target": "backend_internal_api_server_go_api_server"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "backend_internal_api_server_go_api_server"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -35556,6 +35580,16 @@
       "confidence_score": 1.0,
       "source": "backend_internal_api_server_new",
       "target": "backend_internal_api_server_go_game"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "api_server_new"
     },
     {
       "relation": "calls",
@@ -35675,6 +35709,16 @@
       "target": "api_server_decodejson"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L112",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "api_server_decodejson"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -35718,6 +35762,16 @@
       "confidence_score": 1.0,
       "source": "api_server_writejson",
       "target": "backend_internal_api_server_go_responsewriter"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L123",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "api_server_writejson"
     },
     {
       "relation": "references",
@@ -35766,6 +35820,16 @@
       "target": "backend_internal_api_server_go_responsewriter"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L129",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "api_server_writeerr"
+    },
+    {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -35788,6 +35852,16 @@
       "target": "api_statuswriter"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server.go",
+      "source_location": "L150",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_go",
+      "target": "api_statuswriter"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -35806,7 +35880,7 @@
       "source_location": "L11",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
+      "source": "api_server_test",
       "target": "api_server_test_testdecodejsonrejectsunknownfields"
     },
     {
@@ -35816,7 +35890,7 @@
       "source_location": "L35",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
+      "source": "api_server_test",
       "target": "api_server_test_testhandlerversionandmethodboundary"
     },
     {
@@ -35826,18 +35900,8 @@
       "source_location": "L22",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
-      "target": "api_server_test_testwritejsonusesjsoncontenttype"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/server_test.go",
-      "source_location": "L11",
-      "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "api_server_test",
-      "target": "api_server_test_testdecodejsonrejectsunknownfields"
+      "target": "api_server_test_testwritejsonusesjsoncontenttype"
     },
     {
       "relation": "references",
@@ -35849,6 +35913,16 @@
       "confidence_score": 1.0,
       "source": "api_server_test_testdecodejsonrejectsunknownfields",
       "target": "backend_internal_api_server_test_go_t"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/server_test.go",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
+      "target": "api_server_test_testdecodejsonrejectsunknownfields"
     },
     {
       "relation": "references",
@@ -35879,7 +35953,7 @@
       "source_location": "L22",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "api_server_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
       "target": "api_server_test_testwritejsonusesjsoncontenttype"
     },
     {
@@ -35889,7 +35963,7 @@
       "source_location": "L35",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "api_server_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_api_server_test_go",
       "target": "api_server_test_testhandlerversionandmethodboundary"
     },
     {
@@ -36638,116 +36712,6 @@
       "target": "googledrive_dpapi_windows_unprotect"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L276",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_callbackresult"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L329",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_oauthjson"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L334",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_oauthjsonclient"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L409",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_reconnecttransport"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L42",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L397",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_accountemail"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L339",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_loadclientconfiguration"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_new"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L386",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_newverifier"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L394",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_opensystembrowser"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L387",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
-      "target": "googledrive_service_randomurltoken"
-    },
-    {
       "relation": "conceptually_related_to",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -36778,6 +36742,16 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_auth_googledrive_service_new",
+      "target": "googledrive_service"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
       "target": "googledrive_service"
     },
     {
@@ -36874,9 +36848,9 @@
       "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "googledrive_service",
-      "target": "googledrive_service"
+      "target": "googledrive_service",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -36998,6 +36972,17 @@
       "target": "googledrive_service_loadclientconfiguration"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L56",
+      "weight": 1.0,
+      "context": "return_type",
+      "confidence_score": 1.0,
+      "source": "googledrive_service_new",
+      "target": "googledrive_service"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/auth/googledrive/service.go",
@@ -37042,6 +37027,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "googledrive_service",
+      "target": "googledrive_service_ready",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L312",
       "weight": 1.0,
       "_origin": "ast",
@@ -37077,17 +37072,6 @@
       "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L56",
       "weight": 1.0,
-      "context": "return_type",
-      "confidence_score": 1.0,
-      "source": "googledrive_service_new",
-      "target": "googledrive_service"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/auth/googledrive/service.go",
-      "source_location": "L56",
-      "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
       "confidence_score": 1.0,
@@ -37127,6 +37111,16 @@
       "confidence_score": 1.0,
       "source": "googledrive_service_new",
       "target": "backend_internal_auth_googledrive_service_go_store"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_new"
     },
     {
       "relation": "calls",
@@ -37250,6 +37244,28 @@
       "confidence_score": 1.0,
       "source": "googledrive_service_finishconnection",
       "target": "googledrivesettings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "googledrive_service_available",
+      "target": "googledrive_service_ready",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L266",
+      "weight": 1.0,
+      "source": "googledrive_service_httpclient",
+      "target": "googledrive_service_ready",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -37666,6 +37682,16 @@
       "target": "googledrive_callbackresult"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L276",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_callbackresult"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -37698,6 +37724,16 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_auth_googledrive_service",
+      "target": "googledrive_oauthjson"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L329",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
       "target": "googledrive_oauthjson"
     },
     {
@@ -37735,6 +37771,26 @@
       "target": "googledrive_oauthjsonclient"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L334",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_oauthjsonclient"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L339",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_loadclientconfiguration"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -37755,6 +37811,16 @@
       "weight": 1.0,
       "source": "googledrive_service_test_testloadsdeveloperoauthjsonwithoutcopyingitintosettings",
       "target": "googledrive_service_loadclientconfiguration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L386",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_newverifier"
     },
     {
       "relation": "calls",
@@ -37782,11 +37848,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L387",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_randomurltoken"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L394",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_opensystembrowser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L397",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
+      "target": "googledrive_service_accountemail"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L409",
       "weight": 1.0,
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_auth_googledrive_service",
+      "target": "googledrive_reconnecttransport"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/auth/googledrive/service.go",
+      "source_location": "L409",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_auth_googledrive_service_go",
       "target": "googledrive_reconnecttransport"
     },
     {
@@ -41499,181 +41605,6 @@
       "target": "backend_internal_gameicon_extract_test_go_t"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L44",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L60",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_new"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L300",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_normalizepath"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L309",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_sameset"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_session"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_gamemon_monitor",
-      "target": "gamemon_session"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L54",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "gamemon_session"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L32",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_session",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L40",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_flushop",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L70",
-      "weight": 1.0,
-      "context": "field",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L228",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_flushall",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L148",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_pollonce",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_gamemon_monitor",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L244",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_flushops",
-      "target": "gamemon_flushop"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -41719,6 +41650,16 @@
       "target": "gamemon_monitor"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
@@ -41758,6 +41699,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L59",
+      "weight": 1.0,
+      "context": "field",
+      "source": "gamemon_monitor",
+      "target": "backend_internal_gamemon_monitor_go_mutex",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L53",
       "weight": 1.0,
       "context": "field",
@@ -41782,6 +41734,27 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L70",
+      "weight": 1.0,
+      "context": "field",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L71",
       "weight": 1.0,
       "context": "field",
@@ -41793,11 +41766,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L55",
+      "source_location": "L48",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "gamemon_monitor",
-      "target": "gamemon_monitor"
+      "target": "gamemon_monitor",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -41884,6 +41857,17 @@
       "target": "gamemon_monitor_launchorigin"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L60",
+      "weight": 1.0,
+      "context": "return_type",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_new",
+      "target": "gamemon_monitor"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
@@ -41914,6 +41898,16 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor",
       "target": "gamemon_monitor_pollonce"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "gamemon_monitor",
+      "target": "gamemon_monitor_probelaunch",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -41970,6 +41964,18 @@
       "target": "gamemon_monitor_start"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "gamemon_session"
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -41980,15 +41986,106 @@
       "target": "runtimepriority_setgameplaymode"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_gamemon_monitor",
+      "target": "gamemon_session"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_session"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L60",
+      "source_location": "L32",
       "weight": 1.0,
-      "context": "return_type",
+      "context": "field",
+      "_origin": "ast",
       "confidence_score": 1.0,
-      "source": "gamemon_monitor_new",
-      "target": "gamemon_monitor"
+      "source": "gamemon_session",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L40",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_flushop",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L228",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_flushall",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L148",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_pollonce",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_gamemon_monitor",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L244",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_flushops",
+      "target": "gamemon_flushop"
     },
     {
       "relation": "references",
@@ -42035,6 +42132,16 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_new",
       "target": "backend_internal_gamemon_monitor_go_store"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L60",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_new"
     },
     {
       "relation": "references",
@@ -42083,6 +42190,28 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_forcepoll",
       "target": "gamemon_monitor_pollonce"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "gamemon_monitor_probelaunch",
+      "target": "gamemon_monitor_forcepoll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L134",
+      "weight": 1.0,
+      "source": "gamemon_monitor_probelaunch",
+      "target": "gamemon_monitor_isrunning",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -42199,6 +42328,69 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_snapshotrunningexecutables",
       "target": "gamemon_monitor_normalizepath"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L300",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_normalizepath"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
+      "target": "gamemon_monitor_normalizepath"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L309",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_sameset"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "gamemon_monitor_test",
+      "target": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L13",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
+      "target": "backend_internal_gamemon_monitor_test_go_t",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend/internal/gamemon/monitor_test.go",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
+      "target": "logstore_sqlite_open"
     },
     {
       "relation": "contains",
@@ -48553,319 +48745,6 @@
       "target": "backend_internal_syncer_drive_store_test_go_response"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L31",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_dirtygame"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L39",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1247",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_classifylocalerror"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1261",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_classifyprovidererror"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L998",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_gameprofile"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L422",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_lenmust"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1099",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_mergeplaytimeledgers"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L68",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_new"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L170",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_normalizecontrol"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1114",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_portablepathhint"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1297",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_providerretryafter"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1141",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_reasondetails"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1231",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_retrydelay"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1305",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_engine_userprovidermessage"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_storefactory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L25",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "target": "syncer_synctrigger"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L23",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_syncer_engine",
-      "target": "syncer_synctrigger"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L51",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine",
-      "target": "syncer_synctrigger"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L754",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine_runonce",
-      "target": "syncer_synctrigger"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L27",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_syncer_engine",
-      "target": "syncer_storefactory"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L42",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine",
-      "target": "syncer_storefactory"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L83",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine_setstorefactory",
-      "target": "syncer_storefactory"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_syncer_engine",
-      "target": "syncer_dirtygame"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L31",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_dirtygame",
-      "target": "backend_internal_syncer_engine_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L48",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine",
-      "target": "syncer_dirtygame"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L49",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine",
-      "target": "backend_internal_syncer_engine_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L1168",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine_noteproviderretryat",
-      "target": "backend_internal_syncer_engine_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L733",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine_resumepending",
-      "target": "backend_internal_syncer_engine_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L680",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "syncer_engine_scheduledue",
-      "target": "backend_internal_syncer_engine_go_time"
-    },
-    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -48910,6 +48789,16 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_syncer_engine_test_waitforjob",
+      "target": "syncer_engine"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L39",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
       "target": "syncer_engine"
     },
     {
@@ -49012,6 +48901,18 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L49",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine",
+      "target": "backend_internal_syncer_engine_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L41",
       "weight": 1.0,
       "context": "field",
@@ -49020,14 +48921,26 @@
       "target": "folderstore"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L48",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine",
+      "target": "syncer_dirtygame"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L39",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "syncer_engine",
-      "target": "syncer_engine"
+      "target": "syncer_engine",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -49220,6 +49133,17 @@
       "confidence_score": 1.0,
       "source": "syncer_engine",
       "target": "syncer_engine_mergeplaytimeledgers"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L63",
+      "weight": 1.0,
+      "context": "return_type",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_new",
+      "target": "syncer_engine"
     },
     {
       "relation": "contains",
@@ -49787,12 +49711,160 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/syncer/engine.go",
-      "source_location": "L63",
+      "source_location": "L42",
       "weight": 1.0,
-      "context": "return_type",
+      "context": "field",
+      "_origin": "ast",
       "confidence_score": 1.0,
-      "source": "syncer_engine_new",
-      "target": "syncer_engine"
+      "source": "syncer_engine",
+      "target": "syncer_storefactory"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L51",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine",
+      "target": "syncer_synctrigger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_syncer_engine",
+      "target": "syncer_synctrigger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_synctrigger"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L754",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_runonce",
+      "target": "syncer_synctrigger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_syncer_engine",
+      "target": "syncer_storefactory"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_storefactory"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L83",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_setstorefactory",
+      "target": "syncer_storefactory"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_syncer_engine",
+      "target": "syncer_dirtygame"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_dirtygame"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L31",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_dirtygame",
+      "target": "backend_internal_syncer_engine_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1168",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_noteproviderretryat",
+      "target": "backend_internal_syncer_engine_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L733",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_resumepending",
+      "target": "backend_internal_syncer_engine_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L680",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "syncer_engine_scheduledue",
+      "target": "backend_internal_syncer_engine_go_time"
     },
     {
       "relation": "references",
@@ -50065,6 +50137,16 @@
       "confidence_score": 1.0,
       "source": "syncer_engine_updatejob",
       "target": "backend_internal_syncer_engine_go_syncjob"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L68",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_new"
     },
     {
       "relation": "calls",
@@ -50534,6 +50616,16 @@
       "target": "syncer_engine_gamecontrol"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L170",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_normalizecontrol"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -50945,6 +51037,16 @@
       "confidence_score": 1.0,
       "source": "syncer_engine_protectionstatus",
       "target": "syncer_engine_revisions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L422",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_lenmust"
     },
     {
       "relation": "references",
@@ -51948,6 +52050,16 @@
       "target": "syncer_store_reconcilewithstore"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L998",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_gameprofile"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -52036,6 +52148,16 @@
       "target": "backend_internal_syncer_engine_go_playtimeledger"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1099",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_mergeplaytimeledgers"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -52045,6 +52167,26 @@
       "weight": 1.0,
       "source": "syncer_folder_test_testplaytimeledgersmergebydeviceandroundtrip",
       "target": "syncer_engine_mergeplaytimeledgers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1114",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_portablepathhint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_reasondetails"
     },
     {
       "relation": "calls",
@@ -52189,6 +52331,16 @@
       "target": "syncer_engine_userprovidermessage"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1231",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_retrydelay"
+    },
+    {
       "relation": "references",
       "context": "return_type",
       "confidence": "EXTRACTED",
@@ -52235,6 +52387,26 @@
       "target": "backend_internal_syncer_engine_go_duration"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1247",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_classifylocalerror"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1261",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_classifyprovidererror"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/syncer/engine.go",
@@ -52244,6 +52416,17 @@
       "confidence_score": 1.0,
       "source": "syncer_engine_classifyprovidererror",
       "target": "providerstate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
+      "target": "syncer_engine_classifyprovidererror"
     },
     {
       "relation": "calls",
@@ -52281,6 +52464,16 @@
       "target": "providerstate"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1297",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_providerretryafter"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "INFERRED",
@@ -52292,6 +52485,16 @@
       "target": "syncer_engine_providerretryafter"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine.go",
+      "source_location": "L1305",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
+      "target": "syncer_engine_userprovidermessage"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -52300,6 +52503,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "syncer_engine_noteproviderfailure",
+      "target": "syncer_engine_userprovidermessage"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L194",
+      "weight": 1.0,
+      "source": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
       "target": "syncer_engine_userprovidermessage"
     },
     {
@@ -52487,7 +52701,7 @@
       "source_location": "L251",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testconcurrentproviderheadispreservedforreview"
     },
     {
@@ -52497,7 +52711,7 @@
       "source_location": "L131",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testconfigurationchangedrefreshesprotectiontargetandproviderstate"
     },
     {
@@ -52507,7 +52721,7 @@
       "source_location": "L83",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testenginekeepslocalrevisionwhenproviderisoffline"
     },
     {
@@ -52517,8 +52731,18 @@
       "source_location": "L18",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testenginelocalfirstrecoverypointandexactrestore"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "syncer_engine_test",
+      "target": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -52527,7 +52751,7 @@
       "source_location": "L345",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testprotectionenvironment"
     },
     {
@@ -52537,7 +52761,7 @@
       "source_location": "L187",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_testrecoverylibraryrestorepublishesonlyverifiedrevision"
     },
     {
@@ -52547,7 +52771,7 @@
       "source_location": "L169",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_teststructuredproviderratelimitclassification"
     },
     {
@@ -52557,7 +52781,7 @@
       "source_location": "L363",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
+      "source": "syncer_engine_test",
       "target": "syncer_engine_test_waitforjob"
     },
     {
@@ -52567,7 +52791,7 @@
       "source_location": "L18",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testenginelocalfirstrecoverypointandexactrestore"
     },
     {
@@ -52736,6 +52960,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/syncer/engine_test.go",
+      "source_location": "L188",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
+      "target": "backend_internal_syncer_engine_test_go_t",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L345",
       "weight": 1.0,
       "context": "parameter_type",
@@ -52783,7 +53018,7 @@
       "source_location": "L83",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testenginekeepslocalrevisionwhenproviderisoffline"
     },
     {
@@ -52815,7 +53050,7 @@
       "source_location": "L131",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testconfigurationchangedrefreshesprotectiontargetandproviderstate"
     },
     {
@@ -52825,7 +53060,7 @@
       "source_location": "L169",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_teststructuredproviderratelimitclassification"
     },
     {
@@ -52835,7 +53070,7 @@
       "source_location": "L187",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testrecoverylibraryrestorepublishesonlyverifiedrevision"
     },
     {
@@ -52867,7 +53102,7 @@
       "source_location": "L251",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testconcurrentproviderheadispreservedforreview"
     },
     {
@@ -52954,7 +53189,7 @@
       "source_location": "L345",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_testprotectionenvironment"
     },
     {
@@ -53033,7 +53268,7 @@
       "source_location": "L363",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "syncer_engine_test",
+      "source": "d_myprojects_cloud_saver_backend_internal_syncer_engine_test_go",
       "target": "syncer_engine_test_waitforjob"
     },
     {
@@ -76543,5 +76778,5 @@
       "source_file": ".github/workflows/release-windows.yml"
     }
   ],
-  "built_at_commit": "6fdb6dea65649a830e18a9ed49968b1aef354cbe"
+  "built_at_commit": "12ad09d2b7edcc62c30be35e32ab1d3e4be65cb1"
 }

@@ -122,6 +122,9 @@ func decodeJSON(r *http.Request, out any) error {
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
+	// Every response reflects local runtime state (processes, jobs, provider
+	// health). A cached response can leave the desktop UI showing stale status.
+	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
 }

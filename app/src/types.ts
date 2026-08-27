@@ -7,6 +7,8 @@ export type PauseScope = "none" | "uploads" | "all";
 export type ProviderState = "local_only" | "online" | "offline" | "reconnecting" | "authentication_required" | "rate_limited" | "quota_full" | "provider_unavailable" | "remote_data_problem";
 export interface GoogleDriveConnection {
   connected: boolean;
+	ready?: boolean;
+	configurationError?: string;
   accountEmail?: string;
   reconnectRequired?: boolean;
   oauthClientSource?: "built_in" | "environment" | "oauth_json";

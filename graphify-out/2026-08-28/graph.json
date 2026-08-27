@@ -1889,7 +1889,7 @@
       "label": "normalizeBackupHistory()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L133",
+      "source_location": "L131",
       "id": "api_parsers_normalizebackuphistory",
       "community": 93,
       "norm_label": "normalizebackuphistory()"
@@ -1898,7 +1898,7 @@
       "label": "normalizeGoogleDrive()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L146",
+      "source_location": "L144",
       "id": "api_parsers_normalizegoogledrive",
       "community": 93,
       "norm_label": "normalizegoogledrive()"
@@ -1907,7 +1907,7 @@
       "label": "normalizeSnapshots()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L160",
+      "source_location": "L158",
       "id": "api_parsers_normalizesnapshots",
       "community": 93,
       "norm_label": "normalizesnapshots()"
@@ -1916,7 +1916,7 @@
       "label": "normalizeLogs()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L172",
+      "source_location": "L170",
       "id": "api_parsers_normalizelogs",
       "community": 93,
       "norm_label": "normalizelogs()"
@@ -1925,7 +1925,7 @@
       "label": "normalizeSettings()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L184",
+      "source_location": "L182",
       "id": "api_parsers_normalizesettings",
       "community": 93,
       "norm_label": "normalizesettings()"
@@ -1934,7 +1934,7 @@
       "label": "normalizeStatus()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L221",
+      "source_location": "L219",
       "id": "api_parsers_normalizestatus",
       "community": 93,
       "norm_label": "normalizestatus()"
@@ -1943,7 +1943,7 @@
       "label": "normalizeSyncJobs()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L246",
+      "source_location": "L244",
       "id": "api_parsers_normalizesyncjobs",
       "community": 93,
       "norm_label": "normalizesyncjobs()"
@@ -1952,7 +1952,7 @@
       "label": "normalizeSyncConflicts()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L262",
+      "source_location": "L260",
       "id": "api_parsers_normalizesyncconflicts",
       "community": 93,
       "norm_label": "normalizesyncconflicts()"
@@ -2318,19 +2318,10 @@
       "norm_label": "pausescope"
     },
     {
-      "label": "LaunchOrigin",
-      "file_type": "code",
-      "source_file": "app/src/types.ts",
-      "source_location": "L7",
-      "id": "src_types_launchorigin",
-      "community": 76,
-      "norm_label": "launchorigin"
-    },
-    {
       "label": "ProviderState",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "id": "src_types_providerstate",
       "community": 76,
       "norm_label": "providerstate"
@@ -2339,7 +2330,7 @@
       "label": "GoogleDriveConnection",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L9",
+      "source_location": "L8",
       "id": "src_types_googledriveconnection",
       "community": 76,
       "norm_label": "googledriveconnection"
@@ -2348,7 +2339,7 @@
       "label": "SyncPolicy",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L17",
+      "source_location": "L16",
       "id": "src_types_syncpolicy",
       "community": 76,
       "norm_label": "syncpolicy"
@@ -2357,7 +2348,7 @@
       "label": "ServiceControlState",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L24",
+      "source_location": "L23",
       "id": "src_types_servicecontrolstate",
       "community": 76,
       "norm_label": "servicecontrolstate"
@@ -2366,7 +2357,7 @@
       "label": "ProviderHealth",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L32",
+      "source_location": "L31",
       "id": "src_types_providerhealth",
       "community": 76,
       "norm_label": "providerhealth"
@@ -2375,7 +2366,7 @@
       "label": "GameProtectionStatus",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L44",
+      "source_location": "L43",
       "id": "src_types_gameprotectionstatus",
       "community": 76,
       "norm_label": "gameprotectionstatus"
@@ -2384,7 +2375,7 @@
       "label": "BackupPolicy",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L57",
+      "source_location": "L56",
       "id": "src_types_backuppolicy",
       "community": 76,
       "norm_label": "backuppolicy"
@@ -2393,7 +2384,7 @@
       "label": "BackupHistoryEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L64",
+      "source_location": "L63",
       "id": "src_types_backuphistoryentry",
       "community": 76,
       "norm_label": "backuphistoryentry"
@@ -2402,7 +2393,7 @@
       "label": "SnapshotSummary",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L74",
+      "source_location": "L73",
       "id": "src_types_snapshotsummary",
       "community": 76,
       "norm_label": "snapshotsummary"
@@ -2411,7 +2402,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L83",
+      "source_location": "L82",
       "id": "src_types_game",
       "community": 95,
       "norm_label": "game"
@@ -2420,7 +2411,7 @@
       "label": "Settings",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L101",
+      "source_location": "L99",
       "id": "src_types_settings",
       "community": 76,
       "norm_label": "settings"
@@ -2429,7 +2420,7 @@
       "label": "SettingsUpdate",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L131",
+      "source_location": "L129",
       "id": "src_types_settingsupdate",
       "community": 76,
       "norm_label": "settingsupdate"
@@ -2438,7 +2429,7 @@
       "label": "Status",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L156",
+      "source_location": "L154",
       "id": "src_types_status",
       "community": 54,
       "norm_label": "status"
@@ -2447,7 +2438,7 @@
       "label": "SyncJob",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L172",
+      "source_location": "L170",
       "id": "src_types_syncjob",
       "community": 76,
       "norm_label": "syncjob"
@@ -2456,7 +2447,7 @@
       "label": "Revision",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L193",
+      "source_location": "L191",
       "id": "src_types_revision",
       "community": 76,
       "norm_label": "revision"
@@ -2465,7 +2456,7 @@
       "label": "RecoveryPoint",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L207",
+      "source_location": "L205",
       "id": "src_types_recoverypoint",
       "community": 76,
       "norm_label": "recoverypoint"
@@ -2474,7 +2465,7 @@
       "label": "ActivityEvent",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L217",
+      "source_location": "L215",
       "id": "src_types_activityevent",
       "community": 76,
       "norm_label": "activityevent"
@@ -2483,7 +2474,7 @@
       "label": "RecoveryLibraryEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L229",
+      "source_location": "L227",
       "id": "src_types_recoverylibraryentry",
       "community": 76,
       "norm_label": "recoverylibraryentry"
@@ -2492,7 +2483,7 @@
       "label": "StorageUsage",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L247",
+      "source_location": "L245",
       "id": "src_types_storageusage",
       "community": 76,
       "norm_label": "storageusage"
@@ -2501,7 +2492,7 @@
       "label": "StorageSummary",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L256",
+      "source_location": "L254",
       "id": "src_types_storagesummary",
       "community": 76,
       "norm_label": "storagesummary"
@@ -2510,7 +2501,7 @@
       "label": "SyncConflict",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L265",
+      "source_location": "L263",
       "id": "src_types_syncconflict",
       "community": 76,
       "norm_label": "syncconflict"
@@ -2519,7 +2510,7 @@
       "label": "LogEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L275",
+      "source_location": "L273",
       "id": "src_types_logentry",
       "community": 76,
       "norm_label": "logentry"
@@ -2528,7 +2519,7 @@
       "label": "DebugInfo",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L283",
+      "source_location": "L281",
       "id": "src_types_debuginfo",
       "community": 76,
       "norm_label": "debuginfo"
@@ -2537,7 +2528,7 @@
       "label": "BackupExportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L296",
+      "source_location": "L294",
       "id": "src_types_backupexportrequest",
       "community": 76,
       "norm_label": "backupexportrequest"
@@ -2546,7 +2537,7 @@
       "label": "BackupExportResponse",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L301",
+      "source_location": "L299",
       "id": "src_types_backupexportresponse",
       "community": 76,
       "norm_label": "backupexportresponse"
@@ -2555,7 +2546,7 @@
       "label": "BackupImportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L306",
+      "source_location": "L304",
       "id": "src_types_backupimportrequest",
       "community": 76,
       "norm_label": "backupimportrequest"
@@ -2564,7 +2555,7 @@
       "label": "PlayGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L313",
+      "source_location": "L311",
       "id": "src_types_playgamerequest",
       "community": 76,
       "norm_label": "playgamerequest"
@@ -2573,7 +2564,7 @@
       "label": "SyncGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L318",
+      "source_location": "L316",
       "id": "src_types_syncgamerequest",
       "community": 76,
       "norm_label": "syncgamerequest"
@@ -2582,7 +2573,7 @@
       "label": "SnapshotCreateResponse",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L322",
+      "source_location": "L320",
       "id": "src_types_snapshotcreateresponse",
       "community": 76,
       "norm_label": "snapshotcreateresponse"
@@ -3356,7 +3347,7 @@
       "label": "gameResponse",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L20",
+      "source_location": "L19",
       "id": "api_gameresponse",
       "community": 17,
       "norm_label": "gameresponse"
@@ -3365,7 +3356,7 @@
       "label": "BackupPolicy",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L28",
+      "source_location": "L27",
       "id": "backend_internal_api_handlers_games_go_backuppolicy",
       "community": 17,
       "norm_label": "backuppolicy"
@@ -3374,7 +3365,7 @@
       "label": "SyncPolicy",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L29",
+      "source_location": "L28",
       "id": "backend_internal_api_handlers_games_go_syncpolicy",
       "community": 17,
       "norm_label": "syncpolicy"
@@ -3383,25 +3374,16 @@
       "label": "GameProtectionStatus",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L30",
+      "source_location": "L29",
       "id": "backend_internal_api_handlers_games_go_gameprotectionstatus",
       "community": 17,
       "norm_label": "gameprotectionstatus"
     },
     {
-      "label": "LaunchOrigin",
-      "file_type": "code",
-      "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L35",
-      "id": "launchorigin",
-      "community": 17,
-      "norm_label": "launchorigin"
-    },
-    {
       "label": "Server",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L38",
+      "source_location": "L36",
       "id": "backend_internal_api_handlers_games_go_api_server",
       "community": 17,
       "norm_label": "server"
@@ -3410,7 +3392,7 @@
       "label": ".handleGames()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L38",
+      "source_location": "L36",
       "id": "api_server_handlegames",
       "community": 17,
       "norm_label": ".handlegames()"
@@ -3419,7 +3401,7 @@
       "label": "ResponseWriter",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L38",
+      "source_location": "L36",
       "id": "backend_internal_api_handlers_games_go_responsewriter",
       "community": 17,
       "norm_label": "responsewriter"
@@ -3428,7 +3410,7 @@
       "label": "Request",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L38",
+      "source_location": "L36",
       "id": "backend_internal_api_handlers_games_go_request",
       "community": 17,
       "norm_label": "request"
@@ -3437,7 +3419,7 @@
       "label": ".handleGameByID()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L84",
+      "source_location": "L82",
       "id": "api_server_handlegamebyid",
       "community": 17,
       "norm_label": ".handlegamebyid()"
@@ -3446,7 +3428,7 @@
       "label": ".handleGamePlay()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L167",
+      "source_location": "L165",
       "id": "api_server_handlegameplay",
       "community": 17,
       "norm_label": ".handlegameplay()"
@@ -3455,7 +3437,7 @@
       "label": ".handleGameProtectionPolicy()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L226",
+      "source_location": "L217",
       "id": "api_server_handlegameprotectionpolicy",
       "community": 17,
       "norm_label": ".handlegameprotectionpolicy()"
@@ -3464,7 +3446,7 @@
       "label": ".handleGameSync()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L248",
+      "source_location": "L239",
       "id": "api_server_handlegamesync",
       "community": 17,
       "norm_label": ".handlegamesync()"
@@ -3473,7 +3455,7 @@
       "label": ".handleGameCover()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L278",
+      "source_location": "L269",
       "id": "api_server_handlegamecover",
       "community": 17,
       "norm_label": ".handlegamecover()"
@@ -3482,7 +3464,7 @@
       "label": ".handleGameBackupPolicy()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L335",
+      "source_location": "L326",
       "id": "api_server_handlegamebackuppolicy",
       "community": 17,
       "norm_label": ".handlegamebackuppolicy()"
@@ -3491,7 +3473,7 @@
       "label": ".handleGamePair()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L376",
+      "source_location": "L367",
       "id": "api_server_handlegamepair",
       "community": 17,
       "norm_label": ".handlegamepair()"
@@ -3500,7 +3482,7 @@
       "label": ".toGameResponses()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L398",
+      "source_location": "L389",
       "id": "api_server_togameresponses",
       "community": 17,
       "norm_label": ".togameresponses()"
@@ -3509,7 +3491,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L398",
+      "source_location": "L389",
       "id": "backend_internal_api_handlers_games_go_game",
       "community": 17,
       "norm_label": "game"
@@ -3518,7 +3500,7 @@
       "label": ".displayedPlaytime()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L426",
+      "source_location": "L417",
       "id": "api_server_displayedplaytime",
       "community": 17,
       "norm_label": ".displayedplaytime()"
@@ -3527,7 +3509,7 @@
       "label": ".toGameResponse()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L433",
+      "source_location": "L424",
       "id": "api_server_togameresponse",
       "community": 17,
       "norm_label": ".togameresponse()"
@@ -3536,7 +3518,7 @@
       "label": "Time",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L433",
+      "source_location": "L424",
       "id": "backend_internal_api_handlers_games_go_time",
       "community": 17,
       "norm_label": "time"
@@ -3545,7 +3527,7 @@
       "label": "normalizeCoverImageData()",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L460",
+      "source_location": "L446",
       "id": "api_handlers_games_normalizecoverimagedata",
       "community": 17,
       "norm_label": "normalizecoverimagedata()"
@@ -4366,7 +4348,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L54",
       "id": "api_server_handler",
-      "community": 22,
+      "community": 38,
       "norm_label": ".handler()"
     },
     {
@@ -4375,7 +4357,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L54",
       "id": "backend_internal_api_server_go_handler",
-      "community": 22,
+      "community": 38,
       "norm_label": "handler"
     },
     {
@@ -4429,7 +4411,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L133",
       "id": "api_server_withdebugrequestlogs",
-      "community": 22,
+      "community": 38,
       "norm_label": ".withdebugrequestlogs()"
     },
     {
@@ -4500,7 +4482,7 @@
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
       "source_location": "L1",
-      "id": "app_app",
+      "id": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "community": 3,
       "norm_label": "app.go"
     },
@@ -4634,7 +4616,7 @@
       "label": ".Stop()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L313",
+      "source_location": "L312",
       "id": "app_application_stop",
       "community": 3,
       "norm_label": ".stop()"
@@ -4643,7 +4625,7 @@
       "label": ".httpSrvAddr()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L346",
+      "source_location": "L345",
       "id": "app_application_httpsrvaddr",
       "community": 3,
       "norm_label": ".httpsrvaddr()"
@@ -4652,7 +4634,7 @@
       "label": ".reloadWatcherForRunningGames()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L351",
+      "source_location": "L350",
       "id": "app_application_reloadwatcherforrunninggames",
       "community": 3,
       "norm_label": ".reloadwatcherforrunninggames()"
@@ -4661,7 +4643,7 @@
       "label": ".logEvent()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L378",
+      "source_location": "L377",
       "id": "app_application_logevent",
       "community": 3,
       "norm_label": ".logevent()"
@@ -4670,7 +4652,7 @@
       "label": ".runningGameNames()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L387",
+      "source_location": "L386",
       "id": "app_application_runninggamenames",
       "community": 3,
       "norm_label": ".runninggamenames()"
@@ -4679,7 +4661,7 @@
       "label": "openUI()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L407",
+      "source_location": "L406",
       "id": "app_app_openui",
       "community": 3,
       "norm_label": "openui()"
@@ -4688,7 +4670,7 @@
       "label": "desktopAppExecutable()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L416",
+      "source_location": "L415",
       "id": "app_app_desktopappexecutable",
       "community": 3,
       "norm_label": "desktopappexecutable()"
@@ -4697,7 +4679,7 @@
       "label": "resolveExecutableCandidate()",
       "file_type": "code",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L477",
+      "source_location": "L476",
       "id": "app_app_resolveexecutablecandidate",
       "community": 3,
       "norm_label": "resolveexecutablecandidate()"
@@ -5122,7 +5104,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_autobackup_service_go",
-      "community": 16,
+      "community": 29,
       "norm_label": "service.go"
     },
     {
@@ -5131,7 +5113,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L27",
       "id": "autobackup_service",
-      "community": 16,
+      "community": 29,
       "norm_label": "service"
     },
     {
@@ -5140,7 +5122,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L28",
       "id": "backend_internal_autobackup_service_go_manager",
-      "community": 16,
+      "community": 29,
       "norm_label": "manager"
     },
     {
@@ -5149,7 +5131,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L29",
       "id": "backend_internal_autobackup_service_go_store",
-      "community": 16,
+      "community": 29,
       "norm_label": "store"
     },
     {
@@ -5158,7 +5140,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L33",
       "id": "backend_internal_autobackup_service_go_mutex",
-      "community": 16,
+      "community": 29,
       "norm_label": "mutex"
     },
     {
@@ -5167,7 +5149,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L35",
       "id": "timer",
-      "community": 16,
+      "community": 29,
       "norm_label": "timer"
     },
     {
@@ -5176,7 +5158,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L37",
       "id": "backend_internal_autobackup_service_go_time",
-      "community": 16,
+      "community": 29,
       "norm_label": "time"
     },
     {
@@ -5185,7 +5167,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L40",
       "id": "backend_internal_autobackup_service_go_bool",
-      "community": 16,
+      "community": 29,
       "norm_label": "bool"
     },
     {
@@ -5194,7 +5176,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L41",
       "id": "backend_internal_autobackup_service_go_once",
-      "community": 16,
+      "community": 29,
       "norm_label": "once"
     },
     {
@@ -5203,7 +5185,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L43",
       "id": "backend_internal_autobackup_service_go_waitgroup",
-      "community": 16,
+      "community": 29,
       "norm_label": "waitgroup"
     },
     {
@@ -5212,7 +5194,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L47",
       "id": "autobackup_service_new",
-      "community": 16,
+      "community": 29,
       "norm_label": "new()"
     },
     {
@@ -5221,7 +5203,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L63",
       "id": "autobackup_service_start",
-      "community": 16,
+      "community": 29,
       "norm_label": ".start()"
     },
     {
@@ -5230,7 +5212,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L63",
       "id": "backend_internal_autobackup_service_go_context",
-      "community": 16,
+      "community": 29,
       "norm_label": "context"
     },
     {
@@ -5239,7 +5221,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L89",
       "id": "autobackup_service_updaterunning",
-      "community": 16,
+      "community": 29,
       "norm_label": ".updaterunning()"
     },
     {
@@ -5248,7 +5230,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L137",
       "id": "autobackup_service_stop",
-      "community": 16,
+      "community": 29,
       "norm_label": ".stop()"
     },
     {
@@ -5257,7 +5239,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L145",
       "id": "autobackup_service_stoptimers",
-      "community": 16,
+      "community": 29,
       "norm_label": ".stoptimers()"
     },
     {
@@ -5266,7 +5248,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L154",
       "id": "autobackup_service_onexitdelayelapsed",
-      "community": 16,
+      "community": 29,
       "norm_label": ".onexitdelayelapsed()"
     },
     {
@@ -5275,7 +5257,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L165",
       "id": "autobackup_service_runperiodicchecks",
-      "community": 16,
+      "community": 29,
       "norm_label": ".runperiodicchecks()"
     },
     {
@@ -5284,7 +5266,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L192",
       "id": "autobackup_service_periodicdue",
-      "community": 16,
+      "community": 29,
       "norm_label": ".periodicdue()"
     },
     {
@@ -5293,7 +5275,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L201",
       "id": "autobackup_service_loadlastsuccess",
-      "community": 16,
+      "community": 29,
       "norm_label": ".loadlastsuccess()"
     },
     {
@@ -5302,7 +5284,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L239",
       "id": "autobackup_service_enqueuebackup",
-      "community": 16,
+      "community": 29,
       "norm_label": ".enqueuebackup()"
     },
     {
@@ -5311,7 +5293,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L260",
       "id": "autobackup_service_runbackup",
-      "community": 16,
+      "community": 29,
       "norm_label": ".runbackup()"
     },
     {
@@ -5320,7 +5302,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L326",
       "id": "autobackup_service_computesavesignature",
-      "community": 16,
+      "community": 29,
       "norm_label": "computesavesignature()"
     },
     {
@@ -5329,7 +5311,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L369",
       "id": "autobackup_service_shouldignore",
-      "community": 16,
+      "community": 29,
       "norm_label": "shouldignore()"
     },
     {
@@ -6071,28 +6053,19 @@
       "norm_label": "t"
     },
     {
-      "label": "Monitor",
+      "label": "monitor.go",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L55",
-      "id": "gamemon_monitor",
+      "source_location": "L1",
+      "id": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
       "community": 29,
-      "norm_label": "monitor"
-    },
-    {
-      "label": "LaunchOrigin",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L32",
-      "id": "gamemon_launchorigin",
-      "community": 29,
-      "norm_label": "launchorigin"
+      "norm_label": "monitor.go"
     },
     {
       "label": "session",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L40",
+      "source_location": "L29",
       "id": "gamemon_session",
       "community": 29,
       "norm_label": "session"
@@ -6101,7 +6074,7 @@
       "label": "Time",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L42",
+      "source_location": "L31",
       "id": "backend_internal_gamemon_monitor_go_time",
       "community": 29,
       "norm_label": "time"
@@ -6110,16 +6083,25 @@
       "label": "flushOp",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L48",
+      "source_location": "L37",
       "id": "gamemon_flushop",
       "community": 29,
       "norm_label": "flushop"
     },
     {
+      "label": "Monitor",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L44",
+      "id": "gamemon_monitor",
+      "community": 29,
+      "norm_label": "monitor"
+    },
+    {
       "label": "Manager",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L56",
+      "source_location": "L45",
       "id": "backend_internal_gamemon_monitor_go_manager",
       "community": 29,
       "norm_label": "manager"
@@ -6128,7 +6110,7 @@
       "label": "Store",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L57",
+      "source_location": "L46",
       "id": "backend_internal_gamemon_monitor_go_store",
       "community": 29,
       "norm_label": "store"
@@ -6137,7 +6119,7 @@
       "label": "Duration",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L61",
+      "source_location": "L50",
       "id": "backend_internal_gamemon_monitor_go_duration",
       "community": 29,
       "norm_label": "duration"
@@ -6146,7 +6128,7 @@
       "label": "RWMutex",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L64",
+      "source_location": "L53",
       "id": "backend_internal_gamemon_monitor_go_rwmutex",
       "community": 29,
       "norm_label": "rwmutex"
@@ -6155,7 +6137,7 @@
       "label": "Bool",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L73",
+      "source_location": "L56",
       "id": "backend_internal_gamemon_monitor_go_bool",
       "community": 29,
       "norm_label": "bool"
@@ -6164,7 +6146,7 @@
       "label": "New()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L77",
+      "source_location": "L60",
       "id": "gamemon_monitor_new",
       "community": 29,
       "norm_label": "new()"
@@ -6173,7 +6155,7 @@
       "label": ".Start()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L95",
+      "source_location": "L74",
       "id": "gamemon_monitor_start",
       "community": 29,
       "norm_label": ".start()"
@@ -6182,7 +6164,7 @@
       "label": "Context",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L95",
+      "source_location": "L74",
       "id": "backend_internal_gamemon_monitor_go_context",
       "community": 29,
       "norm_label": "context"
@@ -6191,7 +6173,7 @@
       "label": ".SetOnRunningChanged()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L123",
+      "source_location": "L102",
       "id": "gamemon_monitor_setonrunningchanged",
       "community": 29,
       "norm_label": ".setonrunningchanged()"
@@ -6200,52 +6182,16 @@
       "label": ".ForcePoll()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L130",
+      "source_location": "L109",
       "id": "gamemon_monitor_forcepoll",
       "community": 29,
       "norm_label": ".forcepoll()"
     },
     {
-      "label": ".ExpectLaunch()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L139",
-      "id": "gamemon_monitor_expectlaunch",
-      "community": 29,
-      "norm_label": ".expectlaunch()"
-    },
-    {
-      "label": ".CancelExpectedLaunch()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L149",
-      "id": "gamemon_monitor_cancelexpectedlaunch",
-      "community": 16,
-      "norm_label": ".cancelexpectedlaunch()"
-    },
-    {
-      "label": ".LaunchOrigin()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L157",
-      "id": "gamemon_monitor_launchorigin",
-      "community": 29,
-      "norm_label": ".launchorigin()"
-    },
-    {
-      "label": ".ExternalRunningIDs()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L166",
-      "id": "gamemon_monitor_externalrunningids",
-      "community": 29,
-      "norm_label": ".externalrunningids()"
-    },
-    {
       "label": ".IsRunning()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L180",
+      "source_location": "L117",
       "id": "gamemon_monitor_isrunning",
       "community": 29,
       "norm_label": ".isrunning()"
@@ -6254,7 +6200,7 @@
       "label": ".PendingSeconds()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L188",
+      "source_location": "L125",
       "id": "gamemon_monitor_pendingseconds",
       "community": 29,
       "norm_label": ".pendingseconds()"
@@ -6263,7 +6209,7 @@
       "label": ".RunningIDs()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L199",
+      "source_location": "L136",
       "id": "gamemon_monitor_runningids",
       "community": 29,
       "norm_label": ".runningids()"
@@ -6272,7 +6218,7 @@
       "label": ".pollOnce()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L211",
+      "source_location": "L148",
       "id": "gamemon_monitor_pollonce",
       "community": 29,
       "norm_label": ".pollonce()"
@@ -6281,7 +6227,7 @@
       "label": ".flushAll()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L324",
+      "source_location": "L228",
       "id": "gamemon_monitor_flushall",
       "community": 29,
       "norm_label": ".flushall()"
@@ -6290,7 +6236,7 @@
       "label": ".flushOps()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L340",
+      "source_location": "L244",
       "id": "gamemon_monitor_flushops",
       "community": 29,
       "norm_label": ".flushops()"
@@ -6299,7 +6245,7 @@
       "label": ".snapshotRunningExecutables()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L359",
+      "source_location": "L263",
       "id": "gamemon_monitor_snapshotrunningexecutables",
       "community": 29,
       "norm_label": ".snapshotrunningexecutables()"
@@ -6308,7 +6254,7 @@
       "label": "normalizePath()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L396",
+      "source_location": "L300",
       "id": "gamemon_monitor_normalizepath",
       "community": 29,
       "norm_label": "normalizepath()"
@@ -6317,91 +6263,10 @@
       "label": "sameSet()",
       "file_type": "code",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L405",
+      "source_location": "L309",
       "id": "gamemon_monitor_sameset",
       "community": 29,
       "norm_label": "sameset()"
-    },
-    {
-      "label": "monitor_test.go",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L1",
-      "id": "gamemon_monitor_test",
-      "community": 29,
-      "norm_label": "monitor_test.go"
-    },
-    {
-      "label": "TestMonitorClassifiesRoveAndExternalLaunches()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L12",
-      "id": "gamemon_monitor_test_testmonitorclassifiesroveandexternallaunches",
-      "community": 29,
-      "norm_label": "testmonitorclassifiesroveandexternallaunches()"
-    },
-    {
-      "label": "T",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L12",
-      "id": "backend_internal_gamemon_monitor_test_go_t",
-      "community": 29,
-      "norm_label": "t"
-    },
-    {
-      "label": "TestMonitorExpiresExpectedLaunchBeforeProcessAppears()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L35",
-      "id": "gamemon_monitor_test_testmonitorexpiresexpectedlaunchbeforeprocessappears",
-      "community": 29,
-      "norm_label": "testmonitorexpiresexpectedlaunchbeforeprocessappears()"
-    },
-    {
-      "label": "runningSwitch",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L51",
-      "id": "gamemon_runningswitch",
-      "community": 29,
-      "norm_label": "runningswitch"
-    },
-    {
-      "label": ".Store()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L53",
-      "id": "gamemon_runningswitch_store",
-      "community": 29,
-      "norm_label": ".store()"
-    },
-    {
-      "label": ".Load()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L54",
-      "id": "gamemon_runningswitch_load",
-      "community": 29,
-      "norm_label": ".load()"
-    },
-    {
-      "label": "testMonitor()",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "id": "gamemon_monitor_test_testmonitor",
-      "community": 29,
-      "norm_label": "testmonitor()"
-    },
-    {
-      "label": "Monitor",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "id": "backend_internal_gamemon_monitor_test_go_monitor",
-      "community": 29,
-      "norm_label": "monitor"
     },
     {
       "label": "protection.go",
@@ -8137,7 +8002,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_syncer_engine_go",
-      "community": 36,
+      "community": 18,
       "norm_label": "engine.go"
     },
     {
@@ -8146,7 +8011,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L25",
       "id": "syncer_synctrigger",
-      "community": 36,
+      "community": 18,
       "norm_label": "synctrigger"
     },
     {
@@ -8155,7 +8020,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L29",
       "id": "syncer_storefactory",
-      "community": 23,
+      "community": 18,
       "norm_label": "storefactory"
     },
     {
@@ -8191,7 +8056,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L40",
       "id": "backend_internal_syncer_engine_go_manager",
-      "community": 103,
+      "community": 18,
       "norm_label": "manager"
     },
     {
@@ -8200,7 +8065,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L41",
       "id": "backend_internal_syncer_engine_go_store",
-      "community": 30,
+      "community": 18,
       "norm_label": "store"
     },
     {
@@ -8254,7 +8119,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L59",
       "id": "backend_internal_syncer_engine_go_context",
-      "community": 103,
+      "community": 18,
       "norm_label": "context"
     },
     {
@@ -8272,7 +8137,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L68",
       "id": "syncer_engine_new",
-      "community": 103,
+      "community": 18,
       "norm_label": "new()"
     },
     {
@@ -8281,7 +8146,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L89",
       "id": "syncer_engine_setstorefactory",
-      "community": 23,
+      "community": 18,
       "norm_label": ".setstorefactory()"
     },
     {
@@ -8290,7 +8155,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L95",
       "id": "syncer_engine_start",
-      "community": 30,
+      "community": 18,
       "norm_label": ".start()"
     },
     {
@@ -8299,7 +8164,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L125",
       "id": "syncer_engine_stop",
-      "community": 30,
+      "community": 18,
       "norm_label": ".stop()"
     },
     {
@@ -8308,7 +8173,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L135",
       "id": "syncer_engine_resume",
-      "community": 30,
+      "community": 18,
       "norm_label": ".resume()"
     },
     {
@@ -8317,7 +8182,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L146",
       "id": "syncer_engine_globalcontrol",
-      "community": 30,
+      "community": 18,
       "norm_label": ".globalcontrol()"
     },
     {
@@ -8326,7 +8191,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L146",
       "id": "backend_internal_syncer_engine_go_servicecontrolstate",
-      "community": 30,
+      "community": 18,
       "norm_label": "servicecontrolstate"
     },
     {
@@ -8335,7 +8200,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L155",
       "id": "syncer_engine_gamecontrol",
-      "community": 30,
+      "community": 18,
       "norm_label": ".gamecontrol()"
     },
     {
@@ -8344,7 +8209,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L170",
       "id": "syncer_engine_normalizecontrol",
-      "community": 30,
+      "community": 18,
       "norm_label": "normalizecontrol()"
     },
     {
@@ -8353,7 +8218,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L182",
       "id": "syncer_engine_setservicecontrol",
-      "community": 30,
+      "community": 18,
       "norm_label": ".setservicecontrol()"
     },
     {
@@ -8389,7 +8254,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L245",
       "id": "syncer_engine_waitforlocalprotection",
-      "community": 108,
+      "community": 18,
       "norm_label": ".waitforlocalprotection()"
     },
     {
@@ -8398,7 +8263,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L245",
       "id": "backend_internal_syncer_engine_go_revision",
-      "community": 108,
+      "community": 18,
       "norm_label": "revision"
     },
     {
@@ -8452,7 +8317,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L395",
       "id": "syncer_engine_protectionstatus",
-      "community": 39,
+      "community": 18,
       "norm_label": ".protectionstatus()"
     },
     {
@@ -8461,7 +8326,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L395",
       "id": "backend_internal_syncer_engine_go_gameprotectionstatus",
-      "community": 39,
+      "community": 18,
       "norm_label": "gameprotectionstatus"
     },
     {
@@ -8470,7 +8335,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L422",
       "id": "syncer_engine_lenmust",
-      "community": 39,
+      "community": 18,
       "norm_label": "lenmust()"
     },
     {
@@ -8479,7 +8344,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L422",
       "id": "backend_internal_syncer_engine_go_t",
-      "community": 39,
+      "community": 18,
       "norm_label": "t"
     },
     {
@@ -8497,7 +8362,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L440",
       "id": "syncer_engine_resolveconflict",
-      "community": 103,
+      "community": 0,
       "norm_label": ".resolveconflict()"
     },
     {
@@ -8506,7 +8371,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L440",
       "id": "backend_internal_syncer_engine_go_game",
-      "community": 103,
+      "community": 18,
       "norm_label": "game"
     },
     {
@@ -8515,7 +8380,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L453",
       "id": "syncer_engine_revisions",
-      "community": 39,
+      "community": 18,
       "norm_label": ".revisions()"
     },
     {
@@ -8524,7 +8389,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L457",
       "id": "syncer_engine_recoverypoints",
-      "community": 39,
+      "community": 18,
       "norm_label": ".recoverypoints()"
     },
     {
@@ -8533,7 +8398,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L457",
       "id": "backend_internal_syncer_engine_go_recoverypoint",
-      "community": 39,
+      "community": 18,
       "norm_label": "recoverypoint"
     },
     {
@@ -8542,7 +8407,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L461",
       "id": "syncer_engine_storageusage",
-      "community": 39,
+      "community": 18,
       "norm_label": ".storageusage()"
     },
     {
@@ -8551,7 +8416,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L461",
       "id": "storageusage",
-      "community": 39,
+      "community": 18,
       "norm_label": "storageusage"
     },
     {
@@ -8560,7 +8425,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L496",
       "id": "syncer_engine_storagesummary",
-      "community": 39,
+      "community": 18,
       "norm_label": ".storagesummary()"
     },
     {
@@ -8569,7 +8434,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L496",
       "id": "storagesummary",
-      "community": 39,
+      "community": 18,
       "norm_label": "storagesummary"
     },
     {
@@ -8578,7 +8443,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L517",
       "id": "syncer_engine_cloudprofiles",
-      "community": 103,
+      "community": 18,
       "norm_label": ".cloudprofiles()"
     },
     {
@@ -8587,7 +8452,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L517",
       "id": "backend_internal_syncer_engine_go_gameprofile",
-      "community": 108,
+      "community": 18,
       "norm_label": "gameprofile"
     },
     {
@@ -8596,7 +8461,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L535",
       "id": "syncer_engine_restoreandtrack",
-      "community": 103,
+      "community": 18,
       "norm_label": ".restoreandtrack()"
     },
     {
@@ -8605,7 +8470,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L582",
       "id": "syncer_engine_restorecloudprofile",
-      "community": 103,
+      "community": 18,
       "norm_label": ".restorecloudprofile()"
     },
     {
@@ -8614,7 +8479,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L652",
       "id": "syncer_engine_deleterecoverypoint",
-      "community": 39,
+      "community": 18,
       "norm_label": ".deleterecoverypoint()"
     },
     {
@@ -8623,7 +8488,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L679",
       "id": "syncer_engine_preparelaunch",
-      "community": 103,
+      "community": 18,
       "norm_label": ".preparelaunch()"
     },
     {
@@ -8632,7 +8497,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L726",
       "id": "syncer_engine_restorelocalrevision",
-      "community": 103,
+      "community": 18,
       "norm_label": ".restorelocalrevision()"
     },
     {
@@ -8641,7 +8506,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L739",
       "id": "syncer_engine_loop",
-      "community": 30,
+      "community": 18,
       "norm_label": ".loop()"
     },
     {
@@ -8650,7 +8515,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L755",
       "id": "syncer_engine_scheduledue",
-      "community": 30,
+      "community": 18,
       "norm_label": ".scheduledue()"
     },
     {
@@ -8668,7 +8533,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L829",
       "id": "syncer_engine_runonce",
-      "community": 36,
+      "community": 18,
       "norm_label": ".runonce()"
     },
     {
@@ -8677,7 +8542,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "syncer_engine_capturelocal",
-      "community": 103,
+      "community": 18,
       "norm_label": ".capturelocal()"
     },
     {
@@ -8686,7 +8551,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "backend_internal_syncer_engine_go_result",
-      "community": 103,
+      "community": 18,
       "norm_label": "result"
     },
     {
@@ -8695,7 +8560,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L998",
       "id": "syncer_engine_gameprofile",
-      "community": 108,
+      "community": 18,
       "norm_label": "gameprofile()"
     },
     {
@@ -8704,7 +8569,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "syncer_engine_publishprofile",
-      "community": 108,
+      "community": 18,
       "norm_label": ".publishprofile()"
     },
     {
@@ -8713,7 +8578,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "profilestore",
-      "community": 108,
+      "community": 18,
       "norm_label": "profilestore"
     },
     {
@@ -8722,7 +8587,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "backend_internal_syncer_engine_go_revisionstore",
-      "community": 108,
+      "community": 18,
       "norm_label": "revisionstore"
     },
     {
@@ -8740,7 +8605,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "syncer_engine_setplaytimeledgers",
-      "community": 108,
+      "community": 18,
       "norm_label": ".setplaytimeledgers()"
     },
     {
@@ -8749,7 +8614,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "backend_internal_syncer_engine_go_playtimeledger",
-      "community": 108,
+      "community": 18,
       "norm_label": "playtimeledger"
     },
     {
@@ -8767,7 +8632,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1099",
       "id": "syncer_engine_mergeplaytimeledgers",
-      "community": 108,
+      "community": 18,
       "norm_label": "mergeplaytimeledgers()"
     },
     {
@@ -8776,7 +8641,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1114",
       "id": "syncer_engine_portablepathhint",
-      "community": 108,
+      "community": 18,
       "norm_label": "portablepathhint()"
     },
     {
@@ -8785,7 +8650,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1141",
       "id": "syncer_engine_reasondetails",
-      "community": 36,
+      "community": 18,
       "norm_label": "reasondetails()"
     },
     {
@@ -8794,7 +8659,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1156",
       "id": "syncer_engine_uploadspaused",
-      "community": 30,
+      "community": 18,
       "norm_label": ".uploadspaused()"
     },
     {
@@ -8830,7 +8695,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1209",
       "id": "syncer_engine_retryjob",
-      "community": 36,
+      "community": 18,
       "norm_label": ".retryjob()"
     },
     {
@@ -8839,7 +8704,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1231",
       "id": "syncer_engine_retrydelay",
-      "community": 36,
+      "community": 18,
       "norm_label": "retrydelay()"
     },
     {
@@ -8848,7 +8713,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1231",
       "id": "backend_internal_syncer_engine_go_duration",
-      "community": 36,
+      "community": 18,
       "norm_label": "duration"
     },
     {
@@ -8857,7 +8722,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1247",
       "id": "syncer_engine_classifylocalerror",
-      "community": 36,
+      "community": 18,
       "norm_label": "classifylocalerror()"
     },
     {
@@ -8866,7 +8731,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1261",
       "id": "syncer_engine_classifyprovidererror",
-      "community": 36,
+      "community": 18,
       "norm_label": "classifyprovidererror()"
     },
     {
@@ -8875,7 +8740,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1261",
       "id": "providerstate",
-      "community": 36,
+      "community": 18,
       "norm_label": "providerstate"
     },
     {
@@ -8884,7 +8749,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1297",
       "id": "syncer_engine_providerretryafter",
-      "community": 36,
+      "community": 18,
       "norm_label": "providerretryafter()"
     },
     {
@@ -8893,7 +8758,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1305",
       "id": "syncer_engine_userprovidermessage",
-      "community": 36,
+      "community": 18,
       "norm_label": "userprovidermessage()"
     },
     {
@@ -8911,7 +8776,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1336",
       "id": "syncer_engine_noteproviderfailure",
-      "community": 36,
+      "community": 18,
       "norm_label": ".noteproviderfailure()"
     },
     {
@@ -9010,7 +8875,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1465",
       "id": "syncer_engine_setrunning",
-      "community": 30,
+      "community": 18,
       "norm_label": ".setrunning()"
     },
     {
@@ -9100,7 +8965,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L251",
       "id": "syncer_engine_test_testconcurrentproviderheadispreservedforreview",
-      "community": 0,
+      "community": 11,
       "norm_label": "testconcurrentproviderheadispreservedforreview()"
     },
     {
@@ -9172,7 +9037,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_syncer_folder_go",
-      "community": 60,
+      "community": 0,
       "norm_label": "folder.go"
     },
     {
@@ -9181,7 +9046,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L30",
       "id": "syncer_manifestfile",
-      "community": 60,
+      "community": 0,
       "norm_label": "manifestfile"
     },
     {
@@ -9190,7 +9055,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L37",
       "id": "syncer_manifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "manifest"
     },
     {
@@ -9199,7 +9064,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L43",
       "id": "backend_internal_syncer_folder_go_time",
-      "community": 60,
+      "community": 0,
       "norm_label": "time"
     },
     {
@@ -9208,7 +9073,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L48",
       "id": "syncer_head",
-      "community": 60,
+      "community": 0,
       "norm_label": "head"
     },
     {
@@ -9217,7 +9082,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L53",
       "id": "syncer_result",
-      "community": 52,
+      "community": 0,
       "norm_label": "result"
     },
     {
@@ -9226,7 +9091,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L62",
       "id": "syncer_folder_resolveconflict",
-      "community": 52,
+      "community": 0,
       "norm_label": "resolveconflict()"
     },
     {
@@ -9235,7 +9100,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L62",
       "id": "backend_internal_syncer_folder_go_game",
-      "community": 52,
+      "community": 0,
       "norm_label": "game"
     },
     {
@@ -9244,7 +9109,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L62",
       "id": "backend_internal_syncer_folder_go_settings",
-      "community": 52,
+      "community": 0,
       "norm_label": "settings"
     },
     {
@@ -9253,7 +9118,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L62",
       "id": "backend_internal_syncer_folder_go_store",
-      "community": 52,
+      "community": 0,
       "norm_label": "store"
     },
     {
@@ -9262,7 +9127,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L71",
       "id": "syncer_folder_reconcile",
-      "community": 52,
+      "community": 0,
       "norm_label": "reconcile()"
     },
     {
@@ -9271,7 +9136,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L81",
       "id": "syncer_folder_resolveconflictfolderlegacy",
-      "community": 60,
+      "community": 0,
       "norm_label": "resolveconflictfolderlegacy()"
     },
     {
@@ -9280,7 +9145,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L141",
       "id": "syncer_folder_reconcilefolderlegacy",
-      "community": 60,
+      "community": 0,
       "norm_label": "reconcilefolderlegacy()"
     },
     {
@@ -9289,7 +9154,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L238",
       "id": "syncer_folder_scanmanifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "scanmanifest()"
     },
     {
@@ -9298,7 +9163,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L276",
       "id": "syncer_folder_scanmanifestcached",
-      "community": 60,
+      "community": 0,
       "norm_label": "scanmanifestcached()"
     },
     {
@@ -9307,7 +9172,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L276",
       "id": "backend_internal_syncer_folder_go_context",
-      "community": 52,
+      "community": 0,
       "norm_label": "context"
     },
     {
@@ -9316,7 +9181,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L371",
       "id": "syncer_capturelimitkey",
-      "community": 60,
+      "community": 0,
       "norm_label": "capturelimitkey"
     },
     {
@@ -9325,7 +9190,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L374",
       "id": "syncer_folder_withcapturelimit",
-      "community": 60,
+      "community": 0,
       "norm_label": "withcapturelimit()"
     },
     {
@@ -9334,7 +9199,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L378",
       "id": "syncer_folder_hashfilewithcontext",
-      "community": 60,
+      "community": 0,
       "norm_label": "hashfilewithcontext()"
     },
     {
@@ -9343,7 +9208,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L420",
       "id": "syncer_folder_shouldignore",
-      "community": 60,
+      "community": 0,
       "norm_label": "shouldignore()"
     },
     {
@@ -9352,7 +9217,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L441",
       "id": "syncer_folder_saferelativepath",
-      "community": 60,
+      "community": 0,
       "norm_label": "saferelativepath()"
     },
     {
@@ -9361,7 +9226,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L446",
       "id": "syncer_folder_publish",
-      "community": 60,
+      "community": 0,
       "norm_label": "publish()"
     },
     {
@@ -9370,7 +9235,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L485",
       "id": "syncer_folder_loadhead",
-      "community": 60,
+      "community": 0,
       "norm_label": "loadhead()"
     },
     {
@@ -9379,7 +9244,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L508",
       "id": "syncer_folder_localmanifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "localmanifest()"
     },
     {
@@ -9388,7 +9253,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L520",
       "id": "syncer_folder_savelocalmanifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "savelocalmanifest()"
     },
     {
@@ -9397,7 +9262,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L528",
       "id": "syncer_folder_applymanifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "applymanifest()"
     },
     {
@@ -9406,7 +9271,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L564",
       "id": "syncer_folder_recordconflicts",
-      "community": 60,
+      "community": 0,
       "norm_label": "recordconflicts()"
     },
     {
@@ -9415,7 +9280,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L585",
       "id": "syncer_folder_changedpaths",
-      "community": 60,
+      "community": 0,
       "norm_label": "changedpaths()"
     },
     {
@@ -9424,7 +9289,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L606",
       "id": "syncer_folder_overlappingchanges",
-      "community": 60,
+      "community": 0,
       "norm_label": "overlappingchanges()"
     },
     {
@@ -9433,7 +9298,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L620",
       "id": "syncer_folder_deletedpaths",
-      "community": 60,
+      "community": 0,
       "norm_label": "deletedpaths()"
     },
     {
@@ -9442,7 +9307,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L634",
       "id": "syncer_folder_unionpaths",
-      "community": 60,
+      "community": 0,
       "norm_label": "unionpaths()"
     },
     {
@@ -9451,7 +9316,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L647",
       "id": "syncer_folder_manifestsequal",
-      "community": 60,
+      "community": 0,
       "norm_label": "manifestsequal()"
     },
     {
@@ -9460,7 +9325,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L650",
       "id": "syncer_folder_clonemanifest",
-      "community": 60,
+      "community": 0,
       "norm_label": "clonemanifest()"
     },
     {
@@ -9469,7 +9334,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L661",
       "id": "syncer_folder_hashfile",
-      "community": 60,
+      "community": 0,
       "norm_label": "hashfile()"
     },
     {
@@ -9478,7 +9343,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L675",
       "id": "syncer_folder_writeobject",
-      "community": 60,
+      "community": 0,
       "norm_label": "writeobject()"
     },
     {
@@ -9487,7 +9352,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L702",
       "id": "syncer_folder_copyfile",
-      "community": 60,
+      "community": 0,
       "norm_label": "copyfile()"
     },
     {
@@ -9496,7 +9361,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L723",
       "id": "syncer_folder_copyfileatomic",
-      "community": 60,
+      "community": 0,
       "norm_label": "copyfileatomic()"
     },
     {
@@ -9514,7 +9379,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_syncer_folder_test_go",
-      "community": 11,
+      "community": 23,
       "norm_label": "folder_test.go"
     },
     {
@@ -9523,7 +9388,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L13",
       "id": "syncer_folder_test_testplaytimeledgersmergebydeviceandroundtrip",
-      "community": 11,
+      "community": 23,
       "norm_label": "testplaytimeledgersmergebydeviceandroundtrip()"
     },
     {
@@ -9532,7 +9397,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L13",
       "id": "backend_internal_syncer_folder_test_go_t",
-      "community": 11,
+      "community": 23,
       "norm_label": "t"
     },
     {
@@ -9541,7 +9406,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L31",
       "id": "syncer_folder_test_testfolderreconciletransfersupdatesdeletesandconflicts",
-      "community": 11,
+      "community": 23,
       "norm_label": "testfolderreconciletransfersupdatesdeletesandconflicts()"
     },
     {
@@ -9550,7 +9415,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L121",
       "id": "syncer_folder_test_mustwrite",
-      "community": 11,
+      "community": 23,
       "norm_label": "mustwrite()"
     },
     {
@@ -9559,7 +9424,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L130",
       "id": "syncer_folder_test_mustreadequal",
-      "community": 11,
+      "community": 23,
       "norm_label": "mustreadequal()"
     },
     {
@@ -9568,7 +9433,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_syncer_reconcile_store_go",
-      "community": 160,
+      "community": 0,
       "norm_label": "reconcile_store.go"
     },
     {
@@ -9577,7 +9442,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "id": "syncer_reconcile_store_publishtostore",
-      "community": 160,
+      "community": 0,
       "norm_label": "publishtostore()"
     },
     {
@@ -9586,7 +9451,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "id": "backend_internal_syncer_reconcile_store_go_context",
-      "community": 160,
+      "community": 0,
       "norm_label": "context"
     },
     {
@@ -9595,7 +9460,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "id": "backend_internal_syncer_reconcile_store_go_revisionstore",
-      "community": 160,
+      "community": 0,
       "norm_label": "revisionstore"
     },
     {
@@ -9604,7 +9469,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "id": "backend_internal_syncer_reconcile_store_go_manifest",
-      "community": 160,
+      "community": 0,
       "norm_label": "manifest"
     },
     {
@@ -9613,7 +9478,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "id": "backend_internal_syncer_reconcile_store_go_result",
-      "community": 160,
+      "community": 0,
       "norm_label": "result"
     },
     {
@@ -9622,7 +9487,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L71",
       "id": "syncer_reconcile_store_applyfromstore",
-      "community": 160,
+      "community": 0,
       "norm_label": "applyfromstore()"
     },
     {
@@ -9631,7 +9496,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L121",
       "id": "syncer_reconcile_store_copyreaderatomic",
-      "community": 160,
+      "community": 0,
       "norm_label": "copyreaderatomic()"
     },
     {
@@ -9640,7 +9505,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L121",
       "id": "backend_internal_syncer_reconcile_store_go_reader",
-      "community": 160,
+      "community": 0,
       "norm_label": "reader"
     },
     {
@@ -9649,7 +9514,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L125",
       "id": "syncer_reconcile_store_copyreaderatomicverified",
-      "community": 160,
+      "community": 0,
       "norm_label": "copyreaderatomicverified()"
     },
     {
@@ -9658,7 +9523,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L166",
       "id": "syncer_reconcile_store_localmanifestfrom",
-      "community": 160,
+      "community": 0,
       "norm_label": "localmanifestfrom()"
     },
     {
@@ -9667,7 +9532,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L166",
       "id": "backend_internal_syncer_reconcile_store_go_store",
-      "community": 160,
+      "community": 0,
       "norm_label": "store"
     },
     {
@@ -9676,7 +9541,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L169",
       "id": "syncer_reconcile_store_savelocalmanifestto",
-      "community": 160,
+      "community": 0,
       "norm_label": "savelocalmanifestto()"
     },
     {
@@ -9685,7 +9550,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L172",
       "id": "syncer_reconcile_store_recordconflictsto",
-      "community": 160,
+      "community": 0,
       "norm_label": "recordconflictsto()"
     },
     {
@@ -9694,7 +9559,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L178",
       "id": "syncer_reconcile_store_resolveconflictwithstore",
-      "community": 160,
+      "community": 0,
       "norm_label": "resolveconflictwithstore()"
     },
     {
@@ -10099,8 +9964,17 @@
       "source_file": "backend/internal/syncer/store.go",
       "source_location": "L406",
       "id": "syncer_store_reconcilewithstore",
-      "community": 160,
+      "community": 0,
       "norm_label": "reconcilewithstore()"
+    },
+    {
+      "label": "status.go",
+      "file_type": "code",
+      "source_file": "backend/internal/tray/status.go",
+      "source_location": "L1",
+      "id": "d_myprojects_cloud_saver_backend_internal_tray_status_go",
+      "community": 20,
+      "norm_label": "status.go"
     },
     {
       "label": "Status",
@@ -10115,7 +9989,7 @@
       "label": "Time",
       "file_type": "code",
       "source_file": "backend/internal/tray/status.go",
-      "source_location": "L14",
+      "source_location": "L11",
       "id": "backend_internal_tray_status_go_time",
       "community": 20,
       "norm_label": "time"
@@ -10124,7 +9998,7 @@
       "label": "Actions",
       "file_type": "code",
       "source_file": "backend/internal/tray/status.go",
-      "source_location": "L21",
+      "source_location": "L18",
       "id": "tray_actions",
       "community": 20,
       "norm_label": "actions"
@@ -10206,7 +10080,7 @@
       "file_type": "code",
       "source_file": "backend/internal/tray/tray_windows.go",
       "source_location": "L1",
-      "id": "tray_tray_windows",
+      "id": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
       "community": 101,
       "norm_label": "tray_windows.go"
     },
@@ -10286,7 +10160,7 @@
       "label": "loadTrayIcon()",
       "file_type": "code",
       "source_file": "backend/internal/tray/tray_windows.go",
-      "source_location": "L173",
+      "source_location": "L162",
       "id": "tray_tray_windows_loadtrayicon",
       "community": 101,
       "norm_label": "loadtrayicon()"
@@ -10297,7 +10171,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_watcher_watcher_go",
-      "community": 3,
+      "community": 16,
       "norm_label": "watcher.go"
     },
     {
@@ -10306,7 +10180,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L16",
       "id": "watcher_manager",
-      "community": 3,
+      "community": 16,
       "norm_label": "manager"
     },
     {
@@ -10315,7 +10189,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L17",
       "id": "backend_internal_watcher_watcher_go_mutex",
-      "community": 3,
+      "community": 16,
       "norm_label": "mutex"
     },
     {
@@ -10324,7 +10198,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L18",
       "id": "watcher",
-      "community": 3,
+      "community": 16,
       "norm_label": "watcher"
     },
     {
@@ -10333,7 +10207,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L19",
       "id": "backend_internal_watcher_watcher_go_cancelfunc",
-      "community": 3,
+      "community": 16,
       "norm_label": "cancelfunc"
     },
     {
@@ -10342,7 +10216,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L23",
       "id": "watcher_watcher_new",
-      "community": 3,
+      "community": 16,
       "norm_label": "new()"
     },
     {
@@ -10351,7 +10225,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L27",
       "id": "watcher_manager_reload",
-      "community": 3,
+      "community": 16,
       "norm_label": ".reload()"
     },
     {
@@ -10360,7 +10234,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L27",
       "id": "backend_internal_watcher_watcher_go_game",
-      "community": 3,
+      "community": 16,
       "norm_label": "game"
     },
     {
@@ -10369,7 +10243,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L90",
       "id": "watcher_manager_close",
-      "community": 3,
+      "community": 16,
       "norm_label": ".close()"
     },
     {
@@ -10378,7 +10252,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L102",
       "id": "watcher_watcher_addrecursive",
-      "community": 3,
+      "community": 16,
       "norm_label": "addrecursive()"
     },
     {
@@ -10387,7 +10261,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_third_party_systray_systray_go",
-      "community": 189,
+      "community": 1,
       "norm_label": "systray.go"
     },
     {
@@ -10396,7 +10270,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L29",
       "id": "systray_systray_init",
-      "community": 189,
+      "community": 1,
       "norm_label": "init()"
     },
     {
@@ -10423,7 +10297,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L63",
       "id": "systray_systray_newmenuitem",
-      "community": 189,
+      "community": 1,
       "norm_label": "newmenuitem()"
     },
     {
@@ -10432,7 +10306,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L78",
       "id": "systray_systray_run",
-      "community": 189,
+      "community": 1,
       "norm_label": "run()"
     },
     {
@@ -10441,7 +10315,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L88",
       "id": "systray_systray_register",
-      "community": 189,
+      "community": 1,
       "norm_label": "register()"
     },
     {
@@ -10450,7 +10324,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L112",
       "id": "systray_systray_quit",
-      "community": 189,
+      "community": 1,
       "norm_label": "quit()"
     },
     {
@@ -10459,7 +10333,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L119",
       "id": "systray_systray_addmenuitem",
-      "community": 189,
+      "community": 1,
       "norm_label": "addmenuitem()"
     },
     {
@@ -10468,7 +10342,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L128",
       "id": "systray_systray_addmenuitemcheckbox",
-      "community": 189,
+      "community": 1,
       "norm_label": "addmenuitemcheckbox()"
     },
     {
@@ -10477,7 +10351,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L137",
       "id": "systray_systray_addseparator",
-      "community": 189,
+      "community": 1,
       "norm_label": "addseparator()"
     },
     {
@@ -10603,7 +10477,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L225",
       "id": "systray_systray_systraymenuitemselected",
-      "community": 189,
+      "community": 1,
       "norm_label": "systraymenuitemselected()"
     },
     {
@@ -10612,7 +10486,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L240",
       "id": "systray_systray_systraytraydoubleclicked",
-      "community": 189,
+      "community": 1,
       "norm_label": "systraytraydoubleclicked()"
     },
     {
@@ -10630,7 +10504,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L70",
       "id": "systray_wndclassex",
-      "community": 99,
+      "community": 91,
       "norm_label": "wndclassex"
     },
     {
@@ -10657,7 +10531,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L92",
       "id": "systray_wndclassex_unregister",
-      "community": 99,
+      "community": 97,
       "norm_label": ".unregister()"
     },
     {
@@ -10666,7 +10540,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L107",
       "id": "systray_notifyicondata",
-      "community": 91,
+      "community": 99,
       "norm_label": "notifyicondata"
     },
     {
@@ -10675,7 +10549,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L118",
       "id": "guid",
-      "community": 91,
+      "community": 99,
       "norm_label": "guid"
     },
     {
@@ -10693,7 +10567,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L134",
       "id": "systray_notifyicondata_modify",
-      "community": 91,
+      "community": 99,
       "norm_label": ".modify()"
     },
     {
@@ -10702,7 +10576,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L146",
       "id": "systray_notifyicondata_delete",
-      "community": 16,
+      "community": 29,
       "norm_label": ".delete()"
     },
     {
@@ -10756,7 +10630,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L229",
       "id": "systray_wintray_settooltip",
-      "community": 91,
+      "community": 99,
       "norm_label": ".settooltip()"
     },
     {
@@ -10765,7 +10639,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L249",
       "id": "systray_wintray_wndproc",
-      "community": 99,
+      "community": 97,
       "norm_label": ".wndproc()"
     },
     {
@@ -10783,7 +10657,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L436",
       "id": "systray_wintray_createmenu",
-      "community": 97,
+      "community": 99,
       "norm_label": ".createmenu()"
     },
     {
@@ -10828,7 +10702,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L644",
       "id": "systray_wintray_showmenu",
-      "community": 99,
+      "community": 97,
       "norm_label": ".showmenu()"
     },
     {
@@ -13460,6 +13334,87 @@
       "norm_label": "corruption and missing objects"
     },
     {
+      "label": "LaunchOrigin",
+      "file_type": "code",
+      "source_file": "app/src/types.ts",
+      "source_location": "L7",
+      "community": 76,
+      "norm_label": "launchorigin",
+      "id": "src_types_launchorigin"
+    },
+    {
+      "label": "LaunchOrigin",
+      "file_type": "code",
+      "source_file": "backend/internal/api/handlers_games.go",
+      "source_location": "L35",
+      "community": 17,
+      "norm_label": "launchorigin",
+      "id": "launchorigin"
+    },
+    {
+      "label": "app.go",
+      "file_type": "code",
+      "source_file": "backend/internal/app/app.go",
+      "source_location": "L1",
+      "community": 3,
+      "norm_label": "app.go",
+      "id": "app_app"
+    },
+    {
+      "label": "LaunchOrigin",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L32",
+      "community": 29,
+      "norm_label": "launchorigin",
+      "id": "gamemon_launchorigin"
+    },
+    {
+      "label": ".ExpectLaunch()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L139",
+      "community": 29,
+      "norm_label": ".expectlaunch()",
+      "id": "gamemon_monitor_expectlaunch"
+    },
+    {
+      "label": ".CancelExpectedLaunch()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L149",
+      "community": 29,
+      "norm_label": ".cancelexpectedlaunch()",
+      "id": "gamemon_monitor_cancelexpectedlaunch"
+    },
+    {
+      "label": ".LaunchOrigin()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L157",
+      "community": 29,
+      "norm_label": ".launchorigin()",
+      "id": "gamemon_monitor_launchorigin"
+    },
+    {
+      "label": ".ExternalRunningIDs()",
+      "file_type": "code",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L166",
+      "community": 29,
+      "norm_label": ".externalrunningids()",
+      "id": "gamemon_monitor_externalrunningids"
+    },
+    {
+      "label": "tray_windows.go",
+      "file_type": "code",
+      "source_file": "backend/internal/tray/tray_windows.go",
+      "source_location": "L1",
+      "community": 101,
+      "norm_label": "tray_windows.go",
+      "id": "tray_tray_windows"
+    },
+    {
       "label": "main.rs",
       "file_type": "code",
       "source_file": "app/src-tauri/src/main.rs",
@@ -13494,42 +13449,6 @@
       "community": 17,
       "norm_label": "handlers_games.go",
       "id": "d_myprojects_cloud_saver_backend_internal_api_handlers_games_go"
-    },
-    {
-      "label": "app.go",
-      "file_type": "code",
-      "source_file": "backend/internal/app/app.go",
-      "source_location": "L1",
-      "community": 3,
-      "norm_label": "app.go",
-      "id": "d_myprojects_cloud_saver_backend_internal_app_app_go"
-    },
-    {
-      "label": "monitor.go",
-      "file_type": "code",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L1",
-      "community": 29,
-      "norm_label": "monitor.go",
-      "id": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go"
-    },
-    {
-      "label": "status.go",
-      "file_type": "code",
-      "source_file": "backend/internal/tray/status.go",
-      "source_location": "L1",
-      "community": 20,
-      "norm_label": "status.go",
-      "id": "d_myprojects_cloud_saver_backend_internal_tray_status_go"
-    },
-    {
-      "label": "tray_windows.go",
-      "file_type": "code",
-      "source_file": "backend/internal/tray/tray_windows.go",
-      "source_location": "L1",
-      "community": 101,
-      "norm_label": "tray_windows.go",
-      "id": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go"
     },
     {
       "label": "settings.json",
@@ -13986,7 +13905,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L1",
-      "community": 60,
+      "community": 0,
       "norm_label": "folder.go",
       "id": "syncer_folder"
     },
@@ -13995,7 +13914,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
-      "community": 11,
+      "community": 23,
       "norm_label": "folder_test.go",
       "id": "syncer_folder_test"
     },
@@ -14004,7 +13923,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L1",
-      "community": 160,
+      "community": 0,
       "norm_label": "reconcile_store.go",
       "id": "syncer_reconcile_store"
     },
@@ -14031,7 +13950,7 @@
       "file_type": "code",
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
-      "community": 3,
+      "community": 16,
       "norm_label": "watcher.go",
       "id": "watcher_watcher"
     },
@@ -14040,7 +13959,7 @@
       "file_type": "code",
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L1",
-      "community": 189,
+      "community": 1,
       "norm_label": "systray.go",
       "id": "systray_systray"
     },
@@ -14436,7 +14355,7 @@
       "file_type": "code",
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
-      "community": 160,
+      "community": 0,
       "norm_label": "revisionstore",
       "id": "revisionstore"
     },
@@ -16103,7 +16022,7 @@
       "source_file": "app/src/constants/defaults.ts",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 35,
+      "community": 6,
       "norm_label": "default_settings",
       "id": "app_src_constants_defaults_default_settings"
     },
@@ -17499,7 +17418,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 0,
       "norm_label": "application new",
       "id": "backend_internal_app_app_new"
     },
@@ -17539,7 +17458,7 @@
       "source_file": "backend/internal/auth/googledrive/dpapi_windows.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 99,
+      "community": 7,
       "norm_label": "dpapi_windows.go",
       "id": "backend_internal_auth_googledrive_dpapi_windows"
     },
@@ -17549,7 +17468,7 @@
       "source_file": "backend/internal/auth/googledrive/dpapi_windows.go",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 99,
+      "community": 7,
       "norm_label": "protect()",
       "id": "backend_internal_auth_googledrive_dpapi_windows_protect"
     },
@@ -17559,7 +17478,7 @@
       "source_file": "backend/internal/auth/googledrive/dpapi_windows.go",
       "source_location": "L26",
       "_origin": "ast",
-      "community": 99,
+      "community": 7,
       "norm_label": "unprotect()",
       "id": "backend_internal_auth_googledrive_dpapi_windows_unprotect"
     },
@@ -17679,7 +17598,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 16,
+      "community": 29,
       "norm_label": "autobackup/service.go",
       "id": "backend_internal_autobackup_service"
     },
@@ -17689,7 +17608,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L47",
       "_origin": "ast",
-      "community": 16,
+      "community": 29,
       "norm_label": "new()",
       "id": "backend_internal_autobackup_service_new"
     },
@@ -17699,7 +17618,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L326",
       "_origin": "ast",
-      "community": 16,
+      "community": 29,
       "norm_label": "computesavesignature()",
       "id": "backend_internal_autobackup_service_computesavesignature"
     },
@@ -17709,7 +17628,7 @@
       "source_file": "backend/internal/autobackup/service.go",
       "source_location": "L369",
       "_origin": "ast",
-      "community": 16,
+      "community": 29,
       "norm_label": "shouldignore()",
       "id": "backend_internal_autobackup_service_shouldignore"
     },
@@ -17833,7 +17752,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "settings manager",
       "id": "backend_internal_config_manager"
     },
@@ -18017,7 +17936,7 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 23,
+      "community": 6,
       "norm_label": "monitor.go",
       "id": "backend_internal_gamemon_monitor"
     },
@@ -18121,7 +18040,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 0,
       "norm_label": "open sqlite log store",
       "id": "backend_internal_logstore_sqlite_open"
     },
@@ -18621,7 +18540,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 23,
+      "community": 6,
       "norm_label": "engine.go",
       "id": "backend_internal_syncer_engine"
     },
@@ -18635,7 +18554,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 103,
+      "community": 0,
       "norm_label": "protection engine new",
       "id": "backend_internal_syncer_engine_new"
     },
@@ -18645,7 +18564,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L164",
       "_origin": "ast",
-      "community": 30,
+      "community": 18,
       "norm_label": "normalizecontrol()",
       "id": "backend_internal_syncer_engine_normalizecontrol"
     },
@@ -18655,7 +18574,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L416",
       "_origin": "ast",
-      "community": 39,
+      "community": 18,
       "norm_label": "lenmust()",
       "id": "backend_internal_syncer_engine_lenmust"
     },
@@ -18665,7 +18584,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L923",
       "_origin": "ast",
-      "community": 108,
+      "community": 18,
       "norm_label": "gameprofile()",
       "id": "backend_internal_syncer_engine_gameprofile"
     },
@@ -18675,7 +18594,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L936",
       "_origin": "ast",
-      "community": 108,
+      "community": 6,
       "norm_label": "portablepathhint()",
       "id": "backend_internal_syncer_engine_portablepathhint"
     },
@@ -18685,7 +18604,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L963",
       "_origin": "ast",
-      "community": 23,
+      "community": 18,
       "norm_label": "reasondetails()",
       "id": "backend_internal_syncer_engine_reasondetails"
     },
@@ -18695,7 +18614,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1053",
       "_origin": "ast",
-      "community": 36,
+      "community": 18,
       "norm_label": "retrydelay()",
       "id": "backend_internal_syncer_engine_retrydelay"
     },
@@ -18705,7 +18624,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1069",
       "_origin": "ast",
-      "community": 23,
+      "community": 18,
       "norm_label": "classifylocalerror()",
       "id": "backend_internal_syncer_engine_classifylocalerror"
     },
@@ -18715,7 +18634,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1083",
       "_origin": "ast",
-      "community": 36,
+      "community": 18,
       "norm_label": "classifyprovidererror()",
       "id": "backend_internal_syncer_engine_classifyprovidererror"
     },
@@ -18725,7 +18644,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1119",
       "_origin": "ast",
-      "community": 36,
+      "community": 18,
       "norm_label": "providerretryafter()",
       "id": "backend_internal_syncer_engine_providerretryafter"
     },
@@ -18735,7 +18654,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1127",
       "_origin": "ast",
-      "community": 36,
+      "community": 18,
       "norm_label": "userprovidermessage()",
       "id": "backend_internal_syncer_engine_userprovidermessage"
     },
@@ -18775,7 +18694,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L131",
       "_origin": "ast",
-      "community": 11,
+      "community": 0,
       "norm_label": "testconfigurationchangedrefreshesprotectiontargetandproviderstate()",
       "id": "backend_internal_syncer_engine_test_testconfigurationchangedrefreshesprotectiontargetandproviderstate"
     },
@@ -18785,7 +18704,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L169",
       "_origin": "ast",
-      "community": 11,
+      "community": 18,
       "norm_label": "teststructuredproviderratelimitclassification()",
       "id": "backend_internal_syncer_engine_test_teststructuredproviderratelimitclassification"
     },
@@ -18805,7 +18724,7 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L251",
       "_origin": "ast",
-      "community": 103,
+      "community": 0,
       "norm_label": "testconcurrentproviderheadispreservedforreview()",
       "id": "backend_internal_syncer_engine_test_testconcurrentproviderheadispreservedforreview"
     },
@@ -18835,7 +18754,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "folder.go",
       "id": "backend_internal_syncer_folder"
     },
@@ -18845,7 +18764,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L62",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "resolveconflict()",
       "id": "backend_internal_syncer_folder_resolveconflict"
     },
@@ -18855,7 +18774,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L71",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "reconcile()",
       "id": "backend_internal_syncer_folder_reconcile"
     },
@@ -18865,7 +18784,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "resolveconflictfolderlegacy()",
       "id": "backend_internal_syncer_folder_resolveconflictfolderlegacy"
     },
@@ -18875,7 +18794,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L141",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "reconcilefolderlegacy()",
       "id": "backend_internal_syncer_folder_reconcilefolderlegacy"
     },
@@ -18885,7 +18804,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L238",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "scanmanifest()",
       "id": "backend_internal_syncer_folder_scanmanifest"
     },
@@ -18895,7 +18814,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L276",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "scanmanifestcached()",
       "id": "backend_internal_syncer_folder_scanmanifestcached"
     },
@@ -18905,7 +18824,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L374",
       "_origin": "ast",
-      "community": 52,
+      "community": 18,
       "norm_label": "withcapturelimit()",
       "id": "backend_internal_syncer_folder_withcapturelimit"
     },
@@ -18915,7 +18834,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L378",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "hashfilewithcontext()",
       "id": "backend_internal_syncer_folder_hashfilewithcontext"
     },
@@ -18925,7 +18844,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L420",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "shouldignore()",
       "id": "backend_internal_syncer_folder_shouldignore"
     },
@@ -18935,7 +18854,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L441",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "saferelativepath()",
       "id": "backend_internal_syncer_folder_saferelativepath"
     },
@@ -18945,7 +18864,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L446",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "publish()",
       "id": "backend_internal_syncer_folder_publish"
     },
@@ -18955,7 +18874,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L485",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "loadhead()",
       "id": "backend_internal_syncer_folder_loadhead"
     },
@@ -18965,7 +18884,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L508",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "localmanifest()",
       "id": "backend_internal_syncer_folder_localmanifest"
     },
@@ -18975,7 +18894,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L520",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "savelocalmanifest()",
       "id": "backend_internal_syncer_folder_savelocalmanifest"
     },
@@ -18985,7 +18904,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L528",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "applymanifest()",
       "id": "backend_internal_syncer_folder_applymanifest"
     },
@@ -18995,7 +18914,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L564",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "recordconflicts()",
       "id": "backend_internal_syncer_folder_recordconflicts"
     },
@@ -19005,7 +18924,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L585",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "changedpaths()",
       "id": "backend_internal_syncer_folder_changedpaths"
     },
@@ -19015,7 +18934,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L606",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "overlappingchanges()",
       "id": "backend_internal_syncer_folder_overlappingchanges"
     },
@@ -19025,7 +18944,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L620",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "deletedpaths()",
       "id": "backend_internal_syncer_folder_deletedpaths"
     },
@@ -19035,7 +18954,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L634",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "unionpaths()",
       "id": "backend_internal_syncer_folder_unionpaths"
     },
@@ -19045,7 +18964,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L647",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "manifestsequal()",
       "id": "backend_internal_syncer_folder_manifestsequal"
     },
@@ -19055,7 +18974,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L650",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "clonemanifest()",
       "id": "backend_internal_syncer_folder_clonemanifest"
     },
@@ -19065,7 +18984,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L661",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "hashfile()",
       "id": "backend_internal_syncer_folder_hashfile"
     },
@@ -19075,7 +18994,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L675",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "writeobject()",
       "id": "backend_internal_syncer_folder_writeobject"
     },
@@ -19085,7 +19004,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L702",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "copyfile()",
       "id": "backend_internal_syncer_folder_copyfile"
     },
@@ -19095,7 +19014,7 @@
       "source_file": "backend/internal/syncer/folder.go",
       "source_location": "L723",
       "_origin": "ast",
-      "community": 52,
+      "community": 0,
       "norm_label": "copyfileatomic()",
       "id": "backend_internal_syncer_folder_copyfileatomic"
     },
@@ -19115,7 +19034,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 11,
+      "community": 23,
       "norm_label": "folder_test.go",
       "id": "backend_internal_syncer_folder_test"
     },
@@ -19125,7 +19044,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 11,
+      "community": 23,
       "norm_label": "testfolderreconciletransfersupdatesdeletesandconflicts()",
       "id": "backend_internal_syncer_folder_test_testfolderreconciletransfersupdatesdeletesandconflicts"
     },
@@ -19135,7 +19054,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 11,
+      "community": 23,
       "norm_label": "mustwrite()",
       "id": "backend_internal_syncer_folder_test_mustwrite"
     },
@@ -19145,7 +19064,7 @@
       "source_file": "backend/internal/syncer/folder_test.go",
       "source_location": "L111",
       "_origin": "ast",
-      "community": 11,
+      "community": 23,
       "norm_label": "mustreadequal()",
       "id": "backend_internal_syncer_folder_test_mustreadequal"
     },
@@ -19155,7 +19074,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "reconcile_store.go",
       "id": "backend_internal_syncer_reconcile_store"
     },
@@ -19165,7 +19084,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "publishtostore()",
       "id": "backend_internal_syncer_reconcile_store_publishtostore"
     },
@@ -19175,7 +19094,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L71",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "applyfromstore()",
       "id": "backend_internal_syncer_reconcile_store_applyfromstore"
     },
@@ -19185,7 +19104,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L121",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "copyreaderatomic()",
       "id": "backend_internal_syncer_reconcile_store_copyreaderatomic"
     },
@@ -19195,7 +19114,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L125",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "copyreaderatomicverified()",
       "id": "backend_internal_syncer_reconcile_store_copyreaderatomicverified"
     },
@@ -19205,7 +19124,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L166",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "localmanifestfrom()",
       "id": "backend_internal_syncer_reconcile_store_localmanifestfrom"
     },
@@ -19215,7 +19134,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L169",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "savelocalmanifestto()",
       "id": "backend_internal_syncer_reconcile_store_savelocalmanifestto"
     },
@@ -19225,7 +19144,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L172",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "recordconflictsto()",
       "id": "backend_internal_syncer_reconcile_store_recordconflictsto"
     },
@@ -19235,7 +19154,7 @@
       "source_file": "backend/internal/syncer/reconcile_store.go",
       "source_location": "L178",
       "_origin": "ast",
-      "community": 160,
+      "community": 0,
       "norm_label": "resolveconflictwithstore()",
       "id": "backend_internal_syncer_reconcile_store_resolveconflictwithstore"
     },
@@ -19307,7 +19226,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 103,
+      "community": 0,
       "norm_label": "restore immutable revision",
       "id": "backend_internal_syncer_store_restorerevision"
     },
@@ -19317,7 +19236,7 @@
       "source_file": "backend/internal/syncer/store.go",
       "source_location": "L205",
       "_origin": "ast",
-      "community": 103,
+      "community": 0,
       "norm_label": "newfolderstore()",
       "id": "backend_internal_syncer_store_newfolderstore"
     },
@@ -19331,7 +19250,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 160,
+      "community": 0,
       "norm_label": "provider-neutral reconciliation",
       "id": "backend_internal_syncer_store_reconcilewithstore"
     },
@@ -19401,7 +19320,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 3,
+      "community": 16,
       "norm_label": "watcher.go",
       "id": "backend_internal_watcher_watcher"
     },
@@ -19411,7 +19330,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L23",
       "_origin": "ast",
-      "community": 3,
+      "community": 16,
       "norm_label": "new()",
       "id": "backend_internal_watcher_watcher_new"
     },
@@ -19421,7 +19340,7 @@
       "source_file": "backend/internal/watcher/watcher.go",
       "source_location": "L102",
       "_origin": "ast",
-      "community": 3,
+      "community": 16,
       "norm_label": "addrecursive()",
       "id": "backend_internal_watcher_watcher_addrecursive"
     },
@@ -19443,7 +19362,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 1,
+      "community": 97,
       "norm_label": "systray.go",
       "id": "backend_third_party_systray_systray"
     },
@@ -19453,7 +19372,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L29",
       "_origin": "ast",
-      "community": 1,
+      "community": 97,
       "norm_label": "init()",
       "id": "backend_third_party_systray_systray_init"
     },
@@ -19493,7 +19412,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L112",
       "_origin": "ast",
-      "community": 1,
+      "community": 97,
       "norm_label": "quit()",
       "id": "backend_third_party_systray_systray_quit"
     },
@@ -19523,7 +19442,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L137",
       "_origin": "ast",
-      "community": 101,
+      "community": 97,
       "norm_label": "addseparator()",
       "id": "backend_third_party_systray_systray_addseparator"
     },
@@ -19533,7 +19452,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L225",
       "_origin": "ast",
-      "community": 1,
+      "community": 97,
       "norm_label": "systraymenuitemselected()",
       "id": "backend_third_party_systray_systray_systraymenuitemselected"
     },
@@ -19543,7 +19462,7 @@
       "source_file": "backend/third_party/systray/systray.go",
       "source_location": "L240",
       "_origin": "ast",
-      "community": 99,
+      "community": 97,
       "norm_label": "systraytraydoubleclicked()",
       "id": "backend_third_party_systray_systray_systraytraydoubleclicked"
     },
@@ -19633,7 +19552,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L907",
       "_origin": "ast",
-      "community": 91,
+      "community": 92,
       "norm_label": "settooltip()",
       "id": "backend_third_party_systray_systray_windows_settooltip"
     },
@@ -19653,7 +19572,7 @@
       "source_file": "backend/third_party/systray/systray_windows.go",
       "source_location": "L930",
       "_origin": "ast",
-      "community": 101,
+      "community": 97,
       "norm_label": "addseparator()",
       "id": "backend_third_party_systray_systray_windows_addseparator"
     },
@@ -19738,7 +19657,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "native update manager",
       "id": "app_src_tauri_updater_update_manager"
     },
@@ -19751,7 +19670,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "signed update verification",
       "id": "app_src_tauri_updater_signed_update_verification"
     },
@@ -19764,7 +19683,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "daemon shutdown request",
       "id": "app_src_tauri_updater_daemon_shutdown_request"
     },
@@ -19777,7 +19696,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "tauri update bridge",
       "id": "app_src_update_tauri_update_bridge"
     },
@@ -19790,7 +19709,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "backend api client",
       "id": "app_src_api_backend_api_client"
     },
@@ -19803,7 +19722,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "backend response normalizers",
       "id": "app_src_api_response_normalizers"
     },
@@ -19816,7 +19735,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "native file picker",
       "id": "app_src_native_dialog_native_file_picker"
     },
@@ -19829,7 +19748,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "application controller",
       "id": "app_src_app_application_controller"
     },
@@ -19842,7 +19761,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "game protection and recovery ui",
       "id": "app_src_views_game_detail_protection_and_recovery_ui"
     },
@@ -19855,7 +19774,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "provider and update settings ui",
       "id": "app_src_views_settings_provider_and_update_ui"
     },
@@ -19868,7 +19787,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 6,
       "norm_label": "recovery library ui",
       "id": "app_src_views_home_recovery_library_ui"
     },
@@ -19881,7 +19800,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "single-instance daemon bootstrap",
       "id": "backend_cmd_daemon_single_instance_daemon"
     },
@@ -19894,7 +19813,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "local http api server",
       "id": "backend_internal_api_local_http_server"
     },
@@ -19907,7 +19826,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "loopback api access control",
       "id": "backend_internal_api_loopback_access_control"
     },
@@ -19920,7 +19839,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "game management handler",
       "id": "backend_internal_api_game_management_handler"
     },
@@ -19933,7 +19852,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "protection and recovery handler",
       "id": "backend_internal_api_protection_recovery_handler"
     },
@@ -19946,7 +19865,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "backup import export handler",
       "id": "backend_internal_api_backup_import_export_handler"
     },
@@ -19959,7 +19878,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "legacy snapshot handler",
       "id": "backend_internal_api_legacy_snapshot_handler"
     },
@@ -19972,7 +19891,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "google drive oauth handler",
       "id": "backend_internal_api_google_drive_oauth_handler"
     },
@@ -19985,7 +19904,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "update lifecycle safety gate",
       "id": "backend_internal_api_update_lifecycle_gate"
     },
@@ -19998,7 +19917,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "settings update handler",
       "id": "backend_internal_api_settings_handler"
     },
@@ -20011,7 +19930,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "sync queue and conflict handler",
       "id": "backend_internal_api_sync_handler"
     },
@@ -20024,7 +19943,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "activity and log store",
       "id": "backend_internal_logstore_store"
     },
@@ -20037,7 +19956,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "backup archive service",
       "id": "backend_internal_backup_service"
     },
@@ -20050,7 +19969,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "google drive authentication service",
       "id": "backend_internal_googledriveauth_service"
     },
@@ -20063,7 +19982,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 6,
       "norm_label": "cross-device recovery library",
       "id": "backend_internal_api_recovery_library"
     },
@@ -20284,7 +20203,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 103,
+      "community": 0,
       "norm_label": "revision store protocol",
       "id": "backend_internal_syncer_store_revisionstore"
     },
@@ -20310,7 +20229,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 103,
+      "community": 0,
       "norm_label": "sync folder revision store",
       "id": "backend_internal_syncer_store_folderstore"
     },
@@ -21811,9 +21730,9 @@
       "source_location": "L17",
       "weight": 1.0,
       "context": "import",
+      "confidence_score": 1.0,
       "source": "app_src_tauri_src_main_rs_src_main",
-      "target": "app_src_tauri_src_main_rs_pathbuf",
-      "confidence_score": 1.0
+      "target": "app_src_tauri_src_main_rs_pathbuf"
     },
     {
       "relation": "contains",
@@ -21881,9 +21800,9 @@
       "source_file": "app/src-tauri/src/main.rs",
       "source_location": "L210",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_src_tauri_src_main_rs_src_main",
-      "target": "src_main_creates_safe_shortcut_file_names",
-      "confidence_score": 1.0
+      "target": "src_main_creates_safe_shortcut_file_names"
     },
     {
       "relation": "contains",
@@ -21981,9 +21900,9 @@
       "source_file": "app/src-tauri/src/main.rs",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "app_src_tauri_src_main_rs_src_main",
-      "target": "src_main_reads_only_a_valid_game_launch_argument",
-      "confidence_score": 1.0
+      "target": "src_main_reads_only_a_valid_game_launch_argument"
     },
     {
       "relation": "contains",
@@ -31526,17 +31445,6 @@
       "target": "api_gameresponse"
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/api/handlers_games.go",
-      "source_location": "L450",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "api_server_togameresponse",
-      "target": "launchorigin"
-    },
-    {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/handlers_games.go",
@@ -32649,6 +32557,17 @@
       "confidence_score": 1.0,
       "source": "api_server_togameresponse",
       "target": "backend_internal_api_handlers_games_go_time"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/api/handlers_games.go",
+      "source_location": "L450",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_server_togameresponse",
+      "target": "launchorigin"
     },
     {
       "relation": "contains",
@@ -35980,7 +35899,7 @@
       "source_location": "L415",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "app_app",
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "target": "app_app_desktopappexecutable"
     },
     {
@@ -35990,7 +35909,7 @@
       "source_location": "L59",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "app_app",
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "target": "app_app_new"
     },
     {
@@ -36000,18 +35919,38 @@
       "source_location": "L406",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "app_app",
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "target": "app_app_openui"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L464",
+      "source_location": "L476",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "app_app",
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "target": "app_app_resolveexecutablecandidate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/app/app.go",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
+      "target": "app_application"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/app/app.go",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
+      "target": "app_options"
     },
     {
       "relation": "contains",
@@ -36022,16 +35961,6 @@
       "confidence_score": 1.0,
       "source": "app_app",
       "target": "app_application"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/app/app.go",
-      "source_location": "L52",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "app_app",
-      "target": "app_options"
     },
     {
       "relation": "references",
@@ -36267,11 +36196,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L33",
+      "source_location": "L52",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
-      "target": "app_application"
+      "source": "app_app",
+      "target": "app_options"
     },
     {
       "relation": "references",
@@ -36311,11 +36240,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L52",
+      "source_location": "L59",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
-      "target": "app_options"
+      "source": "app_app",
+      "target": "app_app_new"
     },
     {
       "relation": "calls",
@@ -36370,16 +36299,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "app_application_run",
-      "target": "app_app_new"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/app/app.go",
-      "source_location": "L59",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
       "target": "app_app_new"
     },
     {
@@ -36572,6 +36491,16 @@
       "target": "app_application_logevent"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/app/app.go",
+      "source_location": "L406",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "app_app",
+      "target": "app_app_openui"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -36586,11 +36515,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L406",
+      "source_location": "L415",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
-      "target": "app_app_openui"
+      "source": "app_app",
+      "target": "app_app_desktopappexecutable"
     },
     {
       "relation": "calls",
@@ -36607,20 +36536,10 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/app/app.go",
-      "source_location": "L415",
+      "source_location": "L464",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
-      "target": "app_app_desktopappexecutable"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/app/app.go",
-      "source_location": "L476",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_app_app_go",
+      "source": "app_app",
       "target": "app_app_resolveexecutablecandidate"
     },
     {
@@ -41580,6 +41499,181 @@
       "target": "backend_internal_gameicon_extract_test_go_t"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L60",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_new"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L300",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_normalizepath"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L309",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_monitor_sameset"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
+      "target": "gamemon_session"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_gamemon_monitor",
+      "target": "gamemon_session"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L54",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "gamemon_session"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L32",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_session",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L40",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_flushop",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L70",
+      "weight": 1.0,
+      "context": "field",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L228",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_flushall",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L148",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_pollonce",
+      "target": "backend_internal_gamemon_monitor_go_time"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_gamemon_monitor",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor",
+      "target": "gamemon_flushop"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L244",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_flushops",
+      "target": "gamemon_flushop"
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/api/server.go",
@@ -41622,16 +41716,6 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_gamemon_monitor_new",
-      "target": "gamemon_monitor"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L44",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
       "target": "gamemon_monitor"
     },
     {
@@ -41698,27 +41782,6 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L70",
-      "weight": 1.0,
-      "context": "field",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L71",
       "weight": 1.0,
       "context": "field",
@@ -41732,9 +41795,9 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "gamemon_monitor",
-      "target": "gamemon_monitor",
-      "confidence_score": 1.0
+      "target": "gamemon_monitor"
     },
     {
       "relation": "method",
@@ -41819,17 +41882,6 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor",
       "target": "gamemon_monitor_launchorigin"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L60",
-      "weight": 1.0,
-      "context": "return_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_new",
-      "target": "gamemon_monitor"
     },
     {
       "relation": "contains",
@@ -41918,18 +41970,6 @@
       "target": "gamemon_monitor_start"
     },
     {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L54",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor",
-      "target": "gamemon_session"
-    },
-    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -41943,114 +41983,12 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L157",
+      "source_location": "L60",
       "weight": 1.0,
       "context": "return_type",
       "confidence_score": 1.0,
-      "source": "gamemon_monitor_launchorigin",
-      "target": "gamemon_launchorigin"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_gamemon_monitor",
-      "target": "gamemon_session"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L29",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_session"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L32",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_session",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L40",
-      "weight": 1.0,
-      "context": "field",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_flushop",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L228",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_flushall",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L148",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_pollonce",
-      "target": "backend_internal_gamemon_monitor_go_time"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "backend_internal_gamemon_monitor",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_flushop"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L244",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_flushops",
-      "target": "gamemon_flushop"
+      "source": "gamemon_monitor_new",
+      "target": "gamemon_monitor"
     },
     {
       "relation": "references",
@@ -42097,16 +42035,6 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_new",
       "target": "backend_internal_gamemon_monitor_go_store"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L60",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_new"
     },
     {
       "relation": "references",
@@ -42155,17 +42083,6 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_forcepoll",
       "target": "gamemon_monitor_pollonce"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L151",
-      "weight": 1.0,
-      "source": "gamemon_monitor_cancelexpectedlaunch",
-      "target": "systray_notifyicondata_delete"
     },
     {
       "relation": "calls",
@@ -42282,207 +42199,6 @@
       "confidence_score": 1.0,
       "source": "gamemon_monitor_snapshotrunningexecutables",
       "target": "gamemon_monitor_normalizepath"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L300",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_normalizepath"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L82",
-      "weight": 1.0,
-      "source": "gamemon_monitor_test_testmonitor",
-      "target": "gamemon_monitor_normalizepath"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor.go",
-      "source_location": "L309",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_gamemon_monitor_go",
-      "target": "gamemon_monitor_sameset"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test",
-      "target": "gamemon_monitor_test_testmonitor"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L12",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test",
-      "target": "gamemon_monitor_test_testmonitorclassifiesroveandexternallaunches"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L35",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test",
-      "target": "gamemon_monitor_test_testmonitorexpiresexpectedlaunchbeforeprocessappears"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L51",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test",
-      "target": "gamemon_runningswitch"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L12",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorclassifiesroveandexternallaunches",
-      "target": "backend_internal_gamemon_monitor_test_go_t"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L13",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorclassifiesroveandexternallaunches",
-      "target": "gamemon_monitor_test_testmonitor"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L16",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorclassifiesroveandexternallaunches",
-      "target": "gamemon_runningswitch_store"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitor",
-      "target": "backend_internal_gamemon_monitor_test_go_t"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L35",
-      "weight": 1.0,
-      "context": "parameter_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorexpiresexpectedlaunchbeforeprocessappears",
-      "target": "backend_internal_gamemon_monitor_test_go_t"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorexpiresexpectedlaunchbeforeprocessappears",
-      "target": "gamemon_monitor_test_testmonitor"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L44",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitorexpiresexpectedlaunchbeforeprocessappears",
-      "target": "gamemon_runningswitch_store"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "weight": 1.0,
-      "context": "return_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitor",
-      "target": "gamemon_runningswitch"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L54",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_runningswitch",
-      "target": "gamemon_runningswitch_load"
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L53",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_runningswitch",
-      "target": "gamemon_runningswitch_store"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitor",
-      "target": "gamemon_runningswitch_load"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/gamemon/monitor_test.go",
-      "source_location": "L56",
-      "weight": 1.0,
-      "context": "return_type",
-      "confidence_score": 1.0,
-      "source": "gamemon_monitor_test_testmonitor",
-      "target": "backend_internal_gamemon_monitor_test_go_monitor"
     },
     {
       "relation": "contains",
@@ -58723,12 +58439,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/internal/tray/status.go",
-      "source_location": "L6",
+      "source_location": "L18",
       "weight": 1.0,
-      "_origin": "ast",
       "confidence_score": 1.0,
-      "source": "backend_internal_tray_status",
-      "target": "tray_status"
+      "source": "d_myprojects_cloud_saver_backend_internal_tray_status_go",
+      "target": "tray_actions"
     },
     {
       "relation": "contains",
@@ -58738,6 +58453,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "d_myprojects_cloud_saver_backend_internal_tray_status_go",
+      "target": "tray_status"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/tray/status.go",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "confidence_score": 1.0,
+      "source": "backend_internal_tray_status",
       "target": "tray_status"
     },
     {
@@ -58768,9 +58494,9 @@
       "source_file": "backend/internal/tray/status.go",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tray_status",
-      "target": "tray_status",
-      "confidence_score": 1.0
+      "target": "tray_status"
     },
     {
       "relation": "contains",
@@ -58805,16 +58531,6 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "backend_internal_tray_tray_windows_go_tray_manager_run",
-      "target": "tray_actions"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/internal/tray/status.go",
-      "source_location": "L18",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_tray_status_go",
       "target": "tray_actions"
     },
     {
@@ -58954,7 +58670,7 @@
       "source_location": "L17",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "tray_tray_windows",
+      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
       "target": "backend_internal_tray_tray_windows_go_tray_manager"
     },
     {
@@ -58964,7 +58680,7 @@
       "source_location": "L162",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "tray_tray_windows",
+      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
       "target": "tray_tray_windows_loadtrayicon"
     },
     {
@@ -58974,7 +58690,7 @@
       "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "tray_tray_windows",
+      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
       "target": "tray_tray_windows_new"
     },
     {
@@ -59052,7 +58768,7 @@
       "source_location": "L17",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
+      "source": "tray_tray_windows",
       "target": "backend_internal_tray_tray_windows_go_tray_manager"
     },
     {
@@ -59073,7 +58789,7 @@
       "source_location": "L21",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
+      "source": "tray_tray_windows",
       "target": "tray_tray_windows_new"
     },
     {
@@ -59176,7 +58892,7 @@
       "source_location": "L162",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "d_myprojects_cloud_saver_backend_internal_tray_tray_windows_go",
+      "source": "tray_tray_windows",
       "target": "tray_tray_windows_loadtrayicon"
     },
     {
@@ -60673,6 +60389,17 @@
       "confidence_score": 1.0,
       "source": "systray_wintray_settooltip",
       "target": "systray_notifyicondata_modify"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L151",
+      "weight": 1.0,
+      "source": "gamemon_monitor_cancelexpectedlaunch",
+      "target": "systray_notifyicondata_delete"
     },
     {
       "relation": "calls",
@@ -64903,6 +64630,17 @@
       "confidence_score": 1.0,
       "source": "end_users_recovery_recovery_and_safe_restore",
       "target": "end_users_recovery_zip_replacement"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "backend/internal/gamemon/monitor.go",
+      "source_location": "L157",
+      "weight": 1.0,
+      "context": "return_type",
+      "confidence_score": 1.0,
+      "source": "gamemon_monitor_launchorigin",
+      "target": "gamemon_launchorigin"
     },
     {
       "relation": "references",

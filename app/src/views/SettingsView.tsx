@@ -71,7 +71,8 @@ export function SettingsView(props: SettingsViewProps) {
 
         {settings.protectionTarget === "google_drive" ? (
           <div className="provider-status" aria-live="polite">
-            <p>{settings.googleDrive.connected ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to replicate local revisions."}</p>
+            <p>{settings.googleDrive.connected && settings.googleDrive.ready !== false ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to replicate local revisions."}</p>
+			{settings.googleDrive.configurationError ? <p className="banner error" role="alert">{settings.googleDrive.configurationError}</p> : null}
             {settings.googleDrive.oauthClientSource ? <p className="snapshot-meta">OAuth client: {settings.googleDrive.oauthClientSource.replace(/_/g, " ")} · credential: {(settings.googleDrive.oauthCredentialSource ?? "unknown").replace(/_/g, " ")}</p> : null}
             <div className="detail-actions">
               <button className="btn primary" disabled={googleBusy} onClick={() => void runGoogle(onConnectGoogleDrive)} type="button">{googleBusy ? "Waiting for sign-in…" : settings.googleDrive.connected ? "Reconnect" : "Connect Google Drive"}</button>

@@ -40,6 +40,7 @@ type ErrorPayload = { error?: string };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
+	    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
@@ -242,8 +243,8 @@ export const api = {
     const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
     return normalizeBackupHistory(payload);
   },
-  googleDriveStatus() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/status"); },
-  connectGoogleDrive() { return request<{ connected: boolean; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/connect", { method: "POST" }); },
+  googleDriveStatus() { return request<{ connected: boolean; ready?: boolean; configurationError?: string; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/status"); },
+  connectGoogleDrive() { return request<{ connected: boolean; ready?: boolean; configurationError?: string; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/connect", { method: "POST" }); },
   disconnectGoogleDrive() { return request<void>("/providers/google-drive/disconnect", { method: "POST" }); },
   linkGameToCloud(payload: { gameId: string; syncId: string }) {
     return request<Game>("/games/pair", { method: "POST", body: JSON.stringify(payload) });
