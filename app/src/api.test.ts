@@ -29,17 +29,13 @@ describe("frontend API client", () => {
     }));
   });
 
-  it("encodes path and query identifiers", async () => {
+  it("encodes query identifiers", async () => {
     fetchMock.mockResolvedValue(jsonResponse([]));
 
-    await api.getGame("save/one");
     await api.getRecoveryPoints("save one");
-    await api.getProtectionStatus("save/one");
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
-      "http://127.0.0.1:7331/games/save%2Fone",
       "http://127.0.0.1:7331/recovery-points?gameId=save%20one",
-      "http://127.0.0.1:7331/protection/status?gameId=save%2Fone",
     ]);
   });
 
@@ -57,7 +53,7 @@ describe("frontend API client", () => {
 
   it("does not hide non-compatibility failures and reports server error payloads", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ error: "provider offline" }, { ok: false, status: 503, statusText: "Unavailable" }));
-    await expect(api.triggerSync()).rejects.toThrow("provider offline");
+    await expect(api.syncGame({ gameId: "g1" })).rejects.toThrow("provider offline");
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 

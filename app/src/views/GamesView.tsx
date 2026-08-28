@@ -1,5 +1,5 @@
 import { type FormEvent, useMemo, useState } from "react";
-import { Plus, Search, X } from "lucide-react";
+import { LayoutGrid, List, Plus, Search, X } from "lucide-react";
 import { GameCover } from "../components/GameCover";
 import type { Game } from "../types";
 
@@ -17,7 +17,6 @@ type GamesViewProps = {
   onNewVersionChange: (value: string) => void;
   onAddGame: (e: FormEvent) => Promise<boolean>;
   onOpenGame: (gameId: string) => void;
-  initials: (name: string) => string;
 };
 
 export function GamesView(props: GamesViewProps) {
@@ -33,11 +32,11 @@ export function GamesView(props: GamesViewProps) {
     onNewCoverImageChange, onNewVersionChange,
     onAddGame,
     onOpenGame,
-    initials,
   } = props;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const filteredGames = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -67,7 +66,13 @@ export function GamesView(props: GamesViewProps) {
               placeholder="Search games"
             />
           </label>
-          <button className="btn action-outline" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={16} /> Add game</button>
+          <div className="library-toolbar-actions">
+            <div className="library-view-toggle" role="group" aria-label="Library view">
+              <button className={`icon-btn ${viewMode === "grid" ? "active" : ""}`} onClick={() => setViewMode("grid")} type="button" aria-label="Grid view" aria-pressed={viewMode === "grid"} title="Grid view"><LayoutGrid aria-hidden="true" size={16} /></button>
+              <button className={`icon-btn ${viewMode === "list" ? "active" : ""}`} onClick={() => setViewMode("list")} type="button" aria-label="List view" aria-pressed={viewMode === "list"} title="List view"><List aria-hidden="true" size={17} /></button>
+            </div>
+            <button className="btn action-outline" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={16} /> Add game</button>
+          </div>
         </div>
 
         <div className="library-header">
@@ -78,15 +83,27 @@ export function GamesView(props: GamesViewProps) {
         {games.length === 0 ? (
           <p className="empty-state">No games added yet.</p>
         ) : (
-          <div className="library-grid">
-            {filteredGames.map((g) => (
-              <button className="library-card" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
-                <GameCover game={g} className="library-card-image" />
-                <div className="library-card-name">{g.name}</div>
-              </button>
-            ))}
-            <button className="library-card library-add-card" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={25} /><span>Add game</span></button>
-          </div>
+          viewMode === "grid" ? (
+            <div className="library-grid">
+              {filteredGames.map((g) => (
+                <button className="library-card" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
+                  <GameCover game={g} className="library-card-image" />
+                  <div className="library-card-name">{g.name}</div>
+                </button>
+              ))}
+              <button className="library-card library-add-card" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={25} /><span>Add game</span></button>
+            </div>
+          ) : (
+            <div className="library-list" aria-label="Games list">
+              {filteredGames.map((g) => (
+                <button className="library-list-row" key={g.id} onClick={() => onOpenGame(g.id)} type="button">
+                  <GameCover game={g} className="library-list-cover" />
+                  <span>{g.name}</span>
+                </button>
+              ))}
+              <button className="library-list-row library-add-row" onClick={() => setShowAddModal(true)} type="button"><Plus aria-hidden="true" size={18} /><span>Add game</span></button>
+            </div>
+          )
         )}
       </section>
 

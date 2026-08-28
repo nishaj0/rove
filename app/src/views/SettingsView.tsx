@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Save } from "lucide-react";
-import { InfoTooltip } from "../components/InfoTooltip";
-import type { PauseScope, ProtectionTarget, Settings, ThemeMode } from "../types";
+import type { ActivityEvent, PauseScope, ProtectionTarget, RecoveryLibraryEntry, Settings, ThemeMode } from "../types";
 import type { AppUpdateState } from "../update";
 import { DebugConsoleView } from "./DebugConsoleView";
 
@@ -30,6 +29,11 @@ type SettingsViewProps = {
   onAutomaticUpdateChecks: (enabled: boolean) => void;
   onViewUpdateNotes: () => void;
   onDownloadLogs: () => void;
+  activityEvents: ActivityEvent[];
+  safeTime: (input: string) => string;
+  recoveryLibrary: RecoveryLibraryEntry[];
+  onRestoreRecovery: (entry: RecoveryLibraryEntry) => void;
+  onOpenGame: (gameId: string) => void;
 };
 
 export function SettingsView(props: SettingsViewProps) {
@@ -38,7 +42,7 @@ export function SettingsView(props: SettingsViewProps) {
     onDisconnectGoogleDrive, onBrowseSyncRoot, onAutostartChange, onPause,
     onResume, onProtectionEnabled, onRetry, onSaveSettings, onSaveDestination, updateState,
     updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
-    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs,
+    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs, activityEvents, safeTime, recoveryLibrary, onRestoreRecovery, onOpenGame,
   } = props;
   const [googleBusy, setGoogleBusy] = useState(false);
   async function runGoogle(action: () => Promise<void>) {
@@ -50,30 +54,29 @@ export function SettingsView(props: SettingsViewProps) {
 
   return (
     <>
-      <section className="panel" data-window-title="CLOUD.SYNC.DESTINATION">
-        <h2>Sync destination</h2>
-        <p className="empty-state">Local save copies are created before cloud upload. <InfoTooltip label="Cloud uploads can wait safely while offline." /></p>
-        <div className="provider-picker provider-picker-three" aria-label="Sync destination">
+      <section className="panel" data-window-title="SAVE.LOCATION">
+        <h2>Save location</h2>
+        <p className="empty-state">Choose where Rove keeps backup copies of your game saves.</p>
+        <div className="provider-picker provider-picker-three" aria-label="Save location">
           <button className={`provider-card ${settings.protectionTarget === "local" ? "selected" : ""}`} onClick={() => onTargetChange("local")} type="button">
-            <strong>Local only</strong><span>No account required. This cannot survive losing or resetting this disk.</span>
+            <strong>This computer</strong><span>Keep backup copies on this PC.</span>
           </button>
           <button className={`provider-card ${settings.protectionTarget === "folder" ? "selected" : ""}`} onClick={() => onTargetChange("folder")} type="button">
-            <strong>Synced folder</strong><span>Use OneDrive, Dropbox, Syncthing, or another folder provider.</span>
+            <strong>A synced folder</strong><span>Use a folder managed by another app.</span>
           </button>
           <button className={`provider-card ${settings.protectionTarget === "google_drive" ? "selected" : ""}`} onClick={() => onTargetChange("google_drive")} type="button">
-            <strong>Google Drive</strong><span>Direct connection using drive.file. No VPS or user API key.</span>
+            <strong>Google Drive</strong><span>Keep an extra copy in Google Drive.</span>
           </button>
         </div>
         <p className="snapshot-meta" role="status">
-          Active destination: {targetName(activeProtectionTarget)}.
+          Current save location: {targetName(activeProtectionTarget)}.
           {settings.protectionTarget !== activeProtectionTarget ? ` Save settings to switch to ${targetName(settings.protectionTarget)}.` : ""}
         </p>
 
         {settings.protectionTarget === "google_drive" ? (
           <div className="provider-status" aria-live="polite">
-            <p>{settings.googleDrive.connected && settings.googleDrive.ready !== false ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to replicate local revisions."}</p>
-			{settings.googleDrive.configurationError ? <p className="banner error" role="alert">{settings.googleDrive.configurationError}</p> : null}
-            {settings.googleDrive.oauthClientSource ? <p className="snapshot-meta">OAuth client: {settings.googleDrive.oauthClientSource.replace(/_/g, " ")} · credential: {(settings.googleDrive.oauthCredentialSource ?? "unknown").replace(/_/g, " ")}</p> : null}
+            <p>{settings.googleDrive.connected && settings.googleDrive.ready !== false ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to keep an extra copy of your saves."}</p>
+			{settings.googleDrive.configurationError ? <p className="banner warning" role="alert">Google Drive needs attention. Reconnect to continue cloud backups.</p> : null}
             <div className="detail-actions">
               <button className="btn primary" disabled={googleBusy} onClick={() => void runGoogle(onConnectGoogleDrive)} type="button">{googleBusy ? "Waiting for sign-in…" : settings.googleDrive.connected ? "Reconnect" : "Connect Google Drive"}</button>
               {settings.googleDrive.connected ? <button className="btn" disabled={googleBusy} onClick={() => void runGoogle(onDisconnectGoogleDrive)} type="button">Disconnect</button> : null}
@@ -90,10 +93,10 @@ export function SettingsView(props: SettingsViewProps) {
         {settings.protectionTarget !== activeProtectionTarget ? <button className="btn primary destination-save" type="button" onClick={onSaveDestination}><Save aria-hidden="true" size={15} /> Save destination</button> : null}
       </section>
 
-      <section className="panel" data-window-title="SERVICE.CONTROLS">
+      <section className="panel" data-window-title="BACKUPS">
         <div className="panel-head">
-          <h2>Cloud Sync controls</h2>
-          <span className={`state-text ${paused ? "warning" : "success"}`}>{paused ? `Paused: ${settings.serviceControl.pauseScope}` : "Active"}</span>
+          <h2>Backups</h2>
+          <span className={`state-text ${paused ? "warning" : "success"}`}>{paused ? "Paused" : "On"}</span>
         </div>
         <label className="inline-check">
           <input
@@ -101,18 +104,66 @@ export function SettingsView(props: SettingsViewProps) {
             checked={settings.serviceControl.protectionEnabled}
             onChange={(event) => void onProtectionEnabled(event.target.checked)}
           />
-          Cloud Sync enabled globally
+          Protect my game saves
         </label>
-        <div className="detail-actions">
-          <button className="btn" type="button" onClick={() => void onPause("uploads", "manual")}>Pause cloud uploads</button>
-          <button className="btn" type="button" onClick={() => void onPause("all", "one_hour")}>Pause all for one hour</button>
-          <button className="btn" type="button" onClick={() => void onPause("all", "until_login")}>Pause until next login</button>
-          <button className="btn primary" type="button" disabled={!paused} onClick={() => void onResume()}>Resume sync</button>
-          <button className="btn" type="button" onClick={() => void onRetry()}>Retry provider</button>
-        </div>
+        <label className="inline-check">
+          <input type="checkbox" checked={settings.autostart} onChange={(event) => void onAutostartChange(event.target.checked)} />
+          Start Rove when I sign in to Windows
+        </label>
+        <details className="advanced-disclosure settings-disclosure">
+          <summary>Advanced backup options</summary>
+          <div className="detail-actions">
+            <button className="btn" type="button" onClick={() => void onPause("uploads", "manual")}>Pause cloud backups</button>
+            <button className="btn" type="button" onClick={() => void onPause("all", "one_hour")}>Pause for one hour</button>
+            <button className="btn" type="button" onClick={() => void onPause("all", "until_login")}>Pause until I restart Rove</button>
+            <button className="btn primary" type="button" disabled={!paused} onClick={() => void onResume()}>Resume backups</button>
+            <button className="btn" type="button" onClick={() => void onRetry()}>Try connection again</button>
+          </div>
+        </details>
       </section>
 
-      <section className="panel" data-window-title="APPLICATION.UPDATES">
+      <section className="panel advanced-setup-panel" data-window-title="RECENT.ACTIVITY">
+        <details className="advanced-disclosure settings-disclosure">
+          <summary>Recent activity</summary>
+          <p className="disclosure-help">Your latest backups and restores.</p>
+          {activityEvents.length === 0 ? (
+            <p className="empty-state">Your backup and restore activity will appear here.</p>
+          ) : (
+            <ul className="log-feed">
+              {activityEvents.map((entry) => (
+                <li className="log-row" key={entry.id}>
+                  <div className="log-meta"><span>{safeTime(entry.timestamp)}</span></div>
+                  <p><strong>{entry.title}</strong></p>
+                  <p>{entry.detail}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
+      </section>
+
+      {recoveryLibrary.length > 0 ? (
+        <section className="panel advanced-setup-panel" data-window-title="RESTORE.GAME">
+          <details className="advanced-disclosure settings-disclosure">
+            <summary>Restore a game ({recoveryLibrary.length})</summary>
+            <p className="disclosure-help">Bring back a saved game from another computer.</p>
+            <div className="recovery-library-list">
+              {recoveryLibrary.map((entry) => (
+                <article className="recovery-library-row" key={entry.profileId}>
+                  <strong>{entry.name}</strong>
+                  {entry.gameId ? <button className="btn" type="button" onClick={() => onOpenGame(entry.gameId!)}>Open game</button> : <button className="btn primary" type="button" onClick={() => onRestoreRecovery(entry)}>Restore</button>}
+                </article>
+              ))}
+            </div>
+          </details>
+        </section>
+      ) : null}
+
+      <section className="panel advanced-setup-panel" data-window-title="APP.SUPPORT">
+        <details className="advanced-disclosure settings-disclosure">
+          <summary>Advanced app & support</summary>
+          <p className="disclosure-help">Updates, appearance, and troubleshooting tools.</p>
+          <div className="advanced-section">
         <div className="panel-head">
           <h2>Application updates</h2>
           <span className={`state-text ${updateState?.lifecycle === "error" ? "warning" : updateState?.lifecycle === "ready" ? "success" : ""}`}>
@@ -156,9 +207,14 @@ export function SettingsView(props: SettingsViewProps) {
           {updateState?.lifecycle === "ready" ? <button className="btn" type="button" onClick={onDiscardUpdate}>Discard download</button> : null}
           {updateState?.lifecycle === "error" && updateState.retryable ? <button className="btn primary" type="button" onClick={onCheckForUpdate}>Retry</button> : null}
         </div>
+          </div>
+        </details>
       </section>
 
-      <section className="panel" data-window-title="SYSTEM.SETTINGS">
+      <section className="panel advanced-setup-panel" data-window-title="APP.SETTINGS">
+        <details className="advanced-disclosure settings-disclosure">
+          <summary>More settings</summary>
+          <div className="advanced-section">
         <h2>Defaults and behavior</h2>
         <div className="settings-grid">
           <label>
@@ -169,24 +225,12 @@ export function SettingsView(props: SettingsViewProps) {
             </select>
           </label>
           <label className="inline-check">
-            <input type="checkbox" checked={settings.autostart} onChange={(event) => void onAutostartChange(event.target.checked)} />
-            Start silently on Windows login
-          </label>
-          <label className="inline-check">
             <input type="checkbox" checked={settings.automaticUpload} onChange={(event) => onChange({ ...settings, automaticUpload: event.target.checked })} />
             Upload automatically after reconnecting
           </label>
           <label className="inline-check">
-            <input type="checkbox" checked={settings.uploadOnMetered} disabled title="Windows metered-network enforcement is not active yet" readOnly />
-            Upload on metered connections (integration pending)
-          </label>
-          <label className="inline-check">
             <input type="checkbox" checked={settings.remoteCheckBeforeLaunch} onChange={(event) => onChange({ ...settings, remoteCheckBeforeLaunch: event.target.checked })} />
             Check provider before Rove launch
-          </label>
-          <label className="inline-check">
-            <input type="checkbox" checked={settings.importantNotifications} disabled title="Native Windows toast delivery is not active yet" readOnly />
-            Important Windows notifications (integration pending)
           </label>
           <label>
             Automatic revisions to keep
@@ -206,11 +250,10 @@ export function SettingsView(props: SettingsViewProps) {
           </label>
         </div>
         <button className="btn primary" onClick={onSaveSettings} type="button">Save settings</button>
+        {settings.debugLogging ? <DebugConsoleView onDownloadLogs={onDownloadLogs} /> : null}
+          </div>
+        </details>
       </section>
-
-      {settings.debugLogging ? (
-        <DebugConsoleView onDownloadLogs={onDownloadLogs} />
-      ) : null}
     </>
   );
 }

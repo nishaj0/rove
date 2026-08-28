@@ -14,7 +14,7 @@ const game = (id: string, name: string): Game => ({
 function renderView(overrides: Partial<React.ComponentProps<typeof GamesView>> = {}) {
   const props: React.ComponentProps<typeof GamesView> = {
     games: [game("one", "One Game"), game("two", "Two Game")], newName: "", newPath: "", newExecutablePath: "", newCoverImageData: "", newVersion: "",
-    onNewNameChange: vi.fn(), onBrowseSaveFolder: vi.fn(), onBrowseExecutable: vi.fn(), onNewCoverImageChange: vi.fn(), onNewVersionChange: vi.fn(), onAddGame: vi.fn().mockResolvedValue(true), onOpenGame: vi.fn(), initials: (name) => name.slice(0, 2).toUpperCase(), ...overrides,
+    onNewNameChange: vi.fn(), onBrowseSaveFolder: vi.fn(), onBrowseExecutable: vi.fn(), onNewCoverImageChange: vi.fn(), onNewVersionChange: vi.fn(), onAddGame: vi.fn().mockResolvedValue(true), onOpenGame: vi.fn(), ...overrides,
   };
   return { ...render(<GamesView {...props} />), props };
 }
@@ -36,5 +36,15 @@ describe("GamesView", () => {
     expect(screen.getByRole("heading", { name: "Add a game" })).toBeInTheDocument();
     fireEvent.submit(screen.getByRole("heading", { name: "Add a game" }).closest("section")!.querySelector("form")!);
     await waitFor(() => expect(screen.queryByRole("heading", { name: "Add a game" })).not.toBeInTheDocument());
+  });
+
+  it("switches between grid and list views", () => {
+    renderView();
+    expect(screen.queryByLabelText("Games list")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "List view" }));
+    expect(screen.getByLabelText("Games list")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Grid view" })).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(screen.getByRole("button", { name: "Grid view" }));
+    expect(screen.queryByLabelText("Games list")).not.toBeInTheDocument();
   });
 });

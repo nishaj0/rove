@@ -1601,7 +1601,7 @@
       "label": "View",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L30",
+      "source_location": "L29",
       "id": "src_app_view",
       "community": 40,
       "norm_label": "view"
@@ -1610,7 +1610,7 @@
       "label": "NavSnapshot",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L32",
+      "source_location": "L31",
       "id": "src_app_navsnapshot",
       "community": 40,
       "norm_label": "navsnapshot"
@@ -1619,7 +1619,7 @@
       "label": "BackupOperationState",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L37",
+      "source_location": "L36",
       "id": "src_app_backupoperationstate",
       "community": 40,
       "norm_label": "backupoperationstate"
@@ -1628,7 +1628,7 @@
       "label": "isAutostartEnabled()",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L39",
+      "source_location": "L38",
       "id": "src_app_isautostartenabled",
       "community": 40,
       "norm_label": "isautostartenabled()"
@@ -1637,7 +1637,7 @@
       "label": "enableAutostart()",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L40",
+      "source_location": "L39",
       "id": "src_app_enableautostart",
       "community": 40,
       "norm_label": "enableautostart()"
@@ -1646,7 +1646,7 @@
       "label": "disableAutostart()",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L41",
+      "source_location": "L40",
       "id": "src_app_disableautostart",
       "community": 40,
       "norm_label": "disableautostart()"
@@ -1655,7 +1655,7 @@
       "label": "navItems",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "id": "src_app_navitems",
       "community": 40,
       "norm_label": "navitems"
@@ -1664,7 +1664,7 @@
       "label": "viewTitle",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L50",
+      "source_location": "L47",
       "id": "src_app_viewtitle",
       "community": 40,
       "norm_label": "viewtitle"
@@ -1673,7 +1673,7 @@
       "label": "NavIcon()",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L58",
+      "source_location": "L53",
       "id": "src_app_navicon",
       "community": 40,
       "norm_label": "navicon()"
@@ -1682,7 +1682,7 @@
       "label": "App()",
       "file_type": "code",
       "source_file": "app/src/App.tsx",
-      "source_location": "L101",
+      "source_location": "L79",
       "id": "src_app_app",
       "community": 40,
       "norm_label": "app()"
@@ -1693,7 +1693,7 @@
       "source_file": "app/src/api.test.ts",
       "source_location": "L1",
       "id": "src_api_test",
-      "community": 114,
+      "community": 103,
       "norm_label": "api.test.ts"
     },
     {
@@ -1702,7 +1702,7 @@
       "source_file": "app/src/api.test.ts",
       "source_location": "L4",
       "id": "src_api_test_jsonresponse",
-      "community": 114,
+      "community": 103,
       "norm_label": "jsonresponse()"
     },
     {
@@ -1718,7 +1718,7 @@
       "label": "ErrorPayload",
       "file_type": "code",
       "source_file": "app/src/api.ts",
-      "source_location": "L39",
+      "source_location": "L31",
       "id": "src_api_errorpayload",
       "community": 76,
       "norm_label": "errorpayload"
@@ -1727,7 +1727,7 @@
       "label": "request()",
       "file_type": "code",
       "source_file": "app/src/api.ts",
-      "source_location": "L41",
+      "source_location": "L33",
       "id": "src_api_request",
       "community": 76,
       "norm_label": "request()"
@@ -1736,9 +1736,9 @@
       "label": "api",
       "file_type": "code",
       "source_file": "app/src/api.ts",
-      "source_location": "L71",
+      "source_location": "L63",
       "id": "src_api_api",
-      "community": 114,
+      "community": 103,
       "norm_label": "api"
     },
     {
@@ -1886,19 +1886,10 @@
       "norm_label": "normalizegames()"
     },
     {
-      "label": "normalizeBackupHistory()",
-      "file_type": "code",
-      "source_file": "app/src/api/parsers.ts",
-      "source_location": "L131",
-      "id": "api_parsers_normalizebackuphistory",
-      "community": 93,
-      "norm_label": "normalizebackuphistory()"
-    },
-    {
       "label": "normalizeGoogleDrive()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L144",
+      "source_location": "L131",
       "id": "api_parsers_normalizegoogledrive",
       "community": 93,
       "norm_label": "normalizegoogledrive()"
@@ -1907,7 +1898,7 @@
       "label": "normalizeSnapshots()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L158",
+      "source_location": "L145",
       "id": "api_parsers_normalizesnapshots",
       "community": 93,
       "norm_label": "normalizesnapshots()"
@@ -1916,7 +1907,7 @@
       "label": "normalizeLogs()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L170",
+      "source_location": "L157",
       "id": "api_parsers_normalizelogs",
       "community": 93,
       "norm_label": "normalizelogs()"
@@ -1925,7 +1916,7 @@
       "label": "normalizeSettings()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L182",
+      "source_location": "L169",
       "id": "api_parsers_normalizesettings",
       "community": 93,
       "norm_label": "normalizesettings()"
@@ -1934,7 +1925,7 @@
       "label": "normalizeStatus()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L219",
+      "source_location": "L206",
       "id": "api_parsers_normalizestatus",
       "community": 93,
       "norm_label": "normalizestatus()"
@@ -1943,7 +1934,7 @@
       "label": "normalizeSyncJobs()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L244",
+      "source_location": "L231",
       "id": "api_parsers_normalizesyncjobs",
       "community": 93,
       "norm_label": "normalizesyncjobs()"
@@ -1952,7 +1943,7 @@
       "label": "normalizeSyncConflicts()",
       "file_type": "code",
       "source_file": "app/src/api/parsers.ts",
-      "source_location": "L260",
+      "source_location": "L247",
       "id": "api_parsers_normalizesyncconflicts",
       "community": 93,
       "norm_label": "normalizesyncconflicts()"
@@ -2008,7 +1999,7 @@
       "source_file": "app/src/components/InfoTooltip.tsx",
       "source_location": "L1",
       "id": "components_infotooltip",
-      "community": 114,
+      "community": 103,
       "norm_label": "infotooltip.tsx"
     },
     {
@@ -2017,7 +2008,7 @@
       "source_file": "app/src/components/InfoTooltip.tsx",
       "source_location": "L2",
       "id": "components_infotooltip_infotooltip",
-      "community": 114,
+      "community": 103,
       "norm_label": "infotooltip()"
     },
     {
@@ -2026,7 +2017,7 @@
       "source_file": "app/src/constants/branding.ts",
       "source_location": "L1",
       "id": "constants_branding",
-      "community": 172,
+      "community": 43,
       "norm_label": "branding.ts"
     },
     {
@@ -2080,7 +2071,7 @@
       "source_file": "app/src/constants/defaults.ts",
       "source_location": "L51",
       "id": "constants_defaults_newdefaultsettings",
-      "community": 93,
+      "community": 103,
       "norm_label": "newdefaultsettings()"
     },
     {
@@ -2125,7 +2116,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L1",
       "id": "app_src_main_tsx_src_main",
-      "community": 172,
+      "community": 43,
       "norm_label": "main.tsx"
     },
     {
@@ -2134,7 +2125,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L7",
       "id": "src_main_rooterrorboundarystate",
-      "community": 172,
+      "community": 43,
       "norm_label": "rooterrorboundarystate"
     },
     {
@@ -2143,7 +2134,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L11",
       "id": "src_main_rooterrorboundary",
-      "community": 172,
+      "community": 43,
       "norm_label": "rooterrorboundary"
     },
     {
@@ -2152,7 +2143,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L12",
       "id": "src_main_rooterrorboundary_constructor",
-      "community": 172,
+      "community": 43,
       "norm_label": ".constructor()"
     },
     {
@@ -2161,7 +2152,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L17",
       "id": "src_main_rooterrorboundary_getderivedstatefromerror",
-      "community": 172,
+      "community": 43,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -2170,7 +2161,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L22",
       "id": "src_main_rooterrorboundary_componentdidcatch",
-      "community": 172,
+      "community": 43,
       "norm_label": ".componentdidcatch()"
     },
     {
@@ -2179,7 +2170,7 @@
       "source_file": "app/src/main.tsx",
       "source_location": "L26",
       "id": "src_main_rooterrorboundary_render",
-      "community": 172,
+      "community": 95,
       "norm_label": ".render()"
     },
     {
@@ -2188,7 +2179,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L1",
       "id": "src_nativedialog",
-      "community": 39,
+      "community": 40,
       "norm_label": "nativedialog.ts"
     },
     {
@@ -2197,7 +2188,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L3",
       "id": "src_nativedialog_dialogfilter",
-      "community": 39,
+      "community": 40,
       "norm_label": "dialogfilter"
     },
     {
@@ -2206,7 +2197,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L8",
       "id": "src_nativedialog_opendialogoptions",
-      "community": 39,
+      "community": 40,
       "norm_label": "opendialogoptions"
     },
     {
@@ -2215,7 +2206,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L16",
       "id": "src_nativedialog_opendialogresult",
-      "community": 39,
+      "community": 40,
       "norm_label": "opendialogresult"
     },
     {
@@ -2224,7 +2215,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L18",
       "id": "src_nativedialog_opensinglepath",
-      "community": 39,
+      "community": 40,
       "norm_label": "opensinglepath()"
     },
     {
@@ -2233,7 +2224,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L29",
       "id": "src_nativedialog_pickfolder",
-      "community": 39,
+      "community": 40,
       "norm_label": "pickfolder()"
     },
     {
@@ -2242,7 +2233,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L38",
       "id": "src_nativedialog_pickexecutable",
-      "community": 39,
+      "community": 40,
       "norm_label": "pickexecutable()"
     },
     {
@@ -2251,7 +2242,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L47",
       "id": "src_nativedialog_pickzipfile",
-      "community": 39,
+      "community": 40,
       "norm_label": "pickzipfile()"
     },
     {
@@ -2278,7 +2269,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L2",
       "id": "src_types_thememode",
-      "community": 114,
+      "community": 103,
       "norm_label": "thememode"
     },
     {
@@ -2296,7 +2287,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L4",
       "id": "src_types_protectiontarget",
-      "community": 114,
+      "community": 103,
       "norm_label": "protectiontarget"
     },
     {
@@ -2314,7 +2305,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L6",
       "id": "src_types_pausescope",
-      "community": 76,
+      "community": 103,
       "norm_label": "pausescope"
     },
     {
@@ -2359,7 +2350,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L33",
       "id": "src_types_providerhealth",
-      "community": 76,
+      "community": 95,
       "norm_label": "providerhealth"
     },
     {
@@ -2381,19 +2372,10 @@
       "norm_label": "backuppolicy"
     },
     {
-      "label": "BackupHistoryEntry",
-      "file_type": "code",
-      "source_file": "app/src/types.ts",
-      "source_location": "L65",
-      "id": "src_types_backuphistoryentry",
-      "community": 76,
-      "norm_label": "backuphistoryentry"
-    },
-    {
       "label": "SnapshotSummary",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L75",
+      "source_location": "L65",
       "id": "src_types_snapshotsummary",
       "community": 76,
       "norm_label": "snapshotsummary"
@@ -2402,7 +2384,7 @@
       "label": "Game",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L84",
+      "source_location": "L74",
       "id": "src_types_game",
       "community": 95,
       "norm_label": "game"
@@ -2411,7 +2393,7 @@
       "label": "Settings",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L101",
+      "source_location": "L91",
       "id": "src_types_settings",
       "community": 76,
       "norm_label": "settings"
@@ -2420,25 +2402,25 @@
       "label": "SettingsUpdate",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L131",
+      "source_location": "L121",
       "id": "src_types_settingsupdate",
-      "community": 76,
+      "community": 40,
       "norm_label": "settingsupdate"
     },
     {
       "label": "Status",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L156",
+      "source_location": "L146",
       "id": "src_types_status",
-      "community": 54,
+      "community": 76,
       "norm_label": "status"
     },
     {
       "label": "SyncJob",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L172",
+      "source_location": "L162",
       "id": "src_types_syncjob",
       "community": 76,
       "norm_label": "syncjob"
@@ -2447,88 +2429,70 @@
       "label": "Revision",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L193",
+      "source_location": "L183",
       "id": "src_types_revision",
-      "community": 76,
+      "community": 40,
       "norm_label": "revision"
     },
     {
       "label": "RecoveryPoint",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L207",
+      "source_location": "L197",
       "id": "src_types_recoverypoint",
-      "community": 76,
+      "community": 95,
       "norm_label": "recoverypoint"
     },
     {
       "label": "ActivityEvent",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L217",
+      "source_location": "L207",
       "id": "src_types_activityevent",
-      "community": 40,
+      "community": 103,
       "norm_label": "activityevent"
     },
     {
       "label": "RecoveryLibraryEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L229",
+      "source_location": "L219",
       "id": "src_types_recoverylibraryentry",
-      "community": 54,
+      "community": 103,
       "norm_label": "recoverylibraryentry"
     },
     {
       "label": "StorageUsage",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L247",
+      "source_location": "L237",
       "id": "src_types_storageusage",
       "community": 76,
       "norm_label": "storageusage"
     },
     {
-      "label": "StorageSummary",
-      "file_type": "code",
-      "source_file": "app/src/types.ts",
-      "source_location": "L256",
-      "id": "src_types_storagesummary",
-      "community": 54,
-      "norm_label": "storagesummary"
-    },
-    {
       "label": "SyncConflict",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L265",
+      "source_location": "L246",
       "id": "src_types_syncconflict",
-      "community": 76,
+      "community": 95,
       "norm_label": "syncconflict"
     },
     {
       "label": "LogEntry",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L275",
+      "source_location": "L256",
       "id": "src_types_logentry",
-      "community": 114,
+      "community": 103,
       "norm_label": "logentry"
-    },
-    {
-      "label": "DebugInfo",
-      "file_type": "code",
-      "source_file": "app/src/types.ts",
-      "source_location": "L283",
-      "id": "src_types_debuginfo",
-      "community": 76,
-      "norm_label": "debuginfo"
     },
     {
       "label": "BackupExportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L296",
+      "source_location": "L264",
       "id": "src_types_backupexportrequest",
       "community": 76,
       "norm_label": "backupexportrequest"
@@ -2537,7 +2501,7 @@
       "label": "BackupExportResponse",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L301",
+      "source_location": "L269",
       "id": "src_types_backupexportresponse",
       "community": 76,
       "norm_label": "backupexportresponse"
@@ -2546,7 +2510,7 @@
       "label": "BackupImportRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L306",
+      "source_location": "L274",
       "id": "src_types_backupimportrequest",
       "community": 76,
       "norm_label": "backupimportrequest"
@@ -2555,7 +2519,7 @@
       "label": "PlayGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L313",
+      "source_location": "L281",
       "id": "src_types_playgamerequest",
       "community": 76,
       "norm_label": "playgamerequest"
@@ -2564,19 +2528,10 @@
       "label": "SyncGameRequest",
       "file_type": "code",
       "source_file": "app/src/types.ts",
-      "source_location": "L318",
+      "source_location": "L286",
       "id": "src_types_syncgamerequest",
       "community": 76,
       "norm_label": "syncgamerequest"
-    },
-    {
-      "label": "SnapshotCreateResponse",
-      "file_type": "code",
-      "source_file": "app/src/types.ts",
-      "source_location": "L322",
-      "id": "src_types_snapshotcreateresponse",
-      "community": 76,
-      "norm_label": "snapshotcreateresponse"
     },
     {
       "label": "update.test.ts",
@@ -2705,58 +2660,40 @@
       "norm_label": "updateactionlabel()"
     },
     {
-      "label": "ActivityView.tsx",
+      "label": "saveStatus.ts",
       "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
+      "source_file": "app/src/utils/saveStatus.ts",
       "source_location": "L1",
-      "id": "views_activityview",
-      "community": 40,
-      "norm_label": "activityview.tsx"
+      "id": "utils_savestatus",
+      "community": 95,
+      "norm_label": "savestatus.ts"
     },
     {
-      "label": "ActivityViewProps",
+      "label": "SaveStatus",
       "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
+      "source_file": "app/src/utils/saveStatus.ts",
       "source_location": "L3",
-      "id": "views_activityview_activityviewprops",
-      "community": 40,
-      "norm_label": "activityviewprops"
-    },
-    {
-      "label": "ActivityView()",
-      "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L11",
-      "id": "views_activityview_activityview",
-      "community": 40,
-      "norm_label": "activityview()"
-    },
-    {
-      "label": "BackupView.tsx",
-      "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
-      "id": "views_backupview",
+      "id": "utils_savestatus_savestatus",
       "community": 95,
-      "norm_label": "backupview.tsx"
+      "norm_label": "savestatus"
     },
     {
-      "label": "BackupViewProps",
+      "label": "SaveStatusInput",
       "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L3",
-      "id": "views_backupview_backupviewprops",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L10",
+      "id": "utils_savestatus_savestatusinput",
       "community": 95,
-      "norm_label": "backupviewprops"
+      "norm_label": "savestatusinput"
     },
     {
-      "label": "BackupView()",
+      "label": "getSaveStatus()",
       "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L19",
-      "id": "views_backupview_backupview",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L18",
+      "id": "utils_savestatus_getsavestatus",
       "community": 95,
-      "norm_label": "backupview()"
+      "norm_label": "getsavestatus()"
     },
     {
       "label": "DebugConsoleView.tsx",
@@ -2764,7 +2701,7 @@
       "source_file": "app/src/views/DebugConsoleView.tsx",
       "source_location": "L1",
       "id": "views_debugconsoleview",
-      "community": 114,
+      "community": 103,
       "norm_label": "debugconsoleview.tsx"
     },
     {
@@ -2773,7 +2710,7 @@
       "source_file": "app/src/views/DebugConsoleView.tsx",
       "source_location": "L5",
       "id": "views_debugconsoleview_debugconsoleviewprops",
-      "community": 114,
+      "community": 103,
       "norm_label": "debugconsoleviewprops"
     },
     {
@@ -2782,7 +2719,7 @@
       "source_file": "app/src/views/DebugConsoleView.tsx",
       "source_location": "L12",
       "id": "views_debugconsoleview_levelclass",
-      "community": 114,
+      "community": 103,
       "norm_label": "levelclass()"
     },
     {
@@ -2791,7 +2728,7 @@
       "source_file": "app/src/views/DebugConsoleView.tsx",
       "source_location": "L20",
       "id": "views_debugconsoleview_formatts",
-      "community": 114,
+      "community": 103,
       "norm_label": "formatts()"
     },
     {
@@ -2800,8 +2737,35 @@
       "source_file": "app/src/views/DebugConsoleView.tsx",
       "source_location": "L32",
       "id": "views_debugconsoleview_debugconsoleview",
-      "community": 114,
+      "community": 103,
       "norm_label": "debugconsoleview()"
+    },
+    {
+      "label": "GameDetailView.test.tsx",
+      "file_type": "code",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L1",
+      "id": "views_gamedetailview_test",
+      "community": 95,
+      "norm_label": "gamedetailview.test.tsx"
+    },
+    {
+      "label": "game",
+      "file_type": "code",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L6",
+      "id": "views_gamedetailview_test_game",
+      "community": 95,
+      "norm_label": "game"
+    },
+    {
+      "label": "renderView()",
+      "file_type": "code",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L14",
+      "id": "views_gamedetailview_test_renderview",
+      "community": 95,
+      "norm_label": "renderview()"
     },
     {
       "label": "GameDetailView.tsx",
@@ -2809,25 +2773,25 @@
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L1",
       "id": "views_gamedetailview",
-      "community": 76,
+      "community": 95,
       "norm_label": "gamedetailview.tsx"
     },
     {
       "label": "GameDetailViewProps",
       "file_type": "code",
       "source_file": "app/src/views/GameDetailView.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "views_gamedetailview_gamedetailviewprops",
-      "community": 76,
+      "community": 95,
       "norm_label": "gamedetailviewprops"
     },
     {
       "label": "GameDetailView()",
       "file_type": "code",
       "source_file": "app/src/views/GameDetailView.tsx",
-      "source_location": "L48",
+      "source_location": "L50",
       "id": "views_gamedetailview_gamedetailview",
-      "community": 54,
+      "community": 95,
       "norm_label": "gamedetailview()"
     },
     {
@@ -2879,64 +2843,19 @@
       "label": "GamesView()",
       "file_type": "code",
       "source_file": "app/src/views/GamesView.tsx",
-      "source_location": "L23",
+      "source_location": "L22",
       "id": "views_gamesview_gamesview",
       "community": 95,
       "norm_label": "gamesview()"
     },
     {
-      "label": "HomeView.test.tsx",
+      "label": "SettingsView.test.tsx",
       "file_type": "code",
-      "source_file": "app/src/views/HomeView.test.tsx",
+      "source_file": "app/src/views/SettingsView.test.tsx",
       "source_location": "L1",
-      "id": "views_homeview_test",
-      "community": 54,
-      "norm_label": "homeview.test.tsx"
-    },
-    {
-      "label": "status",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L6",
-      "id": "views_homeview_test_status",
-      "community": 54,
-      "norm_label": "status"
-    },
-    {
-      "label": "HomeView.tsx",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "id": "views_homeview",
-      "community": 54,
-      "norm_label": "homeview.tsx"
-    },
-    {
-      "label": "HomeViewProps",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L6",
-      "id": "views_homeview_homeviewprops",
-      "community": 54,
-      "norm_label": "homeviewprops"
-    },
-    {
-      "label": "HomeView()",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L18",
-      "id": "views_homeview_homeview",
-      "community": 54,
-      "norm_label": "homeview()"
-    },
-    {
-      "label": "formatBytes()",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L100",
-      "id": "views_homeview_formatbytes",
-      "community": 54,
-      "norm_label": "formatbytes()"
+      "id": "views_settingsview_test",
+      "community": 103,
+      "norm_label": "settingsview.test.tsx"
     },
     {
       "label": "SettingsView.tsx",
@@ -2944,34 +2863,34 @@
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L1",
       "id": "views_settingsview",
-      "community": 114,
+      "community": 103,
       "norm_label": "settingsview.tsx"
     },
     {
       "label": "SettingsViewProps",
       "file_type": "code",
       "source_file": "app/src/views/SettingsView.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "id": "views_settingsview_settingsviewprops",
-      "community": 114,
+      "community": 103,
       "norm_label": "settingsviewprops"
     },
     {
       "label": "SettingsView()",
       "file_type": "code",
       "source_file": "app/src/views/SettingsView.tsx",
-      "source_location": "L35",
+      "source_location": "L39",
       "id": "views_settingsview_settingsview",
-      "community": 114,
+      "community": 103,
       "norm_label": "settingsview()"
     },
     {
       "label": "formatUpdateBytes()",
       "file_type": "code",
       "source_file": "app/src/views/SettingsView.tsx",
-      "source_location": "L218",
+      "source_location": "L261",
       "id": "views_settingsview_formatupdatebytes",
-      "community": 114,
+      "community": 103,
       "norm_label": "formatupdatebytes()"
     },
     {
@@ -3205,7 +3124,7 @@
       "source_file": "app/vitest.setup.ts",
       "source_location": "L1",
       "id": "app_vitest_setup",
-      "community": 114,
+      "community": 95,
       "norm_label": "vitest.setup.ts"
     },
     {
@@ -3304,7 +3223,7 @@
       "source_file": "backend/internal/api/handlers_debug.go",
       "source_location": "L8",
       "id": "backend_internal_api_handlers_debug_go_api_server",
-      "community": 44,
+      "community": 52,
       "norm_label": "server"
     },
     {
@@ -3313,7 +3232,7 @@
       "source_file": "backend/internal/api/handlers_debug.go",
       "source_location": "L8",
       "id": "api_server_handledebuginfo",
-      "community": 44,
+      "community": 52,
       "norm_label": ".handledebuginfo()"
     },
     {
@@ -3322,7 +3241,7 @@
       "source_file": "backend/internal/api/handlers_debug.go",
       "source_location": "L8",
       "id": "backend_internal_api_handlers_debug_go_responsewriter",
-      "community": 44,
+      "community": 52,
       "norm_label": "responsewriter"
     },
     {
@@ -3331,7 +3250,7 @@
       "source_file": "backend/internal/api/handlers_debug.go",
       "source_location": "L8",
       "id": "backend_internal_api_handlers_debug_go_request",
-      "community": 44,
+      "community": 52,
       "norm_label": "request"
     },
     {
@@ -3619,7 +3538,7 @@
       "source_file": "backend/internal/api/handlers_lifecycle.go",
       "source_location": "L11",
       "id": "backend_internal_api_handlers_lifecycle_go_api_server",
-      "community": 44,
+      "community": 54,
       "norm_label": "server"
     },
     {
@@ -3628,7 +3547,7 @@
       "source_file": "backend/internal/api/handlers_lifecycle.go",
       "source_location": "L11",
       "id": "api_server_handleprepareupdate",
-      "community": 44,
+      "community": 54,
       "norm_label": ".handleprepareupdate()"
     },
     {
@@ -3637,7 +3556,7 @@
       "source_file": "backend/internal/api/handlers_lifecycle.go",
       "source_location": "L11",
       "id": "backend_internal_api_handlers_lifecycle_go_responsewriter",
-      "community": 44,
+      "community": 54,
       "norm_label": "responsewriter"
     },
     {
@@ -3646,7 +3565,7 @@
       "source_file": "backend/internal/api/handlers_lifecycle.go",
       "source_location": "L11",
       "id": "backend_internal_api_handlers_lifecycle_go_request",
-      "community": 44,
+      "community": 54,
       "norm_label": "request"
     },
     {
@@ -3997,7 +3916,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_api_handlers_settings_test_go",
-      "community": 187,
+      "community": 22,
       "norm_label": "handlers_settings_test.go"
     },
     {
@@ -4006,7 +3925,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L14",
       "id": "api_handlers_settings_test_testsettingssaveignoreslegacygoogledrivestatusfields",
-      "community": 187,
+      "community": 22,
       "norm_label": "testsettingssaveignoreslegacygoogledrivestatusfields()"
     },
     {
@@ -4015,7 +3934,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L14",
       "id": "backend_internal_api_handlers_settings_test_go_t",
-      "community": 187,
+      "community": 22,
       "norm_label": "t"
     },
     {
@@ -4024,7 +3943,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L52",
       "id": "api_handlers_settings_test_testsettingssaveacceptspartialupdate",
-      "community": 187,
+      "community": 22,
       "norm_label": "testsettingssaveacceptspartialupdate()"
     },
     {
@@ -4384,7 +4303,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L123",
       "id": "backend_internal_api_server_go_responsewriter",
-      "community": 22,
+      "community": 25,
       "norm_label": "responsewriter"
     },
     {
@@ -5959,7 +5878,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_gameicon_extract_go",
-      "community": 156,
+      "community": 35,
       "norm_label": "extract.go"
     },
     {
@@ -5968,7 +5887,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L22",
       "id": "gameicon_extract_extractdataurl",
-      "community": 156,
+      "community": 35,
       "norm_label": "extractdataurl()"
     },
     {
@@ -5977,7 +5896,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L62",
       "id": "gameicon_extract_pngimagesfromico",
-      "community": 156,
+      "community": 35,
       "norm_label": "pngimagesfromico()"
     },
     {
@@ -5986,7 +5905,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L62",
       "id": "image",
-      "community": 156,
+      "community": 35,
       "norm_label": "image"
     },
     {
@@ -5995,7 +5914,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L90",
       "id": "gameicon_extract_scaledown",
-      "community": 156,
+      "community": 35,
       "norm_label": "scaledown()"
     },
     {
@@ -6004,7 +5923,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L112",
       "id": "gameicon_extract_sourcefordataurl",
-      "community": 156,
+      "community": 35,
       "norm_label": "sourcefordataurl()"
     },
     {
@@ -6013,7 +5932,7 @@
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L118",
       "id": "gameicon_extract_errormessage",
-      "community": 156,
+      "community": 35,
       "norm_label": "errormessage()"
     },
     {
@@ -6022,7 +5941,7 @@
       "source_file": "backend/internal/gameicon/extract_test.go",
       "source_location": "L1",
       "id": "d_myprojects_cloud_saver_backend_internal_gameicon_extract_test_go",
-      "community": 156,
+      "community": 35,
       "norm_label": "extract_test.go"
     },
     {
@@ -6031,7 +5950,7 @@
       "source_file": "backend/internal/gameicon/extract_test.go",
       "source_location": "L9",
       "id": "gameicon_extract_test_testextractdataurlrejectsmissingandnonexecutablefiles",
-      "community": 156,
+      "community": 35,
       "norm_label": "testextractdataurlrejectsmissingandnonexecutablefiles()"
     },
     {
@@ -6040,7 +5959,7 @@
       "source_file": "backend/internal/gameicon/extract_test.go",
       "source_location": "L9",
       "id": "backend_internal_gameicon_extract_test_go_t",
-      "community": 156,
+      "community": 35,
       "norm_label": "t"
     },
     {
@@ -8038,7 +7957,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L25",
       "id": "syncer_synctrigger",
-      "community": 23,
+      "community": 16,
       "norm_label": "synctrigger"
     },
     {
@@ -8056,7 +7975,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L31",
       "id": "syncer_dirtygame",
-      "community": 52,
+      "community": 16,
       "norm_label": "dirtygame"
     },
     {
@@ -8065,7 +7984,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L32",
       "id": "backend_internal_syncer_engine_go_time",
-      "community": 52,
+      "community": 16,
       "norm_label": "time"
     },
     {
@@ -8074,7 +7993,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L40",
       "id": "backend_internal_syncer_engine_go_manager",
-      "community": 36,
+      "community": 18,
       "norm_label": "manager"
     },
     {
@@ -8281,7 +8200,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L245",
       "id": "backend_internal_syncer_engine_go_revision",
-      "community": 16,
+      "community": 36,
       "norm_label": "revision"
     },
     {
@@ -8335,7 +8254,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L395",
       "id": "syncer_engine_protectionstatus",
-      "community": 18,
+      "community": 160,
       "norm_label": ".protectionstatus()"
     },
     {
@@ -8344,7 +8263,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L395",
       "id": "backend_internal_syncer_engine_go_gameprotectionstatus",
-      "community": 18,
+      "community": 160,
       "norm_label": "gameprotectionstatus"
     },
     {
@@ -8353,7 +8272,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L422",
       "id": "syncer_engine_lenmust",
-      "community": 18,
+      "community": 160,
       "norm_label": "lenmust()"
     },
     {
@@ -8362,7 +8281,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L422",
       "id": "backend_internal_syncer_engine_go_t",
-      "community": 18,
+      "community": 160,
       "norm_label": "t"
     },
     {
@@ -8389,7 +8308,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L440",
       "id": "backend_internal_syncer_engine_go_game",
-      "community": 16,
+      "community": 36,
       "norm_label": "game"
     },
     {
@@ -8398,7 +8317,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L453",
       "id": "syncer_engine_revisions",
-      "community": 18,
+      "community": 160,
       "norm_label": ".revisions()"
     },
     {
@@ -8407,7 +8326,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L457",
       "id": "syncer_engine_recoverypoints",
-      "community": 18,
+      "community": 160,
       "norm_label": ".recoverypoints()"
     },
     {
@@ -8416,7 +8335,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L457",
       "id": "backend_internal_syncer_engine_go_recoverypoint",
-      "community": 18,
+      "community": 160,
       "norm_label": "recoverypoint"
     },
     {
@@ -8425,7 +8344,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L461",
       "id": "syncer_engine_storageusage",
-      "community": 18,
+      "community": 160,
       "norm_label": ".storageusage()"
     },
     {
@@ -8434,7 +8353,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L461",
       "id": "storageusage",
-      "community": 18,
+      "community": 160,
       "norm_label": "storageusage"
     },
     {
@@ -8443,7 +8362,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L496",
       "id": "syncer_engine_storagesummary",
-      "community": 18,
+      "community": 160,
       "norm_label": ".storagesummary()"
     },
     {
@@ -8452,7 +8371,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L496",
       "id": "storagesummary",
-      "community": 18,
+      "community": 160,
       "norm_label": "storagesummary"
     },
     {
@@ -8497,7 +8416,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L652",
       "id": "syncer_engine_deleterecoverypoint",
-      "community": 18,
+      "community": 160,
       "norm_label": ".deleterecoverypoint()"
     },
     {
@@ -8515,7 +8434,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L726",
       "id": "syncer_engine_restorelocalrevision",
-      "community": 16,
+      "community": 36,
       "norm_label": ".restorelocalrevision()"
     },
     {
@@ -8560,7 +8479,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "syncer_engine_capturelocal",
-      "community": 16,
+      "community": 36,
       "norm_label": ".capturelocal()"
     },
     {
@@ -8569,7 +8488,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L937",
       "id": "backend_internal_syncer_engine_go_result",
-      "community": 16,
+      "community": 36,
       "norm_label": "result"
     },
     {
@@ -8578,7 +8497,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L998",
       "id": "syncer_engine_gameprofile",
-      "community": 16,
+      "community": 36,
       "norm_label": "gameprofile()"
     },
     {
@@ -8587,7 +8506,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "syncer_engine_publishprofile",
-      "community": 16,
+      "community": 36,
       "norm_label": ".publishprofile()"
     },
     {
@@ -8596,7 +8515,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "profilestore",
-      "community": 16,
+      "community": 36,
       "norm_label": "profilestore"
     },
     {
@@ -8605,7 +8524,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1015",
       "id": "backend_internal_syncer_engine_go_revisionstore",
-      "community": 16,
+      "community": 36,
       "norm_label": "revisionstore"
     },
     {
@@ -8623,7 +8542,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "syncer_engine_setplaytimeledgers",
-      "community": 16,
+      "community": 36,
       "norm_label": ".setplaytimeledgers()"
     },
     {
@@ -8632,7 +8551,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1076",
       "id": "backend_internal_syncer_engine_go_playtimeledger",
-      "community": 16,
+      "community": 36,
       "norm_label": "playtimeledger"
     },
     {
@@ -8641,7 +8560,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1088",
       "id": "syncer_engine_setrecoveredplaytime",
-      "community": 36,
+      "community": 18,
       "norm_label": ".setrecoveredplaytime()"
     },
     {
@@ -8650,7 +8569,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1099",
       "id": "syncer_engine_mergeplaytimeledgers",
-      "community": 16,
+      "community": 36,
       "norm_label": "mergeplaytimeledgers()"
     },
     {
@@ -8785,7 +8704,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1334",
       "id": "syncer_engine_noteproviderattempt",
-      "community": 52,
+      "community": 16,
       "norm_label": ".noteproviderattempt()"
     },
     {
@@ -8803,7 +8722,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1352",
       "id": "syncer_engine_noteproviderretryat",
-      "community": 52,
+      "community": 16,
       "norm_label": ".noteproviderretryat()"
     },
     {
@@ -8812,7 +8731,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1362",
       "id": "syncer_engine_noteprovidersuccess",
-      "community": 52,
+      "community": 16,
       "norm_label": ".noteprovidersuccess()"
     },
     {
@@ -8830,7 +8749,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1393",
       "id": "syncer_engine_persisthealth",
-      "community": 52,
+      "community": 16,
       "norm_label": ".persisthealth()"
     },
     {
@@ -8839,7 +8758,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1402",
       "id": "syncer_engine_noteprotectioncomplete",
-      "community": 16,
+      "community": 18,
       "norm_label": ".noteprotectioncomplete()"
     },
     {
@@ -13361,6 +13280,51 @@
       "norm_label": "corruption and missing objects"
     },
     {
+      "label": "normalizeBackupHistory()",
+      "file_type": "code",
+      "source_file": "app/src/api/parsers.ts",
+      "source_location": "L131",
+      "community": 93,
+      "norm_label": "normalizebackuphistory()",
+      "id": "api_parsers_normalizebackuphistory"
+    },
+    {
+      "label": "BackupHistoryEntry",
+      "file_type": "code",
+      "source_file": "app/src/types.ts",
+      "source_location": "L65",
+      "community": 76,
+      "norm_label": "backuphistoryentry",
+      "id": "src_types_backuphistoryentry"
+    },
+    {
+      "label": "StorageSummary",
+      "file_type": "code",
+      "source_file": "app/src/types.ts",
+      "source_location": "L256",
+      "community": 76,
+      "norm_label": "storagesummary",
+      "id": "src_types_storagesummary"
+    },
+    {
+      "label": "DebugInfo",
+      "file_type": "code",
+      "source_file": "app/src/types.ts",
+      "source_location": "L283",
+      "community": 76,
+      "norm_label": "debuginfo",
+      "id": "src_types_debuginfo"
+    },
+    {
+      "label": "SnapshotCreateResponse",
+      "file_type": "code",
+      "source_file": "app/src/types.ts",
+      "source_location": "L322",
+      "community": 76,
+      "norm_label": "snapshotcreateresponse",
+      "id": "src_types_snapshotcreateresponse"
+    },
+    {
       "label": "handlers_google_drive.go",
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_google_drive.go",
@@ -13527,7 +13491,7 @@
       "file_type": "code",
       "source_file": "app/src/main.tsx",
       "source_location": "L1",
-      "community": 172,
+      "community": 43,
       "norm_label": "main.tsx",
       "id": "src_main"
     },
@@ -13716,7 +13680,7 @@
       "file_type": "code",
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L1",
-      "community": 187,
+      "community": 22,
       "norm_label": "handlers_settings_test.go",
       "id": "api_handlers_settings_test"
     },
@@ -13824,7 +13788,7 @@
       "file_type": "code",
       "source_file": "backend/internal/gameicon/extract.go",
       "source_location": "L1",
-      "community": 156,
+      "community": 35,
       "norm_label": "extract.go",
       "id": "gameicon_extract"
     },
@@ -13833,7 +13797,7 @@
       "file_type": "code",
       "source_file": "backend/internal/gameicon/extract_test.go",
       "source_location": "L1",
-      "community": 156,
+      "community": 35,
       "norm_label": "extract_test.go",
       "id": "gameicon_extract_test"
     },
@@ -14545,7 +14509,7 @@
       "source_file": "app/package.json",
       "source_location": "L17",
       "_origin": "ast",
-      "community": 114,
+      "community": 95,
       "norm_label": "react",
       "id": "react"
     },
@@ -15785,7 +15749,7 @@
       "source_file": "app/src/api.ts",
       "source_location": "L69",
       "_origin": "ast",
-      "community": 10,
+      "community": 13,
       "norm_label": "api",
       "id": "app_src_api_api"
     },
@@ -16085,7 +16049,7 @@
       "source_file": "app/src/constants/defaults.ts",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 35,
+      "community": 39,
       "norm_label": "default_settings",
       "id": "app_src_constants_defaults_default_settings"
     },
@@ -16105,7 +16069,7 @@
       "source_file": "app/src/constants/defaults.ts",
       "source_location": "L47",
       "_origin": "ast",
-      "community": 15,
+      "community": 33,
       "norm_label": "newdefaultbackuppolicy()",
       "id": "app_src_constants_defaults_newdefaultbackuppolicy"
     },
@@ -16325,7 +16289,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "nativedialog.ts",
       "id": "app_src_nativedialog"
     },
@@ -16335,7 +16299,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L3",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "dialogfilter",
       "id": "app_src_nativedialog_dialogfilter"
     },
@@ -16345,7 +16309,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "opendialogoptions",
       "id": "app_src_nativedialog_opendialogoptions"
     },
@@ -16355,7 +16319,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L16",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "opendialogresult",
       "id": "app_src_nativedialog_opendialogresult"
     },
@@ -16365,7 +16329,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "opensinglepath()",
       "id": "app_src_nativedialog_opensinglepath"
     },
@@ -16375,7 +16339,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L29",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "pickfolder()",
       "id": "app_src_nativedialog_pickfolder"
     },
@@ -16385,7 +16349,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L38",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "pickexecutable()",
       "id": "app_src_nativedialog_pickexecutable"
     },
@@ -16395,7 +16359,7 @@
       "source_file": "app/src/nativeDialog.ts",
       "source_location": "L47",
       "_origin": "ast",
-      "community": 43,
+      "community": 10,
       "norm_label": "pickzipfile()",
       "id": "app_src_nativedialog_pickzipfile"
     },
@@ -16425,7 +16389,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L2",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "thememode",
       "id": "app_src_types_thememode"
     },
@@ -16445,7 +16409,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "protectiontarget",
       "id": "app_src_types_protectiontarget"
     },
@@ -16455,7 +16419,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 13,
+      "community": 15,
       "norm_label": "protectionmode",
       "id": "app_src_types_protectionmode"
     },
@@ -16465,7 +16429,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "pausescope",
       "id": "app_src_types_pausescope"
     },
@@ -16475,7 +16439,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 13,
+      "community": 15,
       "norm_label": "providerstate",
       "id": "app_src_types_providerstate"
     },
@@ -16485,7 +16449,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 13,
+      "community": 15,
       "norm_label": "googledriveconnection",
       "id": "app_src_types_googledriveconnection"
     },
@@ -16525,7 +16489,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L43",
       "_origin": "ast",
-      "community": 13,
+      "community": 33,
       "norm_label": "gameprotectionstatus",
       "id": "app_src_types_gameprotectionstatus"
     },
@@ -16535,7 +16499,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L56",
       "_origin": "ast",
-      "community": 13,
+      "community": 33,
       "norm_label": "backuppolicy",
       "id": "app_src_types_backuppolicy"
     },
@@ -16545,7 +16509,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L63",
       "_origin": "ast",
-      "community": 13,
+      "community": 15,
       "norm_label": "backuphistoryentry",
       "id": "app_src_types_backuphistoryentry"
     },
@@ -16565,7 +16529,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L82",
       "_origin": "ast",
-      "community": 45,
+      "community": 13,
       "norm_label": "game",
       "id": "app_src_types_game"
     },
@@ -16575,7 +16539,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L97",
       "_origin": "ast",
-      "community": 33,
+      "community": 45,
       "norm_label": "settings",
       "id": "app_src_types_settings"
     },
@@ -16605,7 +16569,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L168",
       "_origin": "ast",
-      "community": 33,
+      "community": 13,
       "norm_label": "syncjob",
       "id": "app_src_types_syncjob"
     },
@@ -16665,7 +16629,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L248",
       "_origin": "ast",
-      "community": 33,
+      "community": 13,
       "norm_label": "syncconflict",
       "id": "app_src_types_syncconflict"
     },
@@ -16675,7 +16639,7 @@
       "source_file": "app/src/types.ts",
       "source_location": "L258",
       "_origin": "ast",
-      "community": 13,
+      "community": 15,
       "norm_label": "logentry",
       "id": "app_src_types_logentry"
     },
@@ -16860,72 +16824,12 @@
       "id": "app_src_update_updateactionlabel"
     },
     {
-      "label": "ActivityView.tsx",
-      "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 13,
-      "norm_label": "activityview.tsx",
-      "id": "app_src_views_activityview"
-    },
-    {
-      "label": "ActivityViewProps",
-      "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 13,
-      "norm_label": "activityviewprops",
-      "id": "app_src_views_activityview_activityviewprops"
-    },
-    {
-      "label": "ActivityView()",
-      "file_type": "code",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L11",
-      "_origin": "ast",
-      "community": 13,
-      "norm_label": "activityview()",
-      "id": "app_src_views_activityview_activityview"
-    },
-    {
-      "label": "BackupView.tsx",
-      "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 45,
-      "norm_label": "backupview.tsx",
-      "id": "app_src_views_backupview"
-    },
-    {
-      "label": "BackupViewProps",
-      "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L3",
-      "_origin": "ast",
-      "community": 45,
-      "norm_label": "backupviewprops",
-      "id": "app_src_views_backupview_backupviewprops"
-    },
-    {
-      "label": "BackupView()",
-      "file_type": "code",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L19",
-      "_origin": "ast",
-      "community": 45,
-      "norm_label": "backupview()",
-      "id": "app_src_views_backupview_backupview"
-    },
-    {
       "label": "GameDetailView.tsx",
       "file_type": "code",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 33,
+      "community": 13,
       "norm_label": "gamedetailview.tsx",
       "id": "app_src_views_gamedetailview"
     },
@@ -16935,7 +16839,7 @@
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 33,
+      "community": 13,
       "norm_label": "gamedetailviewprops",
       "id": "app_src_views_gamedetailview_gamedetailviewprops"
     },
@@ -16955,7 +16859,7 @@
       "source_file": "app/src/views/GamesView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 45,
+      "community": 13,
       "norm_label": "gamesview.tsx",
       "id": "app_src_views_gamesview"
     },
@@ -16965,7 +16869,7 @@
       "source_file": "app/src/views/GamesView.tsx",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 45,
+      "community": 13,
       "norm_label": "gamesviewprops",
       "id": "app_src_views_gamesview_gamesviewprops"
     },
@@ -16975,49 +16879,9 @@
       "source_file": "app/src/views/GamesView.tsx",
       "source_location": "L46",
       "_origin": "ast",
-      "community": 45,
+      "community": 13,
       "norm_label": "onsubmitaddgame()",
       "id": "app_src_views_gamesview_onsubmitaddgame"
-    },
-    {
-      "label": "HomeView.tsx",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 27,
-      "norm_label": "homeview.tsx",
-      "id": "app_src_views_homeview"
-    },
-    {
-      "label": "HomeViewProps",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L4",
-      "_origin": "ast",
-      "community": 27,
-      "norm_label": "homeviewprops",
-      "id": "app_src_views_homeview_homeviewprops"
-    },
-    {
-      "label": "HomeView()",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L15",
-      "_origin": "ast",
-      "community": 27,
-      "norm_label": "homeview()",
-      "id": "app_src_views_homeview_homeview"
-    },
-    {
-      "label": "formatBytes()",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L96",
-      "_origin": "ast",
-      "community": 27,
-      "norm_label": "formatbytes()",
-      "id": "app_src_views_homeview_formatbytes"
     },
     {
       "label": "SettingsView.tsx",
@@ -17025,7 +16889,7 @@
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "settingsview.tsx",
       "id": "app_src_views_settingsview"
     },
@@ -17035,7 +16899,7 @@
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "settingsviewprops",
       "id": "app_src_views_settingsview_settingsviewprops"
     },
@@ -17045,7 +16909,7 @@
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L30",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "settingsview()",
       "id": "app_src_views_settingsview_settingsview"
     },
@@ -17055,7 +16919,7 @@
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L199",
       "_origin": "ast",
-      "community": 10,
+      "community": 45,
       "norm_label": "formatupdatebytes()",
       "id": "app_src_views_settingsview_formatupdatebytes"
     },
@@ -17327,7 +17191,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 187,
+      "community": 22,
       "norm_label": "handlers_settings_test.go",
       "id": "backend_internal_api_handlers_settings_test"
     },
@@ -17337,7 +17201,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 187,
+      "community": 22,
       "norm_label": "testsettingssaveignoreslegacygoogledrivestatusfields()",
       "id": "backend_internal_api_handlers_settings_test_testsettingssaveignoreslegacygoogledrivestatusfields"
     },
@@ -17347,7 +17211,7 @@
       "source_file": "backend/internal/api/handlers_settings_test.go",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 187,
+      "community": 22,
       "norm_label": "testsettingssaveacceptspartialupdate()",
       "id": "backend_internal_api_handlers_settings_test_testsettingssaveacceptspartialupdate"
     },
@@ -17447,7 +17311,7 @@
       "source_file": "backend/internal/api/server.go",
       "source_location": "L120",
       "_origin": "ast",
-      "community": 44,
+      "community": 25,
       "norm_label": "writejson()",
       "id": "backend_internal_api_server_writejson"
     },
@@ -18637,7 +18501,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L416",
       "_origin": "ast",
-      "community": 18,
+      "community": 160,
       "norm_label": "lenmust()",
       "id": "backend_internal_syncer_engine_lenmust"
     },
@@ -18647,7 +18511,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L923",
       "_origin": "ast",
-      "community": 16,
+      "community": 36,
       "norm_label": "gameprofile()",
       "id": "backend_internal_syncer_engine_gameprofile"
     },
@@ -18667,7 +18531,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L963",
       "_origin": "ast",
-      "community": 23,
+      "community": 16,
       "norm_label": "reasondetails()",
       "id": "backend_internal_syncer_engine_reasondetails"
     },
@@ -18687,7 +18551,7 @@
       "source_file": "backend/internal/syncer/engine.go",
       "source_location": "L1069",
       "_origin": "ast",
-      "community": 23,
+      "community": 16,
       "norm_label": "classifylocalerror()",
       "id": "backend_internal_syncer_engine_classifylocalerror"
     },
@@ -19720,7 +19584,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "native update manager",
       "id": "app_src_tauri_updater_update_manager"
     },
@@ -19733,7 +19597,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "signed update verification",
       "id": "app_src_tauri_updater_signed_update_verification"
     },
@@ -19746,7 +19610,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 39,
       "norm_label": "daemon shutdown request",
       "id": "app_src_tauri_updater_daemon_shutdown_request"
     },
@@ -19759,7 +19623,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "tauri update bridge",
       "id": "app_src_update_tauri_update_bridge"
     },
@@ -19772,7 +19636,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "backend api client",
       "id": "app_src_api_backend_api_client"
     },
@@ -19785,7 +19649,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "backend response normalizers",
       "id": "app_src_api_response_normalizers"
     },
@@ -19798,7 +19662,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "native file picker",
       "id": "app_src_native_dialog_native_file_picker"
     },
@@ -19811,7 +19675,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "application controller",
       "id": "app_src_app_application_controller"
     },
@@ -19824,7 +19688,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "game protection and recovery ui",
       "id": "app_src_views_game_detail_protection_and_recovery_ui"
     },
@@ -19837,22 +19701,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 39,
       "norm_label": "provider and update settings ui",
       "id": "app_src_views_settings_provider_and_update_ui"
-    },
-    {
-      "label": "Recovery Library UI",
-      "file_type": "code",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 35,
-      "norm_label": "recovery library ui",
-      "id": "app_src_views_home_recovery_library_ui"
     },
     {
       "label": "Single-Instance Daemon Bootstrap",
@@ -27017,22 +26868,22 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/src/App.tsx",
-      "source_location": "L20",
+      "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_app",
-      "target": "views_activityview"
+      "target": "utils_savestatus"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/src/App.tsx",
-      "source_location": "L20",
+      "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_app",
-      "target": "views_activityview_activityview"
+      "target": "utils_savestatus_getsavestatus"
     },
     {
       "relation": "imports_from",
@@ -27077,28 +26928,6 @@
       "confidence_score": 1.0,
       "source": "src_app",
       "target": "views_gamesview_gamesview"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
-      "source_location": "L23",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app",
-      "target": "views_homeview"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
-      "source_location": "L23",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_app",
-      "target": "views_homeview_homeview"
     },
     {
       "relation": "imports_from",
@@ -27150,10 +26979,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/App.tsx",
-      "source_location": "L1070",
+      "source_location": "L1083",
       "weight": 1.0,
       "source": "src_app_app",
-      "target": "views_homeview_formatbytes"
+      "target": "utils_savestatus_getsavestatus"
     },
     {
       "relation": "imports_from",
@@ -28853,17 +28682,6 @@
       "target": "components_gamecover"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "components_gamecover"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -28905,17 +28723,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_gamesview",
-      "target": "components_gamecover_gamecover"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
       "target": "components_gamecover_gamecover"
     },
     {
@@ -28970,17 +28777,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_main",
-      "target": "constants_branding"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
       "target": "constants_branding"
     },
     {
@@ -29120,6 +28916,28 @@
       "target": "constants_defaults"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/SettingsView.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_settingsview_test",
+      "target": "constants_defaults"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/SettingsView.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_settingsview_test",
+      "target": "constants_defaults_newdefaultsettings"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -29241,6 +29059,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_main_rooterrorboundary",
+      "target": "src_main_rooterrorboundary_render"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "views_gamedetailview_test_renderview",
       "target": "src_main_rooterrorboundary_render"
     },
     {
@@ -29721,22 +29550,11 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
+      "source_file": "app/src/utils/saveStatus.ts",
       "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_activityview",
-      "target": "src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_backupview",
+      "source": "utils_savestatus",
       "target": "src_types"
     },
     {
@@ -29765,6 +29583,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "src_types"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GamesView.tsx",
       "source_location": "L2",
       "weight": 1.0,
@@ -29781,28 +29610,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_gamesview_test",
-      "target": "src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview_test",
       "target": "src_types"
     },
     {
@@ -29875,12 +29682,34 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "utils_savestatus",
+      "target": "src_types_servicecontrolstate"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "utils_savestatus",
+      "target": "src_types_providerhealth"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "views_gamedetailview",
-      "target": "src_types_providerhealth",
-      "confidence_score": 1.0
+      "target": "src_types_providerhealth"
     },
     {
       "relation": "imports",
@@ -29897,22 +29726,22 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
+      "source_file": "app/src/views/GameDetailView.tsx",
+      "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_backupview",
+      "source": "views_gamedetailview",
       "target": "src_types_game"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/GameDetailView.tsx",
-      "source_location": "L3",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_gamedetailview",
+      "source": "views_gamedetailview_test",
       "target": "src_types_game"
     },
     {
@@ -29941,56 +29770,12 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "src_types_game"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L2",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "views_settingsview",
       "target": "src_types_settings"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_activityview",
-      "target": "src_types_status"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "src_types_status"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview_test",
-      "target": "src_types_status"
     },
     {
       "relation": "imports",
@@ -30029,22 +29814,22 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
+      "source_file": "app/src/views/SettingsView.tsx",
+      "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_activityview",
+      "source": "views_settingsview",
       "target": "src_types_activityevent"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
+      "source_file": "app/src/views/SettingsView.tsx",
+      "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_homeview",
+      "source": "views_settingsview",
       "target": "src_types_recoverylibraryentry"
     },
     {
@@ -30057,17 +29842,6 @@
       "confidence_score": 1.0,
       "source": "views_gamedetailview",
       "target": "src_types_storageusage"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "src_types_storagesummary"
     },
     {
       "relation": "imports",
@@ -30291,42 +30065,65 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L11",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L18",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_activityview",
-      "target": "views_activityview_activityview"
+      "source": "utils_savestatus",
+      "target": "utils_savestatus_getsavestatus"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
+      "source_file": "app/src/utils/saveStatus.ts",
       "source_location": "L3",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_activityview",
-      "target": "views_activityview_activityviewprops"
+      "source": "utils_savestatus",
+      "target": "utils_savestatus_savestatus"
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L19",
+      "source_file": "app/src/utils/saveStatus.ts",
+      "source_location": "L10",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_backupview",
-      "target": "views_backupview_backupview"
+      "source": "utils_savestatus",
+      "target": "utils_savestatus_savestatusinput"
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L3",
+      "source_file": "app/src/views/GameDetailView.tsx",
+      "source_location": "L6",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_backupview",
-      "target": "views_backupview_backupviewprops"
+      "source": "views_gamedetailview",
+      "target": "utils_savestatus"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview",
+      "target": "utils_savestatus_getsavestatus"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/views/GameDetailView.tsx",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "views_gamedetailview_gamedetailview",
+      "target": "utils_savestatus_getsavestatus"
     },
     {
       "relation": "imports_from",
@@ -30405,6 +30202,59 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "react"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "views_gamedetailview"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "views_gamedetailview_gamedetailview"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "views_gamedetailview_test_game"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app/src/views/GameDetailView.test.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "views_gamedetailview_test",
+      "target": "views_gamedetailview_test_renderview"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L1",
       "weight": 1.0,
@@ -30431,17 +30281,6 @@
       "confidence_score": 1.0,
       "source": "views_gamedetailview",
       "target": "views_gamedetailview_gamedetailviewprops"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "app/src/views/GameDetailView.tsx",
-      "source_location": "L107",
-      "weight": 1.0,
-      "source": "views_gamedetailview_gamedetailview",
-      "target": "views_homeview_formatbytes"
     },
     {
       "relation": "imports_from",
@@ -30552,85 +30391,34 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
+      "source_file": "app/src/views/SettingsView.test.tsx",
       "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_homeview_test",
+      "source": "views_settingsview_test",
       "target": "react"
     },
     {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L3",
+      "source_file": "app/src/views/SettingsView.test.tsx",
+      "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_homeview_test",
-      "target": "views_homeview"
+      "source": "views_settingsview_test",
+      "target": "views_settingsview"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview_test",
-      "target": "views_homeview_homeview"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.test.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview_test",
-      "target": "views_homeview_test_status"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L96",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "views_homeview_formatbytes"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "views_homeview_homeview"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
+      "source_file": "app/src/views/SettingsView.test.tsx",
       "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "views_homeview",
-      "target": "views_homeview_homeviewprops"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L40",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "views_homeview_homeview",
-      "target": "views_homeview_formatbytes"
+      "source": "views_settingsview_test",
+      "target": "views_settingsview_settingsview"
     },
     {
       "relation": "imports_from",
@@ -37029,9 +36817,9 @@
       "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L83",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "googledrive_service",
-      "target": "googledrive_service_ready",
-      "confidence_score": 1.0
+      "target": "googledrive_service_ready"
     },
     {
       "relation": "method",
@@ -37252,9 +37040,9 @@
       "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "googledrive_service_available",
-      "target": "googledrive_service_ready",
-      "confidence_score": 1.0
+      "target": "googledrive_service_ready"
     },
     {
       "relation": "calls",
@@ -37263,9 +37051,9 @@
       "source_file": "backend/internal/auth/googledrive/service.go",
       "source_location": "L266",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "googledrive_service_httpclient",
-      "target": "googledrive_service_ready",
-      "confidence_score": 1.0
+      "target": "googledrive_service_ready"
     },
     {
       "relation": "references",
@@ -41702,9 +41490,9 @@
       "source_location": "L59",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "gamemon_monitor",
-      "target": "backend_internal_gamemon_monitor_go_mutex",
-      "confidence_score": 1.0
+      "target": "backend_internal_gamemon_monitor_go_mutex"
     },
     {
       "relation": "references",
@@ -41905,9 +41693,9 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "gamemon_monitor",
-      "target": "gamemon_monitor_probelaunch",
-      "confidence_score": 1.0
+      "target": "gamemon_monitor_probelaunch"
     },
     {
       "relation": "method",
@@ -42198,9 +41986,9 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L133",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "gamemon_monitor_probelaunch",
-      "target": "gamemon_monitor_forcepoll",
-      "confidence_score": 1.0
+      "target": "gamemon_monitor_forcepoll"
     },
     {
       "relation": "calls",
@@ -42209,9 +41997,9 @@
       "source_file": "backend/internal/gamemon/monitor.go",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "gamemon_monitor_probelaunch",
-      "target": "gamemon_monitor_isrunning",
-      "confidence_score": 1.0
+      "target": "gamemon_monitor_isrunning"
     },
     {
       "relation": "calls",
@@ -42366,9 +42154,9 @@
       "source_file": "backend/internal/gamemon/monitor_test.go",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "gamemon_monitor_test",
-      "target": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
-      "confidence_score": 1.0
+      "target": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit"
     },
     {
       "relation": "references",
@@ -42377,9 +42165,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "gamemon_monitor_test_testpollonceflushesthefinalobservedplaytimeonexit",
-      "target": "backend_internal_gamemon_monitor_test_go_t",
-      "confidence_score": 1.0
+      "target": "backend_internal_gamemon_monitor_test_go_t"
     },
     {
       "relation": "calls",
@@ -52740,9 +52528,9 @@
       "source_file": "backend/internal/syncer/engine_test.go",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "syncer_engine_test",
-      "target": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
-      "confidence_score": 1.0
+      "target": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline"
     },
     {
       "relation": "contains",
@@ -52963,9 +52751,9 @@
       "source_location": "L188",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "syncer_engine_test_testoauthconfigurationfailureisnotreportedasoffline",
-      "target": "backend_internal_syncer_engine_test_go_t",
-      "confidence_score": 1.0
+      "target": "backend_internal_syncer_engine_test_go_t"
     },
     {
       "relation": "references",
@@ -68126,30 +67914,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/src/App.tsx",
-      "source_location": "L20",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_app",
-      "target": "app_src_views_activityview"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
-      "source_location": "L20",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_app",
-      "target": "app_src_views_activityview_activityview"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
       "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
@@ -68180,30 +67944,6 @@
       "confidence_score": 1.0,
       "source": "app_src_app",
       "target": "app_src_views_gamesview"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
-      "source_location": "L23",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_app",
-      "target": "app_src_views_homeview"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/App.tsx",
-      "source_location": "L23",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_app",
-      "target": "app_src_views_homeview_homeview"
     },
     {
       "relation": "imports_from",
@@ -68264,18 +68004,6 @@
       "_origin": "ast",
       "source": "app_src_app_app",
       "target": "app_src_update_updateactionlabel"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/src/App.tsx",
-      "source_location": "L1070",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "app_src_app_app",
-      "target": "app_src_views_homeview_formatbytes"
     },
     {
       "relation": "imports",
@@ -70134,18 +69862,6 @@
       "target": "app_src_constants_branding"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_constants_branding"
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -70156,18 +69872,6 @@
       "confidence_score": 1.0,
       "source": "app_src_main",
       "target": "app_src_constants_branding_app_display_name"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L2",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_constants_branding_home_kicker_label"
     },
     {
       "relation": "imports",
@@ -71032,30 +70736,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_activityview",
-      "target": "app_src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_backupview",
-      "target": "app_src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -71074,18 +70754,6 @@
       "_origin": "ast",
       "confidence_score": 1.0,
       "source": "app_src_views_gamesview",
-      "target": "app_src_types"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
       "target": "app_src_types"
     },
     {
@@ -71176,18 +70844,6 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_backupview",
-      "target": "app_src_types_game"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -71212,18 +70868,6 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_types_game"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "app/src/views/SettingsView.tsx",
       "source_location": "L2",
       "weight": 1.0,
@@ -71231,30 +70875,6 @@
       "confidence_score": 1.0,
       "source": "app_src_views_settingsview",
       "target": "app_src_types_settings"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_activityview",
-      "target": "app_src_types_status"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_types_status"
     },
     {
       "relation": "imports",
@@ -71291,30 +70911,6 @@
       "confidence_score": 1.0,
       "source": "app_src_views_gamedetailview",
       "target": "app_src_types_recoverypoint"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_activityview",
-      "target": "app_src_types_activityevent"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L1",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_types_recoverylibraryentry"
     },
     {
       "relation": "imports",
@@ -71477,50 +71073,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_activityview",
-      "target": "app_src_views_activityview_activityview"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/ActivityView.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_activityview",
-      "target": "app_src_views_activityview_activityviewprops"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_backupview",
-      "target": "app_src_views_backupview_backupview"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/BackupView.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_backupview",
-      "target": "app_src_views_backupview_backupviewprops"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "app/src/views/GameDetailView.tsx",
       "source_location": "L44",
       "weight": 1.0,
@@ -71561,51 +71113,6 @@
       "confidence_score": 1.0,
       "source": "app_src_views_gamesview",
       "target": "app_src_views_gamesview_onsubmitaddgame"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L96",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_views_homeview_formatbytes"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L15",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_views_homeview_homeview"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview",
-      "target": "app_src_views_homeview_homeviewprops"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "app/src/views/HomeView.tsx",
-      "source_location": "L40",
-      "weight": 1.0,
-      "_origin": "ast",
-      "confidence_score": 1.0,
-      "source": "app_src_views_homeview_homeview",
-      "target": "app_src_views_homeview_formatbytes"
     },
     {
       "relation": "contains",
@@ -76150,16 +75657,6 @@
       "source_location": null,
       "weight": 1.0,
       "source": "app_src_app_application_controller",
-      "target": "app_src_views_home_recovery_library_ui"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/src/App.tsx",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "app_src_app_application_controller",
       "target": "app_src_views_settings_provider_and_update_ui"
     },
     {
@@ -76778,5 +76275,5 @@
       "source_file": ".github/workflows/release-windows.yml"
     }
   ],
-  "built_at_commit": "12ad09d2b7edcc62c30be35e32ab1d3e4be65cb1"
+  "built_at_commit": "df09143c8c3661d6b9232c85e1e235895614a8b0"
 }

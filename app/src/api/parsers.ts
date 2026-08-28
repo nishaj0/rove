@@ -1,5 +1,5 @@
 import type {
-  BackupHistoryEntry, BackupPolicy, CloudProvider, ConflictPolicy, Game,
+  BackupPolicy, CloudProvider, ConflictPolicy, Game,
   GameProtectionStatus, GoogleDriveConnection, LogEntry, PauseScope,
   ProtectionMode, ProtectionTarget, ProviderHealth, ProviderState,
   ServiceControlState, Settings, SnapshotSummary, Status, SyncConflict,
@@ -126,19 +126,6 @@ export function normalizeGames(input: unknown): Game[] {
       protectionStatus: normalizeProtectionStatus(value.protectionStatus, id),
     };
   }).filter((value): value is Game => value !== null);
-}
-
-export function normalizeBackupHistory(input: unknown): BackupHistoryEntry[] {
-  if (!Array.isArray(input)) return [];
-  return input.map((value): BackupHistoryEntry | null => {
-    if (!isRecord(value)) return null;
-    return {
-      id: asNumber(value.id, 0), gameId: asString(value.gameId),
-      path: asString(value.path), createdAt: asString(value.createdAt),
-      reason: asString(value.reason), signature: asString(value.signature),
-      status: asString(value.status, "ok"),
-    };
-  }).filter((value): value is BackupHistoryEntry => value !== null);
 }
 
 function normalizeGoogleDrive(input: unknown): GoogleDriveConnection {

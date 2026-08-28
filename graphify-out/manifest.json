@@ -30,23 +30,23 @@
     "semantic_hash": ""
   },
   "app/src/App.tsx": {
-    "mtime": 1787864685.1007662,
-    "ast_hash": "461678c666e2be9aaf2765a75fca033b",
+    "mtime": 1787946620.0320244,
+    "ast_hash": "947fb2c8208480550996813c315ac928",
     "semantic_hash": ""
   },
   "app/src/api.ts": {
-    "mtime": 1787864682.760522,
-    "ast_hash": "b139255f081cc86a236656881d4c23d8",
+    "mtime": 1787946911.4809737,
+    "ast_hash": "57511ef8f5157fc48b5b76b3d594fad3",
     "semantic_hash": ""
   },
   "app/src/api/parsers.ts": {
-    "mtime": 1787863541.7112148,
-    "ast_hash": "e5530a6c91a6d0dbc7134b074beb28ef",
+    "mtime": 1787946959.9428487,
+    "ast_hash": "c97f70643359d4551ebff56761c02553",
     "semantic_hash": ""
   },
   "app/src/constants/branding.ts": {
-    "mtime": 1785657224.2737055,
-    "ast_hash": "896f5d38867e29a6f22ea3d2c4f6782c",
+    "mtime": 1787946597.1534798,
+    "ast_hash": "e3354d1589e4840a88db9ecf52af7120",
     "semantic_hash": ""
   },
   "app/src/constants/defaults.ts": {
@@ -75,8 +75,8 @@
     "semantic_hash": "8879be98bf5075703e1b9bfdfbca355e"
   },
   "app/src/types.ts": {
-    "mtime": 1787864457.0150764,
-    "ast_hash": "1ffc74ac7068529253fa0b9104b0ddcd",
+    "mtime": 1787946959.943775,
+    "ast_hash": "1d67a60ab9c2a413c8be789646766df8",
     "semantic_hash": ""
   },
   "app/src/update.ts": {
@@ -84,34 +84,19 @@
     "ast_hash": "2024731b09449479c7e0c5d788638e7a",
     "semantic_hash": "2024731b09449479c7e0c5d788638e7a"
   },
-  "app/src/views/ActivityView.tsx": {
-    "mtime": 1785659071.1732454,
-    "ast_hash": "8449ab0828e851a5bff80167b390fe43",
-    "semantic_hash": ""
-  },
-  "app/src/views/BackupView.tsx": {
-    "mtime": 1784322867.6059465,
-    "ast_hash": "87678637e9be425de6b0fa3dee1e06be",
-    "semantic_hash": "87678637e9be425de6b0fa3dee1e06be"
-  },
   "app/src/views/GameDetailView.tsx": {
-    "mtime": 1787864506.0744524,
-    "ast_hash": "428ecbe63ecf66c5ff999b47a9030dfe",
+    "mtime": 1787866313.917562,
+    "ast_hash": "e48d11f3aa06cafb37b324f64f5d4272",
     "semantic_hash": ""
   },
   "app/src/views/GamesView.tsx": {
-    "mtime": 1785665443.1320324,
-    "ast_hash": "87d819907bb6ce8214177dbc3c0342ad",
-    "semantic_hash": ""
-  },
-  "app/src/views/HomeView.tsx": {
-    "mtime": 1785665444.4020958,
-    "ast_hash": "f8935a4246f457f1437aad631a92569f",
+    "mtime": 1787946621.3661401,
+    "ast_hash": "e67fcac3820e5ab0ec1bc145db56747a",
     "semantic_hash": ""
   },
   "app/src/views/SettingsView.tsx": {
-    "mtime": 1787864488.1629217,
-    "ast_hash": "a7bfabf9e9eacdc37ce3807821d317cd",
+    "mtime": 1787946354.9843874,
+    "ast_hash": "d2aff141d0eec927107333c1596b7c20",
     "semantic_hash": ""
   },
   "app/src/vite-env.d.ts": {
@@ -565,14 +550,14 @@
     "semantic_hash": "32b67963417a30cb80544e0b2a56a98d"
   },
   "app/src/api.test.ts": {
-    "mtime": 1787864706.3270874,
-    "ast_hash": "2f2f0b5019b8059b824570631102d593",
+    "mtime": 1787946866.3637335,
+    "ast_hash": "8b9abf4ef80d8eeec9f1cb18b44a43ff",
     "semantic_hash": ""
   },
   "app/src/api/parsers.test.ts": {
-    "mtime": 1785502553.2515795,
-    "ast_hash": "264c18ed10560e9751c619d0da4b7b5c",
-    "semantic_hash": "264c18ed10560e9751c619d0da4b7b5c"
+    "mtime": 1787946959.947776,
+    "ast_hash": "f11df2bde13e68a8cb40429fa26805b7",
+    "semantic_hash": ""
   },
   "app/src/update.test.ts": {
     "mtime": 1785502871.0202563,
@@ -580,13 +565,8 @@
     "semantic_hash": "bfdfa70ec14b9b77e4619c449f6cf1a0"
   },
   "app/src/views/GamesView.test.tsx": {
-    "mtime": 1785674830.3016136,
-    "ast_hash": "06902bdb313e8106780d6fba215bbd7c",
-    "semantic_hash": ""
-  },
-  "app/src/views/HomeView.test.tsx": {
-    "mtime": 1785665498.545465,
-    "ast_hash": "4934275edb3b6d8bdaf243bd7411b772",
+    "mtime": 1787946632.2598302,
+    "ast_hash": "ff58134aea87ab347619f3e9179a4c6a",
     "semantic_hash": ""
   },
   "app/vitest.setup.ts": {
@@ -697,6 +677,21 @@
   "backend/internal/gamemon/monitor_test.go": {
     "mtime": 1787864793.0230856,
     "ast_hash": "a6c311b28bde4a68d568554eb3033603",
+    "semantic_hash": ""
+  },
+  "app/src/utils/saveStatus.ts": {
+    "mtime": 1787865918.8018956,
+    "ast_hash": "9b1d4ba04357389d35aa663d59ce3252",
+    "semantic_hash": ""
+  },
+  "app/src/views/GameDetailView.test.tsx": {
+    "mtime": 1787945315.6655903,
+    "ast_hash": "6b1aeb75a011a1094bf51756b7d0783c",
+    "semantic_hash": ""
+  },
+  "app/src/views/SettingsView.test.tsx": {
+    "mtime": 1787946368.038699,
+    "ast_hash": "d507e991fb90484492597e8f18f73c0b",
     "semantic_hash": ""
   }
 }

@@ -1,31 +1,23 @@
 import type {
   ActivityEvent,
-  BackupHistoryEntry,
-  BackupPolicy,
   BackupExportRequest,
   BackupExportResponse,
   BackupImportRequest,
-  DebugInfo,
   Game,
   GameProtectionStatus,
-  LogEntry,
   PlayGameRequest,
   RecoveryLibraryEntry,
-  StorageSummary,
   StorageUsage,
   RecoveryPoint,
   Revision,
   ServiceControlState,
-  Settings,
   SettingsUpdate,
-  SnapshotCreateResponse,
   SnapshotSummary,
   SyncGameRequest,
   SyncPolicy,
   Status,
 } from "./types";
 import {
-  normalizeBackupHistory,
   normalizeGames,
   normalizeLogs,
   normalizeSettings,
@@ -40,7 +32,7 @@ type ErrorPayload = { error?: string };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BACKEND_BASE_URL}${path}`, {
-	    cache: "no-store",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
@@ -79,22 +71,10 @@ export const api = {
       body: JSON.stringify(input),
     });
   },
-  getGame(id: string) {
-    return request<Game>(`/games/${encodeURIComponent(id)}`);
-  },
-  updateGame(id: string, input: { name: string; path: string; executablePath: string; coverImageData?: string; version?: string }) {
-    return request<Game>(`/games/${encodeURIComponent(id)}`, {
-      method: "PUT",
-      body: JSON.stringify(input),
-    });
-  },
   deleteGame(id: string) {
     return request<void>(`/games/${encodeURIComponent(id)}`, {
       method: "DELETE",
     });
-  },
-  triggerSync() {
-    return request<{ status: string; jobId: string }>("/sync", { method: "POST" });
   },
   syncGame(payload: SyncGameRequest) {
     return request<{ status: string; jobId: string }>("/games/sync", {
@@ -118,12 +98,6 @@ export const api = {
   },
   updateGameCover(payload: { gameId: string; coverImageData?: string; mode?: "manual" | "executable_icon" | "generated" }) {
     return request<Game>("/games/cover", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  },
-  updateGameBackupPolicy(payload: { gameId: string; backupPolicy: BackupPolicy }) {
-    return request<Game>("/games/backup-policy", {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -153,9 +127,6 @@ export const api = {
     const payload = await request<unknown>(`/logs/recent?limit=${limit}`);
     return normalizeLogs(payload);
   },
-  getDebugInfo() {
-    return request<DebugInfo>("/debug/info");
-  },
   async downloadLogsZip(): Promise<void> {
     const res = await fetch(`${BACKEND_BASE_URL}/logs/download`);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -171,9 +142,6 @@ export const api = {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-  },
-  getProtectionStatus(gameId?: string) {
-    return request<Status | GameProtectionStatus>(`/protection/status${gameId ? `?gameId=${encodeURIComponent(gameId)}` : ""}`);
   },
   setProtectionControl(payload: { gameId?: string; protectionEnabled: boolean; pauseScope: ServiceControlState["pauseScope"]; duration?: "manual" | "one_hour" | "until_login"; reason?: string }) {
     return request<Status | GameProtectionStatus>("/protection/control", {
@@ -208,24 +176,14 @@ export const api = {
   getRecoveryLibrary() {
     return request<RecoveryLibraryEntry[]>("/recovery-library");
   },
-  restoreRecoveryLibrary(syncId: string, destination: string) {
-    return request<{ status: string }>("/recovery-library/restore", {
-      method: "POST",
-      body: JSON.stringify({ syncId, destination, confirmed: true }),
-    });
-  },
   restoreAndTrackRecoveryLibrary(syncId: string, destination: string, executablePath: string) {
     return request<Game>("/recovery-library/restore-and-track", { method: "POST", body: JSON.stringify({ syncId, destination, executablePath, confirmed: true }) });
   },
   getStorageUsage(gameId: string) {
     return request<StorageUsage>(`/storage/usage?gameId=${encodeURIComponent(gameId)}`);
   },
-  getStorageSummary() { return request<StorageSummary>("/storage/summary"); },
   getActivity() {
     return request<ActivityEvent[]>("/activity");
-  },
-  getDiagnostics() {
-    return request<Record<string, unknown>>("/diagnostics");
   },
   exportBackup(payload: BackupExportRequest) {
     return request<BackupExportResponse>("/backup/export", {
@@ -239,16 +197,9 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  async getBackupHistory(gameId: string, limit = 20): Promise<BackupHistoryEntry[]> {
-    const payload = await request<unknown>(`/backup/history?gameId=${encodeURIComponent(gameId)}&limit=${limit}`);
-    return normalizeBackupHistory(payload);
-  },
   googleDriveStatus() { return request<{ connected: boolean; ready?: boolean; configurationError?: string; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/status"); },
   connectGoogleDrive() { return request<{ connected: boolean; ready?: boolean; configurationError?: string; accountEmail?: string; reconnectRequired?: boolean; oauthClientSource?: "built_in" | "environment" | "oauth_json"; oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing" }>("/providers/google-drive/connect", { method: "POST" }); },
   disconnectGoogleDrive() { return request<void>("/providers/google-drive/disconnect", { method: "POST" }); },
-  linkGameToCloud(payload: { gameId: string; syncId: string }) {
-    return request<Game>("/games/pair", { method: "POST", body: JSON.stringify(payload) });
-  },
   async getSyncJobs(gameId?: string) {
     const payload = await request<unknown>(`/sync/jobs${gameId ? `?gameId=${encodeURIComponent(gameId)}` : ""}`);
     return normalizeSyncJobs(payload);
@@ -263,12 +214,6 @@ export const api = {
   async getSnapshots(gameId: string): Promise<SnapshotSummary[]> {
     const payload = await request<unknown>(`/snapshots?gameId=${encodeURIComponent(gameId)}`);
     return normalizeSnapshots(payload);
-  },
-  createSnapshot(gameId: string) {
-    return request<SnapshotCreateResponse>("/snapshots", {
-      method: "POST",
-      body: JSON.stringify({ gameId }),
-    });
   },
   restoreSnapshot(gameId: string, snapshotId: string) {
     return request<{ status: string }>("/snapshots/restore", {

@@ -20,14 +20,13 @@ import {
   setAutomaticUpdateChecks,
   updateActionLabel,
 } from "./update";
-import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageSummary, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
-import { ActivityView } from "./views/ActivityView";
+import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
+import { getSaveStatus } from "./utils/saveStatus";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
-import { HomeView } from "./views/HomeView";
 import { SettingsView } from "./views/SettingsView";
 
-type View = "home" | "games" | "game" | "activity" | "settings";
+type View = "games" | "game" | "settings";
 
 type NavSnapshot = {
   view: View;
@@ -41,30 +40,17 @@ const enableAutostart = () => invoke<boolean>("set_autostart", { enabled: true }
 const disableAutostart = () => invoke<boolean>("set_autostart", { enabled: false });
 
 const navItems: Array<{ id: View; label: string }> = [
-  { id: "home", label: "Home" },
   { id: "games", label: "Games" },
-  { id: "activity", label: "Activity" },
   { id: "settings", label: "Settings" },
 ];
 
 const viewTitle: Record<View, string> = {
-  home: "Home",
   games: "Library",
   game: "Game",
-  activity: "Activity",
   settings: "Settings",
 };
 
 function NavIcon({ view }: { view: View }) {
-  if (view === "home") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M3 10.5L12 3l9 7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M6 9.8V20h12V9.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
   if (view === "games" || view === "game") {
     return (
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -72,14 +58,6 @@ function NavIcon({ view }: { view: View }) {
         <path d="M9 10.5v3M7.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         <circle cx="15.7" cy="11.2" r="1" fill="currentColor" />
         <circle cx="17.8" cy="13.3" r="1" fill="currentColor" />
-      </svg>
-    );
-  }
-
-  if (view === "activity") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     );
   }
@@ -99,11 +77,11 @@ function NavIcon({ view }: { view: View }) {
 }
 
 export default function App() {
-  const [activeView, setActiveView] = useState<View>("home");
+  const [activeView, setActiveView] = useState<View>("games");
   const [selectedGameId, setSelectedGameId] = useState("");
 	const gamesRefreshSequence = useRef(0);
 
-  const navHistoryRef = useRef<NavSnapshot[]>([{ view: "home", selectedGameId: "" }]);
+  const navHistoryRef = useRef<NavSnapshot[]>([{ view: "games", selectedGameId: "" }]);
   const navCursorRef = useRef(0);
   const mainPanelRef = useRef<HTMLElement>(null);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -119,7 +97,6 @@ export default function App() {
   const [recoveryPoints, setRecoveryPoints] = useState<RecoveryPoint[]>([]);
   const [recoveryLibrary, setRecoveryLibrary] = useState<RecoveryLibraryEntry[]>([]);
   const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
-  const [storageSummary, setStorageSummary] = useState<StorageSummary | null>(null);
   const [error, setError] = useState<string>("");
   const [toast, setToast] = useState<string>("");
   const [updateState, setUpdateState] = useState<AppUpdateState | null>(null);
@@ -229,17 +206,6 @@ export default function App() {
     }
   }
 
-  async function onBrowseSnapshotVault() {
-    try {
-      const selected = await pickFolder(settings.snapshotVaultPath || undefined);
-      if (selected) {
-        setSettings((current) => ({ ...current, snapshotVaultPath: selected }));
-      }
-    } catch (err) {
-      setError(toFriendlyError(err));
-    }
-  }
-
   async function onBrowseSyncRoot() {
     try {
       const selected = await pickFolder(settings.syncRoot || undefined);
@@ -261,12 +227,11 @@ export default function App() {
   async function refreshGamesData() {
     const sequence = ++gamesRefreshSequence.current;
     try {
-      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary, nextStorageSummary] = await Promise.all([
+      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary] = await Promise.all([
         api.getGames(),
         api.getStatus(),
         api.getSyncJobs(),
         api.getRecoveryLibrary().catch(() => recoveryLibrary),
-        api.getStorageSummary().catch(() => storageSummary),
       ]);
       // Do not let an older in-flight response overwrite newer process state.
       if (sequence !== gamesRefreshSequence.current) return;
@@ -275,7 +240,6 @@ export default function App() {
       setStatus(nextStatus);
       setSyncJobs(nextJobs);
       setRecoveryLibrary(nextRecoveryLibrary);
-      setStorageSummary(nextStorageSummary);
     } catch (e) {
       if (sequence !== gamesRefreshSequence.current) return;
       setError(toFriendlyError(e));
@@ -418,12 +382,12 @@ export default function App() {
 
     let timer: number | undefined;
 
-    if (activeView === "activity") {
+    if (activeView === "settings") {
       void refreshActivityData();
       timer = window.setInterval(() => {
         void refreshActivityData();
       }, VIEW_REFRESH_INTERVAL_MS);
-    } else if (activeView === "home" || activeView === "games" || activeView === "game") {
+    } else if (activeView === "games" || activeView === "game") {
       void refreshGamesData();
       timer = window.setInterval(() => {
         void refreshGamesData();
@@ -438,8 +402,8 @@ export default function App() {
   }, [activeView]);
 
   useEffect(() => {
-    if (activeView !== "home" && activeView !== "games" && activeView !== "game") return;
-    const refreshOnFocus = () => void refreshGamesData();
+    if (activeView !== "games" && activeView !== "game" && activeView !== "settings") return;
+    const refreshOnFocus = () => void (activeView === "settings" ? refreshActivityData() : refreshGamesData());
     window.addEventListener("focus", refreshOnFocus);
     return () => window.removeEventListener("focus", refreshOnFocus);
   }, [activeView]);
@@ -608,23 +572,13 @@ export default function App() {
     }
   }
 
-  async function onTriggerSync() {
-    try {
-      const result = await api.triggerSync();
-      setToast(`Global sync queued (${result.jobId.slice(0, 8)})`);
-      await refreshGamesData();
-    } catch (err) {
-      setError(toFriendlyError(err));
-    }
-  }
-
   async function onSyncSelectedGame() {
     if (!selectedGame) {
       return;
     }
     try {
       const result = await api.syncGame({ gameId: selectedGame.id });
-      setToast(`Cloud Sync started (${result.jobId.slice(0, 8)})`);
+      setToast(`Backup started (${result.jobId.slice(0, 8)})`);
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -750,7 +704,7 @@ export default function App() {
     try {
       const updated = await api.updateGameProtectionPolicy({ gameId: selectedGame.id, policy });
       setGames((existing) => existing.map((game) => game.id === updated.id ? updated : game));
-      setToast("Cloud Sync policy saved");
+      setToast("Backup options saved");
       return true;
     } catch (err) {
       setError(toFriendlyError(err));
@@ -791,7 +745,7 @@ export default function App() {
       const saved = await api.saveSettings({ protectionTarget: settings.protectionTarget, syncRoot: settings.syncRoot });
       setSettings((current) => ({ ...current, ...saved }));
       setStatus(await api.getStatus());
-      setToast("Cloud Sync destination saved");
+      setToast("Save location updated");
     } catch (err) { setError(toFriendlyError(err)); }
   }
 
@@ -814,12 +768,12 @@ export default function App() {
         protectionEnabled,
         pauseScope,
         duration,
-        reason: !protectionEnabled ? "Cloud Sync disabled by user" : pauseScope === "uploads" ? "Cloud uploads paused by user" : pauseScope === "all" ? "Cloud Sync paused by user" : "",
+        reason: !protectionEnabled ? "Backups turned off by user" : pauseScope === "uploads" ? "Cloud backups paused by user" : pauseScope === "all" ? "Backups paused by user" : "",
       });
       if (!gameId) {
         setSettings((current) => ({ ...current, serviceControl: { protectionEnabled, pauseScope } }));
       }
-      setToast(!protectionEnabled ? "Cloud Sync disabled" : pauseScope === "none" ? "Cloud Sync resumed" : pauseScope === "uploads" ? "Cloud uploads paused; local sync continues" : "Cloud Sync paused");
+      setToast(!protectionEnabled ? "Backups turned off" : pauseScope === "none" ? "Backups resumed" : pauseScope === "uploads" ? "Cloud backups paused; local backups continue" : "Backups paused");
       await refreshGamesData();
     } catch (err) {
       setError(toFriendlyError(err));
@@ -873,16 +827,6 @@ export default function App() {
     }
   }
 
-  async function onCopyDiagnostics() {
-    try {
-      const report = await api.getDiagnostics();
-      await navigator.clipboard.writeText(JSON.stringify(report, null, 2));
-      setToast("Sanitized diagnostics copied");
-    } catch (err) {
-      setError(toFriendlyError(err));
-    }
-  }
-
   async function onRestoreRecoveryEntry(entry: RecoveryLibraryEntry) {
     try {
       const executablePath = await pickExecutable();
@@ -903,7 +847,7 @@ export default function App() {
       const status = await api.connectGoogleDrive();
       setSettings((s) => ({ ...s, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
 		await refreshGamesData();
-      setToast("Google Drive connected. Save Settings to use it for Cloud Sync.");
+      setToast("Google Drive connected. Save Settings to use it for backups.");
     } catch (err) {
       setError(`Google Drive could not be connected: ${toFriendlyError(err)}`);
     }
@@ -964,13 +908,6 @@ export default function App() {
     try { await api.resolveSyncConflict(id, action); setToast("Sync conflict resolved"); await Promise.all([refreshSyncConflicts(selectedGame.id), refreshGamesData()]); } catch (err) { setError(toFriendlyError(err)); }
   }
 
-  async function onLinkCloudGame() {
-    if (!selectedGame) return;
-    const syncId = window.prompt("Paste the Cloud game ID from your other computer.", selectedGame.syncId ?? "");
-    if (!syncId?.trim()) return;
-    try { await api.linkGameToCloud({ gameId: selectedGame.id, syncId: syncId.trim() }); setToast("Cloud game linked"); await refreshGamesData(); } catch (err) { setError(toFriendlyError(err)); }
-  }
-
   function openGame(gameId: string) {
     setExportPath("");
     setImportPath("");
@@ -981,17 +918,6 @@ export default function App() {
     setImportOperationMessage("");
     setSnapshots([]);
     pushNavigation("game", gameId);
-  }
-
-  function initials(name: string): string {
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) {
-      return "GS";
-    }
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   }
 
   function safeDateTime(input: string): string {
@@ -1082,6 +1008,14 @@ export default function App() {
     }
   }
 
+  const sidebarSaveStatus = getSaveStatus({
+    provider: status?.provider,
+    serviceControl: status?.serviceControl,
+    conflictCount: status?.conflictCount,
+    pendingCount: status?.pending,
+    active: Boolean(status?.activeJobId),
+  });
+
   return (
     <div className="app-layout" data-theme={isDarkTheme ? "dark" : "light"}>
       <header className="app-utility">
@@ -1112,7 +1046,7 @@ export default function App() {
         <nav className="side-nav">
           {navItems.map((item) => {
             const isActive = activeView === item.id || (item.id === "games" && activeView === "game");
-            const count = item.id === "games" ? games.length : item.id === "activity" ? syncConflicts.length : 0;
+            const count = item.id === "games" ? games.length : 0;
             return (
             <button
               key={item.id}
@@ -1130,9 +1064,8 @@ export default function App() {
           })}
         </nav>
         <div className="sidebar-status">
-          <span>Cloud Sync</span>
-          <strong>{status?.protectionTarget === "google_drive" ? "Google Drive" : status?.protectionTarget === "folder" ? "Synced folder" : "Local only"}</strong>
-          <span>{status?.serviceControl.pauseScope !== "none" ? "paused" : (status?.provider.state ?? "starting").replace(/_/g, " ")} · {status?.pending ?? 0} pending · {status?.conflictCount ?? 0} conflicts</span>
+          <span>Game saves</span>
+          <strong className={sidebarSaveStatus.tone}>{sidebarSaveStatus.label}</strong>
         </div>
       </aside>
 
@@ -1159,20 +1092,6 @@ export default function App() {
         ) : null}
         {toast ? <div className="banner toast">{toast}</div> : null}
 
-        {activeView === "home" ? (
-          <HomeView
-            games={games}
-            onOpenLibrary={() => pushNavigation("games")}
-            onOpenActivity={() => pushNavigation("activity")}
-            onOpenGame={openGame}
-            initials={initials}
-            status={status}
-            recoveryLibrary={recoveryLibrary}
-            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
-            storageSummary={storageSummary}
-          />
-        ) : null}
-
         {activeView === "games" ? (
           <GamesView
             games={games}
@@ -1188,7 +1107,6 @@ export default function App() {
             onNewVersionChange={setNewVersion}
             onAddGame={onAddGame}
             onOpenGame={openGame}
-            initials={initials}
           />
         ) : null}
 
@@ -1200,6 +1118,7 @@ export default function App() {
             mergeOnImport={mergeOnImport}
             onBack={() => pushNavigation("games")}
             onPlay={() => void onPlaySelectedGame()}
+            onOpenSettings={() => pushNavigation("settings")}
             onCreateShortcut={() => void onCreateRoveShortcut()}
             onProtect={() => void onSyncSelectedGame()}
             onDelete={() => void onDeleteSelectedGame()}
@@ -1235,16 +1154,6 @@ export default function App() {
           />
         ) : null}
 
-        {activeView === "activity" ? (
-          <ActivityView
-            events={activityEvents}
-            status={status}
-            onRefresh={() => void refreshActivityData()}
-            onCopyDiagnostics={() => void onCopyDiagnostics()}
-            safeTime={safeTime}
-          />
-        ) : null}
-
         {activeView === "settings" ? (
           <SettingsView
             settings={settings}
@@ -1271,6 +1180,11 @@ export default function App() {
             onAutomaticUpdateChecks={(enabled) => void onAutomaticUpdateChecks(enabled)}
             onViewUpdateNotes={() => setUpdateNotesOpen(true)}
             onDownloadLogs={() => { api.downloadLogsZip().catch((err: unknown) => setError(toFriendlyError(err))); }}
+            activityEvents={activityEvents}
+            safeTime={safeTime}
+            recoveryLibrary={recoveryLibrary}
+            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
+            onOpenGame={openGame}
           />
         ) : null}
       </main>

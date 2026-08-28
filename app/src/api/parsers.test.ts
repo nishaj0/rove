@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  normalizeBackupHistory,
   normalizeGames,
   normalizeLogs,
   normalizeSettings,
@@ -14,7 +13,6 @@ import { newDefaultSettings } from "../constants/defaults";
 describe("API response parsers", () => {
   it("return safe empty collections for malformed collection payloads", () => {
     expect(normalizeGames(null)).toEqual([]);
-    expect(normalizeBackupHistory({})).toEqual([]);
     expect(normalizeSnapshots("not an array")).toEqual([]);
     expect(normalizeLogs(undefined)).toEqual([]);
     expect(normalizeSyncJobs({})).toEqual([]);
@@ -73,7 +71,7 @@ describe("API response parsers", () => {
     expect(parsed.googleDrive).toEqual({ connected: true, accountEmail: "", reconnectRequired: false, oauthClientSource: "environment", oauthCredentialSource: undefined });
   });
 
-  it("normalizes status, jobs, conflicts, history, snapshots, and logs", () => {
+  it("normalizes status, jobs, conflicts, snapshots, and logs", () => {
     expect(normalizeStatus({
       running: true,
       protectionTarget: "folder",
@@ -90,7 +88,6 @@ describe("API response parsers", () => {
     });
     expect(normalizeSyncJobs([{ id: 1, conflictIds: ["c1", 2], state: "queued" }])).toEqual([expect.objectContaining({ id: "", conflictIds: ["c1"], state: "queued" })]);
     expect(normalizeSyncConflicts([{ id: 1, gameId: "g", path: "slot.dat" }])).toEqual([expect.objectContaining({ id: "", gameId: "g", path: "slot.dat" })]);
-    expect(normalizeBackupHistory([{ id: "bad", status: "failed" }])).toEqual([expect.objectContaining({ id: 0, status: "failed" })]);
     expect(normalizeSnapshots([{ id: "s1", seq: "bad" }])).toEqual([expect.objectContaining({ id: "s1", seq: 0 })]);
     expect(normalizeLogs([{ id: "bad", level: "warn" }])).toEqual([expect.objectContaining({ id: 0, level: "warn", event: "app" })]);
   });

@@ -62,16 +62,6 @@ export interface BackupPolicy {
   retentionCount: number;
 }
 
-export interface BackupHistoryEntry {
-  id: number;
-  gameId: string;
-  path: string;
-  createdAt: string;
-  reason: string;
-  signature: string;
-  status: string;
-}
-
 export interface SnapshotSummary {
   id: string;
   seq: number;
@@ -253,15 +243,6 @@ export interface StorageUsage {
   reclaimableBytes: number;
 }
 
-export interface StorageSummary {
-  localBytes: number;
-  cloudBytes: number;
-  pendingBytes: number;
-  reclaimableBytes: number;
-  gameCount: number;
-  cloudAvailable: boolean;
-}
-
 export interface SyncConflict {
   id: string;
   gameId: string;
@@ -278,19 +259,6 @@ export interface LogEntry {
   level: string;
   event: string;
   message: string;
-}
-
-export interface DebugInfo {
-  debug: boolean;
-  pid: number;
-  startedAt: string;
-  uptimeSec: number;
-  port: number;
-  configPath: string;
-  sqlitePath: string;
-  exePath: string;
-  startupCommand?: string;
-  startupCommandExists?: boolean;
 }
 
 export interface BackupExportRequest {
@@ -317,9 +285,4 @@ export interface PlayGameRequest {
 
 export interface SyncGameRequest {
   gameId: string;
-}
-
-export interface SnapshotCreateResponse {
-  status: string;
-  snapshot?: SnapshotSummary | null;
 }
