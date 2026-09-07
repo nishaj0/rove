@@ -307,10 +307,29 @@ func (m *Manager) Update(next models.Settings) error {
 }
 
 // SetGoogleDriveConnection persists encrypted credentials after an OAuth flow.
+// Any previously chosen folder selection is preserved so re-connecting does
+// not require the user to pick a folder again.
 func (m *Manager) SetGoogleDriveConnection(email, encryptedRefreshToken string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.settings.GoogleDrive = models.GoogleDriveSettings{Connected: true, AccountEmail: strings.TrimSpace(email), EncryptedRefreshToken: encryptedRefreshToken}
+	existing := m.settings.GoogleDrive
+	m.settings.GoogleDrive = models.GoogleDriveSettings{
+		Connected:             true,
+		AccountEmail:          strings.TrimSpace(email),
+		EncryptedRefreshToken: encryptedRefreshToken,
+		FolderID:              existing.FolderID,
+		FolderName:            existing.FolderName,
+	}
+	return m.saveLocked()
+}
+
+// SetGoogleDriveFolderID persists the user-chosen Drive folder without
+// touching the stored OAuth credentials.
+func (m *Manager) SetGoogleDriveFolderID(id, name string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.settings.GoogleDrive.FolderID = strings.TrimSpace(id)
+	m.settings.GoogleDrive.FolderName = strings.TrimSpace(name)
 	return m.saveLocked()
 }
 
@@ -589,7 +608,7 @@ func preserveInvalidSettings(path string, payload []byte) (string, error) {
 
 func writeFileAtomically(path string, payload []byte, mode os.FileMode) error {
 	dir := filepath.Dir(path)
-	temp, err := os.CreateTemp(dir, ".cloud-saver-settings-*.tmp")
+	temp, err := os.CreateTemp(dir, ".rove-settings-*.tmp")
 	if err != nil {
 		return err
 	}

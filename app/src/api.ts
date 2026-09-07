@@ -3,10 +3,12 @@ import type {
   BackupExportRequest,
   BackupExportResponse,
   BackupImportRequest,
+  DriveFolder,
   Game,
   GameProtectionStatus,
   PlayGameRequest,
   RecoveryLibraryEntry,
+  RoveSettings,
   StorageUsage,
   RecoveryPoint,
   Revision,
@@ -134,7 +136,7 @@ export const api = {
     const url = URL.createObjectURL(blob);
     const disposition = res.headers.get("Content-Disposition") ?? "";
     const nameMatch = /filename="?([^"]+)"?/.exec(disposition);
-    const filename = nameMatch ? nameMatch[1] : "cloud-saver-logs.zip";
+    const filename = nameMatch ? nameMatch[1] : "rove-logs.zip";
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
@@ -224,6 +226,49 @@ export const api = {
   deleteSnapshot(gameId: string, snapshotId: string) {
     return request<void>(`/snapshots/${encodeURIComponent(snapshotId)}?gameId=${encodeURIComponent(gameId)}`, {
       method: "DELETE",
+    });
+  },
+  // Google Drive folder picker
+  listGoogleDriveFolders() {
+    return request<DriveFolder[]>("/providers/google-drive/folders");
+  },
+  setGoogleDriveFolder(folderId: string, folderName: string) {
+    return request<{ connected: boolean; folderId?: string; folderName?: string }>("/providers/google-drive/folder", {
+      method: "POST",
+      body: JSON.stringify({ folderId, folderName }),
+    });
+  },
+  createGoogleDriveFolder(createName: string) {
+    return request<{ connected: boolean; folderId?: string; folderName?: string }>("/providers/google-drive/folder", {
+      method: "POST",
+      body: JSON.stringify({ createName }),
+    });
+  },
+  // Settings export / import
+  async exportSettings(): Promise<void> {
+    const res = await fetch(`${BACKEND_BASE_URL}/settings/export`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "rove-settings.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  },
+  importSettings(settings: RoveSettings) {
+    return request<{ status: string }>("/settings/import", {
+      method: "POST",
+      body: JSON.stringify(settings),
+    });
+  },
+  // Recovery point: restore to an existing tracked game
+  restoreRecoveryPointToGame(recoveryPointId: string, gameId: string) {
+    return request<{ status: string; revisionId: string }>("/recovery-points/restore-to-game", {
+      method: "POST",
+      body: JSON.stringify({ recoveryPointId, gameId, confirmed: true }),
     });
   },
 };

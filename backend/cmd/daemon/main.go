@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	if !debug {
-		debug = os.Getenv("CLOUD_SAVER_DEBUG") == "1"
+		debug = os.Getenv("ROVE_DEBUG") == "1" || os.Getenv("CLOUD_SAVER_DEBUG") == "1"
 	}
 	release, acquired, err := singleinstance.AcquireDaemon()
 	if err != nil {

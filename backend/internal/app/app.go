@@ -88,7 +88,7 @@ func New(opts Options) (*Application, error) {
 			if err != nil {
 				return nil, err
 			}
-			return googledrivestore.New(ctx, client)
+			return googledrivestore.New(ctx, client, settings.GoogleDrive.FolderID)
 		}
 		return syncer.NewFolderStore(settings.SyncRoot), nil
 	})

@@ -11,8 +11,31 @@ export interface GoogleDriveConnection {
 	configurationError?: string;
   accountEmail?: string;
   reconnectRequired?: boolean;
+  folderId?: string;
+  folderName?: string;
   oauthClientSource?: "built_in" | "environment" | "oauth_json";
   oauthCredentialSource?: "release_embedded" | "environment" | "oauth_json" | "missing";
+}
+
+export interface DriveFolder {
+  id: string;
+  name: string;
+}
+
+export interface RoveSettings {
+  schemaVersion: number;
+  deviceName?: string;
+  ignorePatterns?: string[];
+  syncIntervalSec?: number;
+  exportedAt?: string;
+}
+
+export interface GameConfig {
+  syncId: string;
+  displayName: string;
+  totalPlaytimeSec?: number;
+  notes?: string;
+  updatedAt: string;
 }
 
 export interface SyncPolicy {

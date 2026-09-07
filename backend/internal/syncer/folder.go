@@ -25,7 +25,7 @@ import (
 	"cloud-saver/backend/internal/models"
 )
 
-const protocolDirectory = ".cloud-saver/v1"
+const protocolDirectory = ".rove/v1"
 
 type manifestFile struct {
 	Hash string `json:"hash"`
@@ -721,7 +721,7 @@ func copyFile(source, target string) (int64, error) {
 }
 
 func copyFileAtomic(source, target string) error {
-	tmp := target + ".cloud-saver-" + uuid.NewString() + ".tmp"
+	tmp := target + ".rove-" + uuid.NewString() + ".tmp"
 	if _, err := copyFile(source, tmp); err != nil {
 		return err
 	}

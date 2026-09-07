@@ -123,7 +123,7 @@ func copyReaderAtomic(in io.Reader, target string) error {
 }
 
 func copyReaderAtomicVerified(in io.Reader, target, expectedHash string) error {
-	tmp := target + ".cloud-saver-" + uuid.NewString() + ".tmp"
+	tmp := target + ".rove-" + uuid.NewString() + ".tmp"
 	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 		return err
 	}

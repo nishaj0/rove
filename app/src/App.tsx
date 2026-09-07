@@ -1185,6 +1185,25 @@ export default function App() {
             recoveryLibrary={recoveryLibrary}
             onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
             onOpenGame={openGame}
+            onListDriveFolders={() => api.listGoogleDriveFolders()}
+            onSetDriveFolder={async (id, name) => {
+              await api.setGoogleDriveFolder(id, name);
+              setSettings((s) => ({ ...s, googleDrive: { ...s.googleDrive, folderId: id, folderName: name } }));
+              setToast(`Drive folder set to "${name}".`);
+            }}
+            onCreateDriveFolder={async (name) => {
+              const result = await api.createGoogleDriveFolder(name);
+              setSettings((s) => ({ ...s, googleDrive: { ...s.googleDrive, folderId: result.folderId, folderName: result.folderName ?? name } }));
+              setToast(`Created and selected Drive folder "${result.folderName ?? name}".`);
+            }}
+            onExportSettings={async () => {
+              try { await api.exportSettings(); } catch (err) { setError(toFriendlyError(err)); }
+            }}
+            onImportSettingsFile={() => {
+              // The file picker and parsing happen inside SettingsView;
+              // we expose the api method for a direct JSON import if needed.
+              void api.importSettings({ schemaVersion: 1 });
+            }}
           />
         ) : null}
       </main>

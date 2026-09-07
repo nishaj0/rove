@@ -2,7 +2,7 @@ package branding
 
 const (
 	DisplayName    = "Rove"
-	InternalName   = "CloudSaver"
+	InternalName   = "Rove"
 	BackupsDirName = "backups"
 )
 

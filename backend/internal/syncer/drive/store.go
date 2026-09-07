@@ -40,12 +40,13 @@ var driveMediaOptions = []googleapi.MediaOption{
 
 // Store maps the immutable Rove revision layout to Drive folders/files.
 type Store struct {
-	service *drive.Service
-	mu      sync.Mutex
-	folders map[string]string
+	service      *drive.Service
+	mu           sync.Mutex
+	folders      map[string]string
+	rootFolderID string // Drive folder ID chosen by the user; empty means Drive root
 }
 
-func New(ctx context.Context, client *http.Client) (*Store, error) {
+func New(ctx context.Context, client *http.Client, rootFolderID string) (*Store, error) {
 	if client == nil {
 		return nil, errors.New("Google Drive client is unavailable")
 	}
@@ -55,7 +56,11 @@ func New(ctx context.Context, client *http.Client) (*Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Store{service: svc, folders: map[string]string{}}, nil
+	root := strings.TrimSpace(rootFolderID)
+	if root == "" {
+		root = "root"
+	}
+	return &Store{service: svc, folders: map[string]string{}, rootFolderID: root}, nil
 }
 
 func (s *Store) ReadHead(ctx context.Context, syncID string) (string, error) {
@@ -94,7 +99,7 @@ func (s *Store) WriteGameProfile(ctx context.Context, profile models.GameProfile
 	return s.writeNamedFile(ctx, profile.SyncID, "game.json", payload, false)
 }
 func (s *Store) ListGameProfiles(ctx context.Context) ([]models.GameProfile, error) {
-	query := "appProperties has { key='cloudSaverType' and value='game_profile' } and trashed = false"
+	query := "appProperties has { key='roveType' and value='game_profile' } and trashed = false"
 	pageToken := ""
 	result := []models.GameProfile{}
 	for {
@@ -145,7 +150,7 @@ func (s *Store) WritePlaytimeLedger(ctx context.Context, syncID string, ledger m
 	return s.writeNamedFile(ctx, syncID, "playtime/"+ledger.DeviceID+".json", payload, false)
 }
 func (s *Store) ListPlaytimeLedgers(ctx context.Context, syncID string) ([]models.PlaytimeLedger, error) {
-	query := fmt.Sprintf("appProperties has { key='cloudSaverType' and value='playtime' } and appProperties has { key='syncId' and value='%s' } and trashed = false", strings.ReplaceAll(syncID, "'", "\\'"))
+	query := fmt.Sprintf("appProperties has { key='roveType' and value='playtime' } and appProperties has { key='syncId' and value='%s' } and trashed = false", strings.ReplaceAll(syncID, "'", "\\'"))
 	pageToken := ""
 	result := []models.PlaytimeLedger{}
 	for {
@@ -226,6 +231,130 @@ func (s *Store) ArchiveDisplaced(ctx context.Context, syncID, deviceID, relPath 
 	return s.writeNamedReader(ctx, syncID, name, r, true)
 }
 
+// WriteRoveSettings stores a portable app-settings snapshot at
+// <root>/.rove/v1/rove-settings.json. This file is not game-specific.
+func (s *Store) WriteRoveSettings(ctx context.Context, settings models.RoveSettings) error {
+	payload, err := json.Marshal(settings)
+	if err != nil {
+		return err
+	}
+	return s.writeGlobalFile(ctx, "rove-settings.json", payload)
+}
+
+// ReadRoveSettings retrieves the portable settings file, returning
+// errNotFound if one has not been saved yet.
+func (s *Store) ReadRoveSettings(ctx context.Context) (models.RoveSettings, error) {
+	payload, err := s.readGlobalFile(ctx, "rove-settings.json")
+	if err != nil {
+		return models.RoveSettings{}, err
+	}
+	var settings models.RoveSettings
+	if err := json.Unmarshal(payload, &settings); err != nil {
+		return models.RoveSettings{}, fmt.Errorf("decode rove-settings.json: %w", err)
+	}
+	return settings, nil
+}
+
+// WriteGameConfig stores per-game user metadata alongside the revision data.
+func (s *Store) WriteGameConfig(ctx context.Context, config models.GameConfig) error {
+	payload, err := json.Marshal(config)
+	if err != nil {
+		return err
+	}
+	return s.writeNamedFile(ctx, config.SyncID, "game-config.json", payload, false)
+}
+
+// ReadGameConfig retrieves the per-game config, returning errNotFound if it
+// does not exist yet.
+func (s *Store) ReadGameConfig(ctx context.Context, syncID string) (models.GameConfig, error) {
+	payload, err := s.readFile(ctx, syncID, "game-config.json")
+	if err != nil {
+		return models.GameConfig{}, err
+	}
+	var config models.GameConfig
+	if err := json.Unmarshal(payload, &config); err != nil {
+		return models.GameConfig{}, fmt.Errorf("decode game-config.json: %w", err)
+	}
+	return config, nil
+}
+
+// ListFolders returns the top-level folders visible to the app so the user
+// can choose a root folder for Rove data during setup.
+func (s *Store) ListFolders(ctx context.Context) ([]models.DriveFolder, error) {
+	q := fmt.Sprintf("mimeType = '%s' and trashed = false and '%s' in parents", folderMIMEType, s.rootFolderID)
+	result := []models.DriveFolder{}
+	pageToken := ""
+	for {
+		call := s.service.Files.List().Q(q).Fields("nextPageToken,files(id,name)").PageSize(100).OrderBy("name").Context(ctx)
+		if pageToken != "" {
+			call = call.PageToken(pageToken)
+		}
+		page, err := call.Do()
+		if err != nil {
+			return nil, wrapDriveError(err)
+		}
+		for _, f := range page.Files {
+			result = append(result, models.DriveFolder{ID: f.Id, Name: f.Name})
+		}
+		if page.NextPageToken == "" {
+			break
+		}
+		pageToken = page.NextPageToken
+	}
+	return result, nil
+}
+
+// writeGlobalFile writes a file directly under <root>/.rove/v1/ (no syncID).
+func (s *Store) writeGlobalFile(ctx context.Context, name string, data []byte) error {
+	parent := s.rootFolderID
+	var err error
+	for _, segment := range []string{".rove", "v1"} {
+		parent, err = s.ensureFolder(ctx, parent, segment)
+		if err != nil {
+			return err
+		}
+	}
+	existing, findErr := s.findChild(ctx, parent, name)
+	if findErr == nil {
+		_, err = s.service.Files.Update(existing.Id, &drive.File{
+			AppProperties: map[string]string{"roveType": "settings"},
+		}).Media(bytes.NewReader(data), driveMediaOptions...).Context(ctx).Do()
+		return wrapDriveError(err)
+	}
+	if !errors.Is(findErr, errNotFound) {
+		return findErr
+	}
+	_, err = s.service.Files.Create(&drive.File{
+		Name:          name,
+		Parents:       []string{parent},
+		AppProperties: map[string]string{"roveType": "settings"},
+	}).Media(bytes.NewReader(data), driveMediaOptions...).Context(ctx).Do()
+	return wrapDriveError(err)
+}
+
+// readGlobalFile reads a file directly from <root>/.rove/v1/.
+func (s *Store) readGlobalFile(ctx context.Context, name string) ([]byte, error) {
+	parent := s.rootFolderID
+	var err error
+	for _, segment := range []string{".rove", "v1"} {
+		parent, err = s.ensureFolder(ctx, parent, segment)
+		if err != nil {
+			return nil, err
+		}
+	}
+	file, err := s.findChild(ctx, parent, name)
+	if err != nil {
+		return nil, err
+	}
+	response, err := s.service.Files.Get(file.Id).Context(ctx).Download()
+	if err != nil {
+		return nil, wrapDriveError(err)
+	}
+	defer response.Body.Close()
+	return io.ReadAll(response.Body)
+}
+
+
 var errNotFound = errors.New("Google Drive file not found")
 
 func (s *Store) readFile(ctx context.Context, syncID, name string) ([]byte, error) {
@@ -263,7 +392,7 @@ func (s *Store) writeNamedReader(ctx context.Context, syncID, logicalName string
 			return nil
 		}
 		_, err = s.service.Files.Update(existing.Id, &drive.File{
-			AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
+			AppProperties: map[string]string{"roveType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
 		}).Media(data, driveMediaOptions...).Context(ctx).Do()
 		return wrapDriveError(err)
 	}
@@ -273,7 +402,7 @@ func (s *Store) writeNamedReader(ctx context.Context, syncID, logicalName string
 	_, err = s.service.Files.Create(&drive.File{
 		Name:          name,
 		Parents:       []string{parent},
-		AppProperties: map[string]string{"cloudSaverType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
+		AppProperties: map[string]string{"roveType": logicalType(logicalName), "syncId": syncID, "logicalName": logicalName},
 	}).Media(data, driveMediaOptions...).Context(ctx).Do()
 	return wrapDriveError(err)
 }
@@ -313,9 +442,9 @@ func (s *Store) parentAndName(ctx context.Context, syncID, logicalName string) (
 	if len(parts) == 0 || parts[0] == "" {
 		return "", "", errors.New("invalid Google Drive path")
 	}
-	segments := []string{".cloud-saver", "v1", "games", syncID}
+	segments := []string{".rove", "v1", "games", syncID}
 	segments = append(segments, parts[:len(parts)-1]...)
-	parent := "root"
+	parent := s.rootFolderID
 	var err error
 	for _, segment := range segments {
 		parent, err = s.ensureFolder(ctx, parent, segment)

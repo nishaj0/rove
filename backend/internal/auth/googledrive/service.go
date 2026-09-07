@@ -109,7 +109,7 @@ func (s *Service) Connect(ctx context.Context) (models.GoogleDriveSettings, erro
 		return models.GoogleDriveSettings{}, errors.New("Google Drive connection is not configured for this build")
 	}
 	if s.clientSecret == "" {
-		return models.GoogleDriveSettings{}, errors.New("Google OAuth client credential is missing in this development build. Set CLOUD_SAVER_GOOGLE_OAUTH_JSON to the downloaded Desktop OAuth JSON, or inject CLOUD_SAVER_GOOGLE_CLIENT_SECRET when building")
+		return models.GoogleDriveSettings{}, errors.New("Google OAuth client credential is missing in this development build. Set ROVE_GOOGLE_OAUTH_JSON to the downloaded Desktop OAuth JSON, or inject ROVE_GOOGLE_CLIENT_SECRET when building")
 	}
 	listener, err := net.Listen("tcp4", "127.0.0.1:0")
 	if err != nil {
@@ -290,6 +290,68 @@ func (s *Service) oauthConfig(redirect string) *oauth2.Config {
 	return &oauth2.Config{ClientID: s.clientID, ClientSecret: s.clientSecret, Endpoint: endpoint, RedirectURL: redirect, Scopes: []string{scope}}
 }
 
+// ListFolders returns the top-level Drive folders visible to this app so the
+// user can select a root location for Rove data.
+func (s *Service) ListFolders(ctx context.Context) ([]models.DriveFolder, error) {
+	client, err := s.HTTPClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	svc, err := drive.NewService(ctx, option.WithHTTPClient(client), option.WithScopes(scope))
+	if err != nil {
+		return nil, err
+	}
+	q := "mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'root' in parents"
+	result := []models.DriveFolder{}
+	pageToken := ""
+	for {
+		call := svc.Files.List().Q(q).Fields("nextPageToken,files(id,name)").PageSize(100).OrderBy("name").Context(ctx)
+		if pageToken != "" {
+			call = call.PageToken(pageToken)
+		}
+		page, err := call.Do()
+		if err != nil {
+			return nil, err
+		}
+		for _, f := range page.Files {
+			result = append(result, models.DriveFolder{ID: f.Id, Name: f.Name})
+		}
+		if page.NextPageToken == "" {
+			break
+		}
+		pageToken = page.NextPageToken
+	}
+	return result, nil
+}
+
+// CreateFolder creates a new top-level folder in My Drive and returns it.
+func (s *Service) CreateFolder(ctx context.Context, name string) (models.DriveFolder, error) {
+	client, err := s.HTTPClient(ctx)
+	if err != nil {
+		return models.DriveFolder{}, err
+	}
+	svc, err := drive.NewService(ctx, option.WithHTTPClient(client), option.WithScopes(scope))
+	if err != nil {
+		return models.DriveFolder{}, err
+	}
+	f, err := svc.Files.Create(&drive.File{
+		Name:     name,
+		MimeType: "application/vnd.google-apps.folder",
+		Parents:  []string{"root"},
+	}).Fields("id,name").Context(ctx).Do()
+	if err != nil {
+		return models.DriveFolder{}, err
+	}
+	return models.DriveFolder{ID: f.Id, Name: f.Name}, nil
+}
+
+// SetFolder persists the user-chosen folder without touching OAuth credentials.
+func (s *Service) SetFolder(folderID, folderName string) error {
+	return s.cfg.SetGoogleDriveFolderID(folderID, folderName)
+}
+
+
+
 type callbackResult struct {
 	code string
 	err  error
@@ -354,8 +416,10 @@ type oauthJSONClient struct {
 }
 
 func loadClientConfiguration() (clientID, clientSecret, clientSource, secretSource string, configErr error) {
-	clientID = strings.TrimSpace(os.Getenv("CLOUD_SAVER_GOOGLE_CLIENT_ID"))
-	clientSecret = strings.TrimSpace(os.Getenv("CLOUD_SAVER_GOOGLE_CLIENT_SECRET"))
+	// ROVE_GOOGLE_* is the canonical name; CLOUD_SAVER_GOOGLE_* is kept for
+	// backwards compatibility with existing developer environments.
+	clientID = strings.TrimSpace(firstNonEmpty(os.Getenv("ROVE_GOOGLE_CLIENT_ID"), os.Getenv("CLOUD_SAVER_GOOGLE_CLIENT_ID")))
+	clientSecret = strings.TrimSpace(firstNonEmpty(os.Getenv("ROVE_GOOGLE_CLIENT_SECRET"), os.Getenv("CLOUD_SAVER_GOOGLE_CLIENT_SECRET")))
 	if clientID != "" {
 		clientSource = "environment"
 	}
@@ -363,7 +427,7 @@ func loadClientConfiguration() (clientID, clientSecret, clientSource, secretSour
 		secretSource = "environment"
 	}
 
-	jsonPath := strings.TrimSpace(os.Getenv("CLOUD_SAVER_GOOGLE_OAUTH_JSON"))
+	jsonPath := strings.TrimSpace(firstNonEmpty(os.Getenv("ROVE_GOOGLE_OAUTH_JSON"), os.Getenv("CLOUD_SAVER_GOOGLE_OAUTH_JSON")))
 	if jsonPath != "" && (clientID == "" || clientSecret == "") {
 		payload, err := os.ReadFile(jsonPath)
 		if err != nil {
@@ -398,6 +462,15 @@ func loadClientConfiguration() (clientID, clientSecret, clientSource, secretSour
 		secretSource = "missing"
 	}
 	return clientID, clientSecret, clientSource, secretSource, nil
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, v := range values {
+		if v != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 func newVerifier() (string, error) { return randomURLToken(64) }

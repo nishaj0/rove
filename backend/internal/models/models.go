@@ -93,6 +93,39 @@ type GoogleDriveSettings struct {
 	AccountEmail          string `json:"accountEmail,omitempty"`
 	EncryptedRefreshToken string `json:"encryptedRefreshToken,omitempty"`
 	ReconnectRequired     bool   `json:"reconnectRequired,omitempty"`
+	// FolderID is the Google Drive folder ID chosen by the user during setup.
+	// When empty, Rove stores files directly under My Drive.
+	FolderID   string `json:"folderId,omitempty"`
+	FolderName string `json:"folderName,omitempty"`
+}
+
+// DriveFolder is a user-visible Google Drive folder returned by the folder
+// picker API so the user can choose where Rove stores its data.
+type DriveFolder struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// GameConfig is a writable per-game metadata file stored in the user's chosen
+// Drive folder alongside the sync revision data. It carries human-readable
+// display names, notes, and aggregated playtime totals.
+type GameConfig struct {
+	SchemaVersion    int       `json:"schemaVersion,omitempty"`
+	SyncID           string    `json:"syncId"`
+	DisplayName      string    `json:"displayName"`
+	TotalPlaytimeSec int64     `json:"totalPlaytimeSec,omitempty"`
+	Notes            string    `json:"notes,omitempty"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+}
+
+// RoveSettings is a portable snapshot of application-level preferences that
+// can be exported from one installation and imported on another.
+type RoveSettings struct {
+	SchemaVersion   int      `json:"schemaVersion"`
+	DeviceName      string   `json:"deviceName,omitempty"`
+	IgnorePatterns  []string `json:"ignorePatterns,omitempty"`
+	SyncIntervalSec int      `json:"syncIntervalSec,omitempty"`
+	ExportedAt      string   `json:"exportedAt,omitempty"`
 }
 
 // stores per-game rules for automatic local backups.

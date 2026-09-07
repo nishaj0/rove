@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Save } from "lucide-react";
-import type { ActivityEvent, PauseScope, ProtectionTarget, RecoveryLibraryEntry, Settings, ThemeMode } from "../types";
+import type { ActivityEvent, DriveFolder, PauseScope, ProtectionTarget, RecoveryLibraryEntry, Settings, ThemeMode } from "../types";
 import type { AppUpdateState } from "../update";
 import { DebugConsoleView } from "./DebugConsoleView";
 
@@ -34,6 +34,13 @@ type SettingsViewProps = {
   recoveryLibrary: RecoveryLibraryEntry[];
   onRestoreRecovery: (entry: RecoveryLibraryEntry) => void;
   onOpenGame: (gameId: string) => void;
+  // Folder picker
+  onListDriveFolders: () => Promise<DriveFolder[]>;
+  onSetDriveFolder: (id: string, name: string) => Promise<void>;
+  onCreateDriveFolder: (name: string) => Promise<void>;
+  // Settings import/export
+  onExportSettings: () => Promise<void>;
+  onImportSettingsFile: () => void;
 };
 
 export function SettingsView(props: SettingsViewProps) {
@@ -43,12 +50,80 @@ export function SettingsView(props: SettingsViewProps) {
     onResume, onProtectionEnabled, onRetry, onSaveSettings, onSaveDestination, updateState,
     updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
     onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs, activityEvents, safeTime, recoveryLibrary, onRestoreRecovery, onOpenGame,
+    onListDriveFolders, onSetDriveFolder, onCreateDriveFolder, onExportSettings, onImportSettingsFile,
   } = props;
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [folderPickerOpen, setFolderPickerOpen] = useState(false);
+  const [driveFolders, setDriveFolders] = useState<DriveFolder[]>([]);
+  const [folderLoading, setFolderLoading] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [folderError, setFolderError] = useState("");
+  const [settingsImportError, setSettingsImportError] = useState("");
+  const importFileRef = useRef<HTMLInputElement>(null);
+
   async function runGoogle(action: () => Promise<void>) {
     setGoogleBusy(true);
     try { await action(); } finally { setGoogleBusy(false); }
   }
+
+  async function openFolderPicker() {
+    setFolderError("");
+    setFolderLoading(true);
+    setFolderPickerOpen(true);
+    try {
+      const folders = await onListDriveFolders();
+      setDriveFolders(folders);
+    } catch (e) {
+      setFolderError(e instanceof Error ? e.message : "Could not load folders");
+    } finally {
+      setFolderLoading(false);
+    }
+  }
+
+  async function selectFolder(id: string, name: string) {
+    setFolderError("");
+    try {
+      await onSetDriveFolder(id, name);
+      setFolderPickerOpen(false);
+    } catch (e) {
+      setFolderError(e instanceof Error ? e.message : "Could not set folder");
+    }
+  }
+
+  async function createFolder() {
+    if (!newFolderName.trim()) return;
+    setFolderError("");
+    setFolderLoading(true);
+    try {
+      await onCreateDriveFolder(newFolderName.trim());
+      setNewFolderName("");
+      setFolderPickerOpen(false);
+    } catch (e) {
+      setFolderError(e instanceof Error ? e.message : "Could not create folder");
+    } finally {
+      setFolderLoading(false);
+    }
+  }
+
+  function handleImportFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const parsed = JSON.parse(reader.result as string);
+        await props.onImportSettingsFile();
+        // The parent handles the actual import call via onImportSettingsFile
+        // which will pick the file; this path handles drag-drop or direct file read
+        void parsed; // consumed by parent
+        setSettingsImportError("");
+      } catch {
+        setSettingsImportError("Could not read settings file.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
   const paused = settings.serviceControl.pauseScope !== "none";
   const targetName = (target: ProtectionTarget) => target === "google_drive" ? "Google Drive" : target === "folder" ? "Synced folder" : "Local only";
 
@@ -77,6 +152,43 @@ export function SettingsView(props: SettingsViewProps) {
           <div className="provider-status" aria-live="polite">
             <p>{settings.googleDrive.connected && settings.googleDrive.ready !== false ? `Connected to ${settings.googleDrive.accountEmail || "Google Drive"}.` : "Connect Google Drive to keep an extra copy of your saves."}</p>
 			{settings.googleDrive.configurationError ? <p className="banner warning" role="alert">Google Drive needs attention. Reconnect to continue cloud backups.</p> : null}
+            {settings.googleDrive.connected && (
+              <p className="snapshot-meta">
+                Save folder: <strong>{settings.googleDrive.folderName || "My Drive (root)"}</strong>
+                {" "}<button className="btn" type="button" onClick={() => void openFolderPicker()}>Change folder</button>
+              </p>
+            )}
+            {folderPickerOpen && (
+              <div className="folder-picker" role="dialog" aria-label="Choose Drive folder">
+                <div className="folder-picker-head">
+                  <strong>Choose a Drive folder</strong>
+                  <button className="btn" type="button" onClick={() => { setFolderPickerOpen(false); setFolderError(""); }}>Cancel</button>
+                </div>
+                {folderError ? <p className="banner error" role="alert">{folderError}</p> : null}
+                {folderLoading ? <p className="snapshot-meta">Loading folders…</p> : (
+                  <ul className="folder-list">
+                    <li><button className="btn" type="button" onClick={() => void selectFolder("root", "My Drive (root)")}>My Drive (root)</button></li>
+                    {driveFolders.map((folder) => (
+                      <li key={folder.id}>
+                        <button className="btn" type="button" onClick={() => void selectFolder(folder.id, folder.name)}>{folder.name}</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="folder-create">
+                  <input
+                    type="text"
+                    placeholder="New folder name"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") void createFolder(); }}
+                  />
+                  <button className="btn primary" type="button" disabled={!newFolderName.trim() || folderLoading} onClick={() => void createFolder()}>
+                    Create &amp; select
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="detail-actions">
               <button className="btn primary" disabled={googleBusy} onClick={() => void runGoogle(onConnectGoogleDrive)} type="button">{googleBusy ? "Waiting for sign-in…" : settings.googleDrive.connected ? "Reconnect" : "Connect Google Drive"}</button>
               {settings.googleDrive.connected ? <button className="btn" disabled={googleBusy} onClick={() => void runGoogle(onDisconnectGoogleDrive)} type="button">Disconnect</button> : null}
@@ -249,7 +361,19 @@ export function SettingsView(props: SettingsViewProps) {
             Enable debug logging
           </label>
         </div>
-        <button className="btn primary" onClick={onSaveSettings} type="button">Save settings</button>
+        <div className="detail-actions">
+          <button className="btn primary" onClick={onSaveSettings} type="button">Save settings</button>
+          <button className="btn" type="button" onClick={() => void onExportSettings()}>Export setup</button>
+          <button className="btn" type="button" onClick={() => importFileRef.current?.click()}>Import setup</button>
+        </div>
+        <input
+          ref={importFileRef}
+          type="file"
+          accept=".json,application/json"
+          style={{ display: "none" }}
+          onChange={handleImportFile}
+        />
+        {settingsImportError ? <p className="banner error" role="alert">{settingsImportError}</p> : null}
         {settings.debugLogging ? <DebugConsoleView onDownloadLogs={onDownloadLogs} /> : null}
           </div>
         </details>

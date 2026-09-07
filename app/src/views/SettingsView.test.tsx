@@ -36,6 +36,11 @@ describe("SettingsView", () => {
       recoveryLibrary={[]}
       onRestoreRecovery={vi.fn()}
       onOpenGame={vi.fn()}
+      onListDriveFolders={vi.fn().mockResolvedValue([])}
+      onSetDriveFolder={vi.fn().mockResolvedValue(undefined)}
+      onCreateDriveFolder={vi.fn().mockResolvedValue(undefined)}
+      onExportSettings={vi.fn().mockResolvedValue(undefined)}
+      onImportSettingsFile={vi.fn()}
     />);
 
     expect(screen.getByRole("heading", { name: "Save location" })).toBeInTheDocument();
