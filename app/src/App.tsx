@@ -5,9 +5,10 @@ import { listen } from "@tauri-apps/api/event";
 import { api } from "./api";
 import { newDefaultSettings } from "./constants/defaults";
 import { BACKEND_DEBUG_INFO_URL } from "./constants/network";
-import { SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
+import { RECOVERY_LIBRARY_REFRESH_INTERVAL_MS, SNAPSHOT_REFRESH_INTERVAL_MS, TOAST_DISMISS_DELAY_MS, VIEW_REFRESH_INTERVAL_MS } from "./constants/timing";
 import roveLogo from "./assets/rove-primary-horizontal.svg";
 import roveReversedLogo from "./assets/rove-reversed-horizontal.svg";
+import { Onboarding } from "./components/Onboarding";
 import { pickExecutable, pickFolder, pickZipFile } from "./nativeDialog";
 import {
   type AppUpdateState,
@@ -20,7 +21,7 @@ import {
   setAutomaticUpdateChecks,
   updateActionLabel,
 } from "./update";
-import type { ActivityEvent, Game, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
+import type { ActivityEvent, Game, RoveSettings, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
 import { getSaveStatus } from "./utils/saveStatus";
 import { GameDetailView } from "./views/GameDetailView";
 import { GamesView } from "./views/GamesView";
@@ -32,6 +33,11 @@ type NavSnapshot = {
   view: View;
   selectedGameId: string;
 };
+
+const ONBOARDING_KEY = "rove.onboarded";
+function hasFinishedOnboarding() {
+  try { return window.localStorage.getItem(ONBOARDING_KEY) === "1"; } catch { return true; }
+}
 
 type BackupOperationState = "idle" | "working" | "success" | "failed";
 
@@ -105,6 +111,9 @@ export default function App() {
   const [updateNotesOpen, setUpdateNotesOpen] = useState(false);
   const launchUpdateChoiceRef = useRef<((choice: "download" | "later" | "cancel") => void) | null>(null);
   const previousUpdateLifecycleRef = useRef<AppUpdateState["lifecycle"] | null>(null);
+
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [addGameSignal, setAddGameSignal] = useState(0);
 
   const [newName, setNewName] = useState("");
   const [newPath, setNewPath] = useState("");
@@ -227,11 +236,10 @@ export default function App() {
   async function refreshGamesData() {
     const sequence = ++gamesRefreshSequence.current;
     try {
-      const [nextGames, nextStatus, nextJobs, nextRecoveryLibrary] = await Promise.all([
+      const [nextGames, nextStatus, nextJobs] = await Promise.all([
         api.getGames(),
         api.getStatus(),
         api.getSyncJobs(),
-        api.getRecoveryLibrary().catch(() => recoveryLibrary),
       ]);
       // Do not let an older in-flight response overwrite newer process state.
       if (sequence !== gamesRefreshSequence.current) return;
@@ -239,11 +247,15 @@ export default function App() {
       setGames(nextGames);
       setStatus(nextStatus);
       setSyncJobs(nextJobs);
-      setRecoveryLibrary(nextRecoveryLibrary);
     } catch (e) {
       if (sequence !== gamesRefreshSequence.current) return;
       setError(toFriendlyError(e));
     }
+  }
+
+  // Listing the cloud is a provider round trip, so it runs on its own slow cadence.
+  async function refreshRecoveryLibrary() {
+    try { setRecoveryLibrary(await api.getRecoveryLibrary()); } catch { /* keep the last list */ }
   }
 
   async function refreshActivityData() {
@@ -321,6 +333,7 @@ export default function App() {
       });
       setStatus(nextStatus);
       setRecoveryLibrary(nextRecoveryLibrary);
+      if (nextGames.length === 0 && !hasFinishedOnboarding()) setOnboardingOpen(true);
       const launchGameID = await invoke<string | null>("take_launch_game").catch(() => null);
       if (launchGameID) void launchGameFromShortcut(launchGameID);
       if (daemonBootstrapError) setError(daemonBootstrapError);
@@ -378,6 +391,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (activeView !== "games") return;
+    void refreshRecoveryLibrary();
+    const timer = window.setInterval(() => { if (!document.hidden) void refreshRecoveryLibrary(); }, RECOVERY_LIBRARY_REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [activeView, status?.protectionTarget]);
+
+  useEffect(() => {
     mainPanelRef.current?.scrollTo({ top: 0, behavior: "auto" });
 
     let timer: number | undefined;
@@ -385,12 +405,12 @@ export default function App() {
     if (activeView === "settings") {
       void refreshActivityData();
       timer = window.setInterval(() => {
-        void refreshActivityData();
+        if (!document.hidden) void refreshActivityData();
       }, VIEW_REFRESH_INTERVAL_MS);
     } else if (activeView === "games" || activeView === "game") {
       void refreshGamesData();
       timer = window.setInterval(() => {
-        void refreshGamesData();
+        if (!document.hidden) void refreshGamesData();
       }, VIEW_REFRESH_INTERVAL_MS);
     }
 
@@ -738,6 +758,25 @@ export default function App() {
     try { await api.saveSettings({ themeMode }); } catch (err) { setError(toFriendlyError(err)); }
   }
 
+  async function applyDestination(protectionTarget: "local" | "folder", syncRoot: string) {
+    try {
+      const saved = await api.saveSettings({ protectionTarget, syncRoot });
+      setSettings((current) => ({ ...current, ...saved }));
+      setStatus(await api.getStatus());
+      void refreshRecoveryLibrary();
+    } catch (err) { setError(toFriendlyError(err)); }
+  }
+
+  async function onboardingPickFolder() {
+    const selected = await pickFolder(settings.syncRoot || undefined).catch(() => null);
+    if (selected) await applyDestination("folder", selected);
+  }
+
+  function finishOnboarding() {
+    try { window.localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* storage unavailable */ }
+    setOnboardingOpen(false);
+  }
+
   async function onSaveDestination() {
     try {
       if (settings.protectionTarget === "folder" && !settings.syncRoot.trim()) throw new Error("Choose a synced folder before saving this destination.");
@@ -845,9 +884,11 @@ export default function App() {
   async function onConnectGoogleDrive() {
     try {
       const status = await api.connectGoogleDrive();
-      setSettings((s) => ({ ...s, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
-		await refreshGamesData();
-      setToast("Google Drive connected. Save Settings to use it for backups.");
+      const saved = await api.saveSettings({ protectionTarget: "google_drive", syncRoot: settings.syncRoot });
+      setSettings((s) => ({ ...s, ...saved, cloudProvider: "google_drive", protectionTarget: "google_drive", googleDrive: status }));
+      await refreshGamesData();
+      void refreshRecoveryLibrary();
+      setToast("Google Drive connected and now keeping your saves.");
     } catch (err) {
       setError(`Google Drive could not be connected: ${toFriendlyError(err)}`);
     }
@@ -1107,6 +1148,11 @@ export default function App() {
             onNewVersionChange={setNewVersion}
             onAddGame={onAddGame}
             onOpenGame={openGame}
+            recoveryLibrary={recoveryLibrary}
+            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
+            cloudTarget={status?.protectionTarget ?? "local"}
+            onOpenSettings={() => pushNavigation("settings")}
+            openAddSignal={addGameSignal}
           />
         ) : null}
 
@@ -1182,9 +1228,6 @@ export default function App() {
             onDownloadLogs={() => { api.downloadLogsZip().catch((err: unknown) => setError(toFriendlyError(err))); }}
             activityEvents={activityEvents}
             safeTime={safeTime}
-            recoveryLibrary={recoveryLibrary}
-            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
-            onOpenGame={openGame}
             onListDriveFolders={() => api.listGoogleDriveFolders()}
             onSetDriveFolder={async (id, name) => {
               await api.setGoogleDriveFolder(id, name);
@@ -1199,14 +1242,28 @@ export default function App() {
             onExportSettings={async () => {
               try { await api.exportSettings(); } catch (err) { setError(toFriendlyError(err)); }
             }}
-            onImportSettingsFile={() => {
-              // The file picker and parsing happen inside SettingsView;
-              // we expose the api method for a direct JSON import if needed.
-              void api.importSettings({ schemaVersion: 1 });
+            onImportSettingsFile={async (parsed) => {
+              await api.importSettings(parsed as RoveSettings);
+              setSettings(await api.getSettings());
+              setToast("Settings imported.");
             }}
           />
         ) : null}
       </main>
+
+      {onboardingOpen ? (
+        <Onboarding
+          destination={settings.protectionTarget}
+          driveConnected={Boolean(settings.googleDrive.connected)}
+          syncRoot={settings.syncRoot}
+          cloudGameCount={recoveryLibrary.filter((entry) => !entry.gameId).length}
+          onChooseLocal={() => applyDestination("local", settings.syncRoot)}
+          onConnectDrive={onConnectGoogleDrive}
+          onChooseFolder={onboardingPickFolder}
+          onAddGame={() => { pushNavigation("games"); setAddGameSignal((n) => n + 1); }}
+          onFinish={finishOnboarding}
+        />
+      ) : null}
 
       {launchUpdatePromptOpen && updateState?.availableVersion ? (
         <div className="add-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) resolveLaunchUpdateChoice("cancel"); }}>

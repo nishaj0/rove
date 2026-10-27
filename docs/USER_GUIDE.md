@@ -25,7 +25,7 @@ Rove watches only running tracked games. An event marks a path dirty; it does no
 
 ## Offline behavior
 
-The Home screen, Game screen, sidebar, and tray distinguish local sync from cloud upload. The sidebar's main **Cloud Sync** label shows the active saved destination (`Local only`, `Google Drive`, or `Synced folder`); the line beneath it is the current health such as `online`, `reconnecting`, `offline`, or `paused`. Selecting a different destination in Settings is a draft until **Save settings** succeeds, and Settings explicitly shows both the active destination and any pending selection.
+The Home screen, Game screen, sidebar, and tray distinguish local sync from cloud upload. The sidebar's main **Cloud Sync** label shows the active saved destination (`Local only`, `Google Drive`, or `Synced folder`); the line beneath it is the current health such as `online`, `reconnecting`, `offline`, or `paused`. Connecting Google Drive applies immediately; selecting any other destination in Settings is a draft until **Save settings** succeeds, and Settings explicitly shows both the active destination and any pending selection.
 
 - **Last local sync** means a revision is safe in the local vault.
 - **Last cloud upload** means a provider accepted the revision.
@@ -58,7 +58,7 @@ The Game page reports unique retained content, automatic record count, pinned co
 
 Restore is exact: files absent from the selected revision are removed. Rove refuses restore while the game is running, creates a pre-restore Recovery Point, verifies object hashes, and uses temporary files or a staging directory before replacement.
 
-The Home **Recovery Library** lists provider profiles without relying on an old local game ID. A remote-only profile can be restored to a new or empty folder. Non-empty fresh-install destinations are refused; add the destination as a game first so conflicts can be reviewed.
+The Library's **In your cloud** section lists provider profiles without relying on an old local game ID. A cloud-only profile can be restored to a new or empty folder. Non-empty fresh-install destinations are refused; add the destination as a game first so conflicts can be reviewed.
 
 See [Recovery and safe restore](end-users/RECOVERY.md).
 

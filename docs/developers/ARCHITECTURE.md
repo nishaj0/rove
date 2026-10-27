@@ -26,9 +26,17 @@ The watcher maps a path to the longest matching game root. File cache entries st
 
 Provider errors are classified into stable codes and health states. Retryable jobs retain the source revision ID, so retry skips local capture. Authentication/quota failures stop spinning. Network change bypasses the current delay once.
 
+## Event batching and cadence
+
+`NotifyFileEvent` only records a path in an in-memory per-game set. `flushDirty` writes the set to SQLite in a single transaction on every two-second scheduler tick and immediately before each capture, so write-heavy games cost one commit per tick rather than one per event. The durable job queue is polled every fifth tick. The game monitor samples processes every five seconds while idle and four while a game runs. The UI skips polling while hidden and refreshes the provider game list (`/recovery-library`) on a 60-second cadence.
+
+## Compatibility
+
+Portable game profiles carry `schemaVersion`. `MaxProfileSchema` is the newest layout a build reads; newer profiles are listed with `requiresUpdate` and `RestoreAndTrack` refuses them. Settings imports with a newer schema are rejected. Older layouts must stay readable.
+
 ## Restore
 
-Tracked restore creates a pre-restore pinned revision and applies through verified temporary files. Fresh Recovery Library restore materializes the full remote head in a sibling staging directory and publishes it only to a new/empty destination.
+Tracked restore creates a pre-restore pinned revision and applies through verified temporary files. Fresh cloud restore (Library → In your cloud) materializes the full remote head in a sibling staging directory and publishes it only to a new/empty destination.
 
 ## Portable game profile and presentation data
 

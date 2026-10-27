@@ -1,7 +1,7 @@
-import { type FormEvent, useMemo, useState } from "react";
-import { LayoutGrid, List, Plus, Search, X } from "lucide-react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { Cloud, LayoutGrid, List, Plus, Search, X } from "lucide-react";
 import { GameCover } from "../components/GameCover";
-import type { Game } from "../types";
+import type { Game, RecoveryLibraryEntry } from "../types";
 
 type GamesViewProps = {
   games: Game[];
@@ -17,7 +17,19 @@ type GamesViewProps = {
   onNewVersionChange: (value: string) => void;
   onAddGame: (e: FormEvent) => Promise<boolean>;
   onOpenGame: (gameId: string) => void;
+  recoveryLibrary?: RecoveryLibraryEntry[];
+  onRestoreRecovery?: (entry: RecoveryLibraryEntry) => void;
+  cloudTarget?: string;
+  onOpenSettings?: () => void;
+  openAddSignal?: number;
 };
+
+const targetLabel: Record<string, string> = { local: "This PC only", google_drive: "Google Drive", folder: "Synced folder" };
+
+function formatSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export function GamesView(props: GamesViewProps) {
   const {
@@ -32,11 +44,26 @@ export function GamesView(props: GamesViewProps) {
     onNewCoverImageChange, onNewVersionChange,
     onAddGame,
     onOpenGame,
+    recoveryLibrary = [],
+    onRestoreRecovery,
+    cloudTarget = "local",
+    onOpenSettings,
+    openAddSignal = 0,
   } = props;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    if (openAddSignal > 0) setShowAddModal(true);
+  }, [openAddSignal]);
+
+  // A freshly restored game has no local revision yet, so match on its sync ID too.
+  const cloudOnly = useMemo(() => {
+    const tracked = new Set(games.map((game) => game.syncId));
+    return recoveryLibrary.filter((entry) => !entry.gameId && !tracked.has(entry.syncId));
+  }, [recoveryLibrary, games]);
 
   const filteredGames = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -78,10 +105,17 @@ export function GamesView(props: GamesViewProps) {
         <div className="library-header">
           <h1>Library</h1>
           <p className="library-count">{filteredGames.length} game{filteredGames.length === 1 ? "" : "s"}</p>
+          <button className="library-destination" type="button" onClick={onOpenSettings} title="Change where saves are kept">
+            <Cloud aria-hidden="true" size={14} /> Saving to {targetLabel[cloudTarget] ?? "This PC only"}
+          </button>
         </div>
 
         {games.length === 0 ? (
-          <p className="empty-state">No games added yet.</p>
+          <div className="library-empty">
+            <h2>{cloudOnly.length > 0 ? "Welcome back" : "Protect your first game"}</h2>
+            <p>{cloudOnly.length > 0 ? "Your cloud already has saves. Restore them below, or add a new game." : "Add a game's save folder and Rove keeps it backed up automatically."}</p>
+            <button className="btn primary" type="button" onClick={() => setShowAddModal(true)}><Plus aria-hidden="true" size={16} /> Add a game</button>
+          </div>
         ) : (
           viewMode === "grid" ? (
             <div className="library-grid">
@@ -105,6 +139,28 @@ export function GamesView(props: GamesViewProps) {
             </div>
           )
         )}
+
+        {cloudOnly.length > 0 ? (
+          <div className="cloud-library" aria-label="Games in your cloud">
+            <h2>In your cloud <span className="library-count">{cloudOnly.length}</span></h2>
+            <p className="snapshot-meta">Saved from another PC or an earlier install. Restore to continue where you left off.</p>
+            <div className="cloud-library-list">
+              {cloudOnly.map((entry) => (
+                <article className="cloud-library-row" key={entry.profileId}>
+                  <div>
+                    <strong>{entry.name}</strong>
+                    <span className="snapshot-meta">{entry.version ? `v${entry.version} · ` : ""}{entry.fileCount} file{entry.fileCount === 1 ? "" : "s"} · {formatSize(entry.totalBytes)}</span>
+                  </div>
+                  {entry.requiresUpdate ? (
+                    <span className="snapshot-meta" role="note">Needs a newer Rove</span>
+                  ) : (
+                    <button className="btn primary" type="button" onClick={() => onRestoreRecovery?.(entry)}>Restore</button>
+                  )}
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {showAddModal ? (

@@ -33,9 +33,6 @@ describe("SettingsView", () => {
       onDownloadLogs={vi.fn()}
       activityEvents={[]}
       safeTime={() => "now"}
-      recoveryLibrary={[]}
-      onRestoreRecovery={vi.fn()}
-      onOpenGame={vi.fn()}
       onListDriveFolders={vi.fn().mockResolvedValue([])}
       onSetDriveFolder={vi.fn().mockResolvedValue(undefined)}
       onCreateDriveFolder={vi.fn().mockResolvedValue(undefined)}

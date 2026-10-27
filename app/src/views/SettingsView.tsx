@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Save } from "lucide-react";
-import type { ActivityEvent, DriveFolder, PauseScope, ProtectionTarget, RecoveryLibraryEntry, Settings, ThemeMode } from "../types";
+import type { ActivityEvent, DriveFolder, PauseScope, ProtectionTarget, Settings, ThemeMode } from "../types";
 import type { AppUpdateState } from "../update";
 import { DebugConsoleView } from "./DebugConsoleView";
 
@@ -31,16 +31,13 @@ type SettingsViewProps = {
   onDownloadLogs: () => void;
   activityEvents: ActivityEvent[];
   safeTime: (input: string) => string;
-  recoveryLibrary: RecoveryLibraryEntry[];
-  onRestoreRecovery: (entry: RecoveryLibraryEntry) => void;
-  onOpenGame: (gameId: string) => void;
   // Folder picker
   onListDriveFolders: () => Promise<DriveFolder[]>;
   onSetDriveFolder: (id: string, name: string) => Promise<void>;
   onCreateDriveFolder: (name: string) => Promise<void>;
   // Settings import/export
   onExportSettings: () => Promise<void>;
-  onImportSettingsFile: () => void;
+  onImportSettingsFile: (parsed: unknown) => Promise<void>;
 };
 
 export function SettingsView(props: SettingsViewProps) {
@@ -49,7 +46,7 @@ export function SettingsView(props: SettingsViewProps) {
     onDisconnectGoogleDrive, onBrowseSyncRoot, onAutostartChange, onPause,
     onResume, onProtectionEnabled, onRetry, onSaveSettings, onSaveDestination, updateState,
     updateInstallBlocked, onCheckForUpdate, onDownloadUpdate, onInstallUpdate,
-    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs, activityEvents, safeTime, recoveryLibrary, onRestoreRecovery, onOpenGame,
+    onDiscardUpdate, onAutomaticUpdateChecks, onViewUpdateNotes, onDownloadLogs, activityEvents, safeTime,
     onListDriveFolders, onSetDriveFolder, onCreateDriveFolder, onExportSettings, onImportSettingsFile,
   } = props;
   const [googleBusy, setGoogleBusy] = useState(false);
@@ -112,13 +109,10 @@ export function SettingsView(props: SettingsViewProps) {
     reader.onload = async () => {
       try {
         const parsed = JSON.parse(reader.result as string);
-        await props.onImportSettingsFile();
-        // The parent handles the actual import call via onImportSettingsFile
-        // which will pick the file; this path handles drag-drop or direct file read
-        void parsed; // consumed by parent
+        await props.onImportSettingsFile(parsed);
         setSettingsImportError("");
-      } catch {
-        setSettingsImportError("Could not read settings file.");
+      } catch (err) {
+        setSettingsImportError(err instanceof SyntaxError ? "That file is not a valid Rove settings file." : err instanceof Error ? err.message : "Could not import settings.");
       }
     };
     reader.readAsText(file);
@@ -253,23 +247,6 @@ export function SettingsView(props: SettingsViewProps) {
           )}
         </details>
       </section>
-
-      {recoveryLibrary.length > 0 ? (
-        <section className="panel advanced-setup-panel" data-window-title="RESTORE.GAME">
-          <details className="advanced-disclosure settings-disclosure">
-            <summary>Restore a game ({recoveryLibrary.length})</summary>
-            <p className="disclosure-help">Bring back a saved game from another computer.</p>
-            <div className="recovery-library-list">
-              {recoveryLibrary.map((entry) => (
-                <article className="recovery-library-row" key={entry.profileId}>
-                  <strong>{entry.name}</strong>
-                  {entry.gameId ? <button className="btn" type="button" onClick={() => onOpenGame(entry.gameId!)}>Open game</button> : <button className="btn primary" type="button" onClick={() => onRestoreRecovery(entry)}>Restore</button>}
-                </article>
-              ))}
-            </div>
-          </details>
-        </section>
-      ) : null}
 
       <section className="panel advanced-setup-panel" data-window-title="APP.SUPPORT">
         <details className="advanced-disclosure settings-disclosure">

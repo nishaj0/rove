@@ -118,6 +118,10 @@ func (s *Server) handleSettingsImport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
+	if imported.SchemaVersion > 1 {
+		writeErr(w, http.StatusBadRequest, errors.New("this settings file was exported by a newer version of Rove; update Rove to import it"))
+		return
+	}
 	current := s.cfg.Get()
 	if imported.IgnorePatterns != nil {
 		current.IgnorePatterns = imported.IgnorePatterns

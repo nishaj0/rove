@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 
 	"cloud-saver/backend/internal/models"
+	"cloud-saver/backend/internal/syncer"
 )
 
 func (s *Server) handleProtectionStatus(w http.ResponseWriter, r *http.Request) {
@@ -268,6 +269,7 @@ type recoveryLibraryEntry struct {
 	TotalBytes      int64                  `json:"totalBytes"`
 	AutomaticCount  int                    `json:"automaticCount"`
 	RecoveryPoints  []models.RecoveryPoint `json:"recoveryPoints"`
+	RequiresUpdate  bool                   `json:"requiresUpdate,omitempty"`
 }
 
 func (s *Server) handleRecoveryLibrary(w http.ResponseWriter, r *http.Request) {
@@ -330,6 +332,7 @@ func (s *Server) handleRecoveryLibrary(w http.ResponseWriter, r *http.Request) {
 				FileCount:       profile.FileCount,
 				TotalBytes:      profile.TotalBytes,
 				RecoveryPoints:  []models.RecoveryPoint{},
+				RequiresUpdate:  syncer.ProfileNeedsNewerApp(profile),
 			})
 		}
 	}

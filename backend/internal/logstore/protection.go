@@ -67,6 +67,36 @@ func (s *Store) DeleteFileState(gameID, relativePath string) error {
 	return err
 }
 
+// MarkFilesDirty flags many paths in one transaction so a burst of file events
+// costs a single SQLite commit.
+func (s *Store) MarkFilesDirty(gameID string, relativePaths []string) error {
+	if gameID == "" || len(relativePaths) == 0 {
+		return nil
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare(`
+INSERT INTO file_state(game_id, relative_path, dirty) VALUES (?, ?, 1)
+ON CONFLICT(game_id, relative_path) DO UPDATE SET dirty = 1`)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+	for _, rel := range relativePaths {
+		if rel == "" {
+			continue
+		}
+		if _, err := stmt.Exec(gameID, rel); err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
 func (s *Store) MarkAllFilesDirty(gameID string) error {
 	_, err := s.db.Exec(`UPDATE file_state SET dirty = 1 WHERE game_id = ?`, gameID)
 	return err

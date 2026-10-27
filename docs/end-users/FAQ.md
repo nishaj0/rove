@@ -84,4 +84,4 @@ If a configured old vault contains snapshots, the Game page shows **Legacy local
 
 ## Expected resource use
 
-Idle monitoring uses adaptive process polling and watcher notifications. Clean gameplay does not recursively hash files. One changed file hashes only that file. Balanced in-game capture is Below Normal priority and rate-limited to 4 MiB/s. Actual CPU/FPS impact depends on save size, disk, antivirus, and the game; use Exit only for the least in-game I/O.
+Idle monitoring uses five-second process polling and watcher notifications whose events are batched into one database write every two seconds, which keeps Rove light on low and mid-range PCs. Clean gameplay does not recursively hash files. One changed file hashes only that file. Balanced in-game capture is Below Normal priority and rate-limited to 4 MiB/s. Actual CPU/FPS impact depends on save size, disk, antivirus, and the game; use Exit only for the least in-game I/O.

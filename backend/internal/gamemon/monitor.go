@@ -20,8 +20,8 @@ import (
 const (
 	// Keep the idle interval short enough to observe games which launch and
 	// crash before their first long background scan.
-	idlePollInterval     = 2 * time.Second
-	activePollInterval   = 2 * time.Second
+	idlePollInterval     = 5 * time.Second
+	activePollInterval   = 4 * time.Second
 	defaultFlushInterval = 15 * time.Second
 	launchProbeInterval  = 250 * time.Millisecond
 	launchProbeWindow    = 10 * time.Second

@@ -576,3 +576,29 @@ h2 { font-size: clamp(21px, 2vw, 27px); }
   margin-bottom: 6px;
 }
 .debug-empty { color: #5a4535; padding: 12px 0; font-size: 12px; }
+
+/* Onboarding */
+.onboarding { max-width: 560px; }
+.onboarding-steps { display: flex; gap: 16px; list-style: none; margin: 0 0 20px; padding: 0; font-size: 12px; color: var(--muted, #7a7a7a); }
+.onboarding-steps li { display: flex; align-items: center; gap: 6px; }
+.onboarding-steps li span { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; font-size: 11px; }
+.onboarding-steps li.active { color: inherit; font-weight: 600; }
+.onboarding-steps li.done { color: var(--accent, #3b7a57); }
+.onboarding-body h2 { margin: 0 0 8px; }
+.onboarding-points { padding-left: 18px; display: grid; gap: 6px; }
+.onboarding-choices { display: grid; gap: 10px; margin-top: 12px; }
+.onboarding-choice { display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; text-align: left; padding: 12px; border: 1px solid var(--border, #d4d4d4); border-radius: 10px; background: transparent; color: inherit; cursor: pointer; }
+.onboarding-choice svg { grid-row: span 2; align-self: center; }
+.onboarding-choice span, .onboarding-choice em { grid-column: 2; font-size: 12px; opacity: .8; font-style: normal; }
+.onboarding-choice.selected { border-color: var(--accent, #3b7a57); box-shadow: 0 0 0 1px var(--accent, #3b7a57); }
+.onboarding-choice:disabled { opacity: .6; cursor: progress; }
+
+/* Library empty state, destination, cloud list */
+.library-empty { display: grid; justify-items: start; gap: 8px; padding: 32px 0; }
+.library-empty h2, .cloud-library h2 { margin: 0; }
+.library-destination { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 4px 10px; border: 1px solid var(--border, #d4d4d4); border-radius: 999px; background: transparent; color: inherit; font-size: 12px; cursor: pointer; }
+.library-header { display: flex; align-items: baseline; gap: 12px; }
+.cloud-library { margin-top: 32px; display: grid; gap: 8px; }
+.cloud-library-list { display: grid; gap: 8px; }
+.cloud-library-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--border, #d4d4d4); border-radius: 10px; }
+.cloud-library-row div { display: grid; }

@@ -20,7 +20,18 @@ Rove uses its own warm, editorial brand system across the desktop UI, applicatio
 - Global and per-game controls can pause uploads while keeping local sync active, or pause all sync while leaving the tray process available.
 - Rove can use the icon embedded in a selected game executable as its cover. A manual image wins; otherwise Rove uses a stable generated cover.
 - Optional game version, cover, portable playtime, and restore hints travel with Rove's `game.json` metadata. The immutable save layout continues to use the stable Sync ID, not a title-derived folder name.
+- A first-run setup walks new users through choosing a save location and adding or restoring a game. Connecting Google Drive takes effect immediately.
+- The Library lists games stored in your cloud but not yet on this PC under **In your cloud**, each with a one-click **Restore**.
+- Saves published by a newer Rove are shown as "Needs a newer Rove" and are never restored by an older build, so version mismatches cannot corrupt a restore.
 - Home reports Rove-managed local/cloud storage only; it never reports unrelated files in a provider account.
+
+## Built for low and mid-range PCs
+
+- File-system events are coalesced in memory and written to SQLite in one batch every two seconds, not once per event.
+- The scheduler ticks every two seconds, and the durable job queue is polled every ten.
+- Process detection polls every five seconds while idle and every four while a game runs.
+- The app window stops polling while it is hidden, and the cloud game list refreshes at most once a minute (and on demand) instead of on every screen refresh.
+- Hashing stays sequential, Below Normal priority, and limited to 4 MiB/s during gameplay.
 
 ## Sync destinations
 

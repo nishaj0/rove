@@ -4,8 +4,8 @@
 
 1. Install Rove.
 2. Select Local only, connect Google Drive, or select the same synced folder.
-3. Open the Home **Recovery Library**.
-4. Choose a remote-only game and select **Restore and track**.
+3. Open the **Library** and find the **In your cloud** section.
+4. Choose the game and select **Restore**. A save marked **Needs a newer Rove** was written by a newer version; update Rove first.
 5. Choose the installed game executable and a new or empty destination save folder.
 6. Confirm the destination. Rove verifies and stages the complete revision, restores it, and links the restored game to the same cloud identity.
 

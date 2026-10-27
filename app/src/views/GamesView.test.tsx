@@ -31,7 +31,7 @@ describe("GamesView", () => {
 
   it("shows the empty state and add-game modal", async () => {
     renderView({ games: [] });
-    expect(screen.getByText("No games added yet.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Protect your first game" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Add game" }));
     expect(screen.getByRole("heading", { name: "Add a game" })).toBeInTheDocument();
     fireEvent.submit(screen.getByRole("heading", { name: "Add a game" }).closest("section")!.querySelector("form")!);
@@ -46,5 +46,23 @@ describe("GamesView", () => {
     expect(screen.getByRole("button", { name: "Grid view" })).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(screen.getByRole("button", { name: "Grid view" }));
     expect(screen.queryByLabelText("Games list")).not.toBeInTheDocument();
+  });
+
+  it("lists cloud-only games, restores them, and blocks saves from a newer Rove", () => {
+    const onRestoreRecovery = vi.fn();
+    const entry = (id: string, requiresUpdate = false) => ({ profileId: id, name: `Cloud ${id}`, syncId: id, latestProtected: "", fileCount: 2, totalBytes: 2048, automaticCount: 0, recoveryPoints: [], requiresUpdate });
+    renderView({ games: [], recoveryLibrary: [entry("a"), entry("b", true), { ...entry("c"), gameId: "local-c" }], onRestoreRecovery });
+    expect(screen.getByRole("heading", { name: "Welcome back" })).toBeInTheDocument();
+    expect(screen.getByText("Cloud a")).toBeInTheDocument();
+    expect(screen.queryByText("Cloud c")).not.toBeInTheDocument();
+    expect(screen.getByText("Needs a newer Rove")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Restore" }));
+    expect(onRestoreRecovery).toHaveBeenCalledWith(expect.objectContaining({ syncId: "a" }));
+  });
+
+  it("hides a cloud entry once its game is tracked locally", () => {
+    const entry = { profileId: "p", name: "Cloud one", syncId: "one", latestProtected: "", fileCount: 1, totalBytes: 1, automaticCount: 0, recoveryPoints: [] };
+    renderView({ recoveryLibrary: [entry] });
+    expect(screen.queryByText("In your cloud")).not.toBeInTheDocument();
   });
 });

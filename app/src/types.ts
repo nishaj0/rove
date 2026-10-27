@@ -255,6 +255,7 @@ export interface RecoveryLibraryEntry {
   totalBytes: number;
   automaticCount: number;
   recoveryPoints: RecoveryPoint[];
+  requiresUpdate?: boolean;
 }
 
 export interface StorageUsage {

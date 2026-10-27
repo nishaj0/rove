@@ -42,7 +42,8 @@ npm run test:coverage
 | Frontend HTTP client | `app/src/api.test.ts` | JSON headers/bodies, URL encoding, 204 responses, server error messages, and the legacy `/sync/game` compatibility fallback. |
 | Native update bridge | `app/src/update.test.ts` | Lifecycle labels, progress subscription cleanup, and exact Tauri command arguments. |
 | Library UI | `app/src/views/GamesView.test.tsx` | Empty state, search filtering, add-game modal submission, and game selection. |
-| Home UI | `app/src/views/HomeView.test.tsx` | Paused/offline provider messaging, byte formatting, recovery restore, and navigation actions. |
+| Library UI | `app/src/views/GamesView.test.tsx`, `app/src/components/Onboarding.test.tsx` | Empty state, cloud-only restore list, newer-version block, first-run setup flow. |
+| Home UI (legacy) | `app/src/views/HomeView.test.tsx` | Paused/offline provider messaging, byte formatting, recovery restore, and navigation actions. |
 | API security boundary | `backend/internal/api/middleware_test.go` | Loopback-only clients, loopback origin allow-list, preflight headers, and foreign-origin rejection. |
 | API response boundary | `backend/internal/api/server_test.go` | Unknown JSON fields are rejected, JSON content type is present, and route method boundaries are enforced. |
 | Lifecycle API | `backend/internal/api/handlers_lifecycle_test.go` | POST-only update preparation, unavailable callback behavior, and asynchronous callback execution. |

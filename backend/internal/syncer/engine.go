@@ -28,6 +28,11 @@ type syncTrigger struct {
 
 type StoreFactory func(context.Context, models.Settings) (RevisionStore, error)
 
+type pendingDirtyGame struct {
+	paths map[string]struct{}
+	all   bool
+}
+
 type dirtyGame struct {
 	lastEvent   time.Time
 	lastCapture time.Time
@@ -49,6 +54,9 @@ type Engine struct {
 	running map[string]struct{}
 	dirty   map[string]dirtyGame
 	exits   map[string]time.Time
+	// pendingDirty coalesces watcher events in memory; flushDirty writes them
+	// to SQLite in one batch so write-heavy games do not cause a commit per event.
+	pendingDirty map[string]*pendingDirtyGame
 	// playtime caches independent per-device contributions published with
 	// portable profiles. The cache avoids provider reads on normal UI refreshes.
 	playtime map[string]map[string]int64
@@ -77,6 +85,7 @@ func New(cfg *config.Manager, logs *logstore.Store, debug bool) *Engine {
 		running:       make(map[string]struct{}),
 		dirty:         make(map[string]dirtyGame),
 		exits:         make(map[string]time.Time),
+		pendingDirty:  make(map[string]*pendingDirtyGame),
 		playtime:      make(map[string]map[string]int64),
 		statusUpdates: make(chan struct{}, 1),
 		ctx:           context.Background(),
@@ -317,19 +326,48 @@ func (e *Engine) NotifyFileEvent(path string) {
 		return
 	}
 	rel = filepath.ToSlash(rel)
-	if rel == "." {
-		_ = e.logs.MarkAllFilesDirty(selected.ID)
-	} else {
-		_ = e.logs.MarkFileDirty(selected.ID, rel)
-	}
 	now := time.Now().UTC()
 	e.mu.Lock()
+	pending := e.pendingDirty[selected.ID]
+	if pending == nil {
+		pending = &pendingDirtyGame{paths: make(map[string]struct{})}
+		e.pendingDirty[selected.ID] = pending
+	}
+	if rel == "." {
+		pending.all = true
+	} else {
+		pending.paths[rel] = struct{}{}
+	}
 	state := e.dirty[selected.ID]
 	state.lastEvent = now
 	e.dirty[selected.ID] = state
 	delete(e.exits, selected.ID)
 	e.mu.Unlock()
 	e.signalStatus()
+}
+
+// flushDirty persists coalesced watcher events. It must run before anything
+// that reads dirty file state (captures) and on every scheduler tick.
+func (e *Engine) flushDirty() {
+	e.mu.Lock()
+	if len(e.pendingDirty) == 0 {
+		e.mu.Unlock()
+		return
+	}
+	batch := e.pendingDirty
+	e.pendingDirty = make(map[string]*pendingDirtyGame)
+	e.mu.Unlock()
+	for gameID, pending := range batch {
+		if pending.all {
+			_ = e.logs.MarkAllFilesDirty(gameID)
+			continue
+		}
+		paths := make([]string, 0, len(pending.paths))
+		for rel := range pending.paths {
+			paths = append(paths, rel)
+		}
+		_ = e.logs.MarkFilesDirty(gameID, paths)
+	}
 }
 
 // UpdateRunning records lifecycle transitions. A stopped game receives a final
@@ -551,6 +589,9 @@ func (e *Engine) RestoreAndTrack(ctx context.Context, syncID, destination, execu
 	if !found {
 		return models.Game{}, errors.New("cloud game profile was not found")
 	}
+	if ProfileNeedsNewerApp(profile) {
+		return models.Game{}, errors.New("this save was written by a newer version of Rove; update Rove to restore it")
+	}
 	e.setRecoveredPlaytime(syncID, profile.PlaytimeSeconds)
 	if err := e.RestoreCloudProfile(ctx, syncID, destination); err != nil {
 		return models.Game{}, err
@@ -737,17 +778,25 @@ func (e *Engine) RestoreLocalRevision(ctx context.Context, game models.Game, rev
 }
 
 func (e *Engine) loop(ctx context.Context) {
-	ticker := time.NewTicker(time.Second)
+	// A 2s tick is plenty: the shortest schedule threshold is 5s. The durable
+	// job queue is only polled every fifth tick to keep idle SQLite reads low.
+	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
+	ticks := 0
 	for {
 		select {
 		case <-ctx.Done():
+			e.flushDirty()
 			return
 		case request := <-e.trigger:
 			e.runOnce(request)
 		case now := <-ticker.C:
+			e.flushDirty()
 			e.scheduleDue(now.UTC())
-			e.resumePending(now.UTC())
+			ticks++
+			if ticks%5 == 0 {
+				e.resumePending(now.UTC())
+			}
 		}
 	}
 }
@@ -935,6 +984,7 @@ func (e *Engine) runOnce(request syncTrigger) {
 }
 
 func (e *Engine) captureLocal(ctx context.Context, game models.Game, kind, name string, pinned bool) (models.Revision, Result, error) {
+	e.flushDirty()
 	settings := e.cfg.Get()
 	e.mu.RLock()
 	_, playing := e.running[game.ID]
@@ -993,6 +1043,15 @@ func (e *Engine) captureLocal(ctx context.Context, game models.Game, kind, name 
 		_, _ = e.logs.PruneAutomaticRevisions(game.ID, settings.AutoRevisionRetention)
 	}
 	return revision, result, nil
+}
+
+// MaxProfileSchema is the newest portable profile layout this build can read.
+const MaxProfileSchema = 2
+
+// ProfileNeedsNewerApp reports whether a cloud profile was published by a
+// newer Rove, so older installs refuse it instead of misreading the layout.
+func ProfileNeedsNewerApp(profile models.GameProfile) bool {
+	return profile.SchemaVersion > MaxProfileSchema
 }
 
 func gameProfile(game models.Game, revision models.Revision) models.GameProfile {
