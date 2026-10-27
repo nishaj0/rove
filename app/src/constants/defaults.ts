@@ -11,7 +11,7 @@ export const DEFAULT_SETTINGS: Settings = {
   port: 7331,
   syncIntervalSeconds: 30,
   conflictPolicy: "latest_wins",
-  themeMode: "light",
+  themeMode: "dark",
   autostart: false,
   ignorePatterns: ["*.tmp", "*.log", "cache"],
   snapshotVaultPath: "",

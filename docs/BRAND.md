@@ -1,6 +1,6 @@
 # Rove brand implementation
 
-Rove uses a warm editorial visual system. The supplied Rove brand kit is the source of truth; the desktop app retains only the useful structural qualities of the former windowed interface: clear borders, compact controls, offset shadows, keyboard-visible focus, and explicit status text.
+The supplied Rove brand kit is the source of truth for the logo and icon. The desktop app and website use a dark-first desktop theme built around that orange: cool blue-slate neutrals, one orange accent for primary actions and the selected item, clear borders, compact controls, keyboard-visible focus, and explicit status text. A light theme is available.
 
 ## Tagline
 
@@ -57,3 +57,17 @@ node node_modules/@tauri-apps/cli/tauri.js icon src-tauri/icons/rove-app-icon-li
 ```
 
 Keep only the regenerated `src-tauri/icons/icon.ico` for this Windows-focused app, then copy that same file to `src-tauri/resources/backend/icon.ico`. Do not commit generated Android, iOS, Appx, or macOS icon variants unless the project begins shipping those platforms.
+
+## Desktop UI theme
+
+Tokens live in `app/src/styles.css` (app) and `rove-website/src/styles/tokens.css` (website) and use OKLCH.
+
+| Role | Dark | Light |
+| --- | --- | --- |
+| Content surface | `oklch(0.185 0.014 265)` | `oklch(0.985 0.003 265)` |
+| Chrome (toolbar, sidebar, status bar) | `oklch(0.145 0.014 265)` | `oklch(0.935 0.007 265)` |
+| Raised surface | `oklch(0.225 0.016 265)` | `oklch(1 0 0)` |
+| Text | `oklch(0.95 0.008 265)` | `oklch(0.22 0.02 265)` |
+| Accent | `oklch(0.72 0.17 48)` | `oklch(0.55 0.18 45)` |
+
+Rules: the accent is used only for primary actions, the selected item and state indicators; status uses green, amber and red together with text; the UI font is the system UI font (Segoe UI Variable on Windows). The logo has no baked-in background, so it sits on either theme.

@@ -14,30 +14,34 @@ const game: Game = {
 function renderView(overrides: Partial<React.ComponentProps<typeof GameDetailView>> = {}) {
   const props: React.ComponentProps<typeof GameDetailView> = {
     game, exportPath: "", importPath: "", mergeOnImport: true, exportOperationState: "idle", exportOperationMessage: "", importOperationState: "idle", importOperationMessage: "", revisions: [], recoveryPoints: [], storageUsage: null, legacySnapshots: [], syncJob: null, syncConflicts: [],
-    onBack: vi.fn(), onPlay: vi.fn(), onProtect: vi.fn(), onOpenSettings: vi.fn(), onCreateShortcut: vi.fn(), onDelete: vi.fn(), onBrowseExportPath: vi.fn(), onBrowseImportPath: vi.fn(), onMergeChange: vi.fn(), onExportBackup: vi.fn(), onImportBackup: vi.fn(), onSavePolicy: vi.fn().mockResolvedValue(true), onPause: vi.fn().mockResolvedValue(undefined), onResume: vi.fn().mockResolvedValue(undefined), onCreateRecoveryPoint: vi.fn(), onRestoreRevision: vi.fn(), onDeleteRecoveryPoint: vi.fn(), onRestoreLegacySnapshot: vi.fn(), onDeleteLegacySnapshot: vi.fn(), onUpdateCover: vi.fn(), onResolveSyncConflict: vi.fn(), formatPlaytime: () => "2m", safeDateTime: () => "now", formatBytes: () => "1 KB", ...overrides,
+    onPlay: vi.fn(), onProtect: vi.fn(), onOpenSettings: vi.fn(), onCreateShortcut: vi.fn(), onDelete: vi.fn(), onBrowseExportPath: vi.fn(), onBrowseImportPath: vi.fn(), onMergeChange: vi.fn(), onExportBackup: vi.fn(), onImportBackup: vi.fn(), onSavePolicy: vi.fn().mockResolvedValue(true), onPause: vi.fn().mockResolvedValue(undefined), onResume: vi.fn().mockResolvedValue(undefined), onCreateRecoveryPoint: vi.fn(), onRestoreRevision: vi.fn(), onDeleteRecoveryPoint: vi.fn(), onRestoreLegacySnapshot: vi.fn(), onDeleteLegacySnapshot: vi.fn(), onUpdateCover: vi.fn(), onResolveSyncConflict: vi.fn(), formatPlaytime: () => "2m", safeDateTime: () => "now", formatBytes: () => "1 KB", ...overrides,
   };
   return { props, ...render(<GameDetailView {...props} />) };
 }
 
 describe("GameDetailView", () => {
-  it("keeps maintenance controls in collapsed Advanced setup", () => {
+  it("shows primary actions up front and keeps maintenance in tabs", () => {
     const { props } = renderView();
     expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Back up now" })).toBeInTheDocument();
-    expect(screen.getByText("Saves are backed up")).toBeInTheDocument();
-    const disclosure = screen.getByText("Advanced setup").closest("details")!;
-    expect(disclosure).not.toHaveAttribute("open");
-    fireEvent.click(screen.getByText("Advanced setup"));
-    expect(disclosure).toHaveAttribute("open");
+    expect(screen.getByRole("status")).toHaveTextContent("Saves are backed up");
+    expect(screen.getByRole("tab", { name: "Saves" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByRole("button", { name: "Remove game from Rove" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Details" }));
+    expect(screen.getByRole("button", { name: "Remove game from Rove" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Backup options" }));
+    expect(screen.getByRole("button", { name: "Save backup options" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Play" }));
     expect(props.onPlay).toHaveBeenCalledTimes(1);
   });
 
-  it("makes a conflict actionable without exposing it as the normal page", () => {
-    const { props } = renderView({ game: { ...game, protectionStatus: { ...game.protectionStatus, conflictCount: 1 } }, syncConflicts: [{ id: "conflict-1", gameId: "game-1", path: "save.dat", localHash: "local", remoteHash: "remote", createdAt: "2026-08-29T00:00:00Z", state: "open" }] });
-    expect(screen.getAllByText("Choose which saved version to keep")).toHaveLength(2);
-    fireEvent.click(screen.getByRole("button", { name: "Review saves" }));
-    expect(screen.getByText("Advanced setup").closest("details")).toHaveAttribute("open");
+  it("makes a conflict actionable and jumps back to the Saves tab to review it", () => {
+    const { props } = renderView({ game: { ...game, protectionStatus: { ...game.protectionStatus, conflictCount: 1 } }, syncConflicts: [{ id: "conflict-1", gameId: "game-1", path: "save.dat", localHash: "localhash", remoteHash: "remotehash", createdAt: "2026-01-01T00:00:00Z" } as never] });
+    fireEvent.click(screen.getByRole("tab", { name: /Backup options/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Review" }));
+    expect(screen.getByRole("region", { name: "Choose a saved version" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Keep both" }));
+    expect(props.onResolveSyncConflict).toHaveBeenCalledWith("conflict-1", "both");
     expect(props.onOpenSettings).not.toHaveBeenCalled();
   });
 });

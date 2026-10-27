@@ -65,7 +65,7 @@ describe("API response parsers", () => {
     const defaults = newDefaultSettings();
 
     expect(parsed.port).toBe(defaults.port);
-    expect(parsed.themeMode).toBe("light");
+    expect(parsed.themeMode).toBe("dark");
     expect(parsed.conflictPolicy).toBe("keep_both");
     expect(parsed.ignorePatterns).toEqual(["*.bak", "cache"]);
     expect(parsed.googleDrive).toEqual({ connected: true, accountEmail: "", reconnectRequired: false, oauthClientSource: "environment", oauthCredentialSource: undefined });

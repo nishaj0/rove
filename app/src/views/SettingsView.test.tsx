@@ -1,10 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { newDefaultSettings } from "../constants/defaults";
 import { SettingsView } from "./SettingsView";
 
 describe("SettingsView", () => {
-  it("keeps connection details and maintenance controls out of the default view", () => {
+  it("shows one preferences section at a time, starting with the save location", () => {
     const settings = { ...newDefaultSettings(), protectionTarget: "google_drive" as const, googleDrive: { connected: false, oauthClientSource: "environment" as const, oauthCredentialSource: "environment" as const } };
     render(<SettingsView
       settings={settings}
@@ -41,9 +41,13 @@ describe("SettingsView", () => {
     />);
 
     expect(screen.getByRole("heading", { name: "Save location" })).toBeInTheDocument();
-    expect(screen.getByText("Protect my game saves")).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "Save location" })).toBeInTheDocument();
+    expect(screen.queryByText("Protect my game saves")).not.toBeInTheDocument();
     expect(screen.queryByText(/OAuth client/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/integration pending/i)).not.toBeInTheDocument();
-    expect(screen.getByText("Advanced backup options").closest("details")).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByRole("button", { name: "Backups" }));
+    expect(screen.getByText("Protect my game saves")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "General" }));
+    expect(screen.getByLabelText("Appearance")).toBeInTheDocument();
   });
 });

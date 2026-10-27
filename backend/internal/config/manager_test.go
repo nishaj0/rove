@@ -73,7 +73,7 @@ func TestLoadRecoversMalformedSettingsFromBackup(t *testing.T) {
 		t.Fatal(err)
 	}
 	settings := manager.Get()
-	settings.ThemeMode = models.ThemeDark
+	settings.ThemeMode = models.ThemeLight
 	if err := manager.Update(settings); err != nil {
 		t.Fatal(err)
 	}

@@ -168,7 +168,7 @@ func DefaultSettings() models.Settings {
 		Port:                    runtimecfg.DefaultAPIPort,
 		SyncIntervalSeconds:     30,
 		ConflictPolicy:          models.ConflictLatestWins,
-		ThemeMode:               models.ThemeLight,
+		ThemeMode:               models.ThemeDark,
 		Autostart:               false,
 		IgnorePatterns:          []string{"*.tmp", "*.log", "cache"},
 		SnapshotVaultPath:       "",

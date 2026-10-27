@@ -4,9 +4,11 @@ Rove is a Windows desktop utility for games that do not have dependable built-in
 
 **Game cloud saves for everyone.**
 
+![The Rove library: games with backup status in the sidebar, an overview, and games waiting in your cloud](docs/images/home.webp)
+
 There is no Rove server or VPS. End users never enter developer API keys.
 
-Rove uses its own warm, editorial brand system across the desktop UI, application icon, and documentation. See the [brand implementation guide](docs/BRAND.md) for the approved assets and rules.
+Rove's desktop app is a dark-first, desktop-style interface (library sidebar, status bar, preferences-style settings) with a single orange accent, and a light theme as an option. See the [brand implementation guide](docs/BRAND.md) for the approved assets and rules.
 
 ## Current Cloud Sync model
 
@@ -21,7 +23,7 @@ Rove uses its own warm, editorial brand system across the desktop UI, applicatio
 - Rove can use the icon embedded in a selected game executable as its cover. A manual image wins; otherwise Rove uses a stable generated cover.
 - Optional game version, cover, portable playtime, and restore hints travel with Rove's `game.json` metadata. The immutable save layout continues to use the stable Sync ID, not a title-derived folder name.
 - A first-run setup walks new users through choosing a save location and adding or restoring a game. Connecting Google Drive takes effect immediately.
-- The Library lists games stored in your cloud but not yet on this PC under **In your cloud**, each with a one-click **Restore**.
+- **Home** and the sidebar list games stored in your cloud but not yet on this PC under **In your cloud**, each with a one-click **Restore**.
 - Saves published by a newer Rove are shown as "Needs a newer Rove" and are never restored by an older build, so version mismatches cannot corrupt a restore.
 - Home reports Rove-managed local/cloud storage only; it never reports unrelated files in a provider account.
 

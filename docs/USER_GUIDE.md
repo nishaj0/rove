@@ -2,6 +2,24 @@
 
 Rove keeps a game's save folder in Cloud Sync even when the game or store does not provide cloud saves. Cloud Sync is local first: losing Internet access never prevents a local revision from being created.
 
+## Tour of the app
+
+![Home: your library, backup status and games in your cloud](images/home.webp)
+
+Rove is laid out like a desktop program:
+
+- **Toolbar:** back and forward, a search box that filters your library, and the light/dark switch.
+- **Sidebar:** your games with a live backup status for each, an **In your cloud** list of games you can restore, and **Settings** at the bottom.
+- **Home:** an overview of protected games, the last backup, your save location, anything that needs attention, and recent activity.
+- **Game page:** **Play** and **Back up now** up front, with tabs for **Saves**, **Backup options**, **Import & export** and **Details**.
+- **Status bar:** whether your saves are backed up, where they are kept, and what is waiting to upload.
+
+![A game page with Play, Back up now, and tabs](images/game-saves.webp)
+
+Settings opens a preferences-style screen with its own section list: Save location, Backups, General, Updates, Activity and Advanced.
+
+![Settings with the section list on the left](images/settings.webp)
+
 ## First setup
 
 1. Open **Games**, add a game, select its save folder, and select its executable.
@@ -58,7 +76,7 @@ The Game page reports unique retained content, automatic record count, pinned co
 
 Restore is exact: files absent from the selected revision are removed. Rove refuses restore while the game is running, creates a pre-restore Recovery Point, verifies object hashes, and uses temporary files or a staging directory before replacement.
 
-The Library's **In your cloud** section lists provider profiles without relying on an old local game ID. A cloud-only profile can be restored to a new or empty folder. Non-empty fresh-install destinations are refused; add the destination as a game first so conflicts can be reviewed.
+Home and the sidebar's **In your cloud** list show provider profiles without relying on an old local game ID. A cloud-only profile can be restored to a new or empty folder. Non-empty fresh-install destinations are refused; add the destination as a game first so conflicts can be reviewed.
 
 See [Recovery and safe restore](end-users/RECOVERY.md).
 

@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Moon, Sun } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Search, Sun } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { api } from "./api";
@@ -23,14 +23,14 @@ import {
 } from "./update";
 import type { ActivityEvent, Game, RoveSettings, PauseScope, RecoveryLibraryEntry, RecoveryPoint, Revision, Settings, SettingsUpdate, SnapshotSummary, Status, StorageUsage, SyncConflict, SyncJob, SyncPolicy } from "./types";
 import { getSaveStatus } from "./utils/saveStatus";
+import { AddGameDialog } from "./components/AddGameDialog";
+import { type AppView, Sidebar } from "./components/Sidebar";
 import { GameDetailView } from "./views/GameDetailView";
-import { GamesView } from "./views/GamesView";
+import { HomeView } from "./views/HomeView";
 import { SettingsView } from "./views/SettingsView";
 
-type View = "games" | "game" | "settings";
-
 type NavSnapshot = {
-  view: View;
+  view: AppView;
   selectedGameId: string;
 };
 
@@ -45,49 +45,12 @@ const isAutostartEnabled = () => invoke<boolean>("is_autostart_enabled");
 const enableAutostart = () => invoke<boolean>("set_autostart", { enabled: true });
 const disableAutostart = () => invoke<boolean>("set_autostart", { enabled: false });
 
-const navItems: Array<{ id: View; label: string }> = [
-  { id: "games", label: "Games" },
-  { id: "settings", label: "Settings" },
-];
-
-const viewTitle: Record<View, string> = {
-  games: "Library",
-  game: "Game",
-  settings: "Settings",
-};
-
-function NavIcon({ view }: { view: View }) {
-  if (view === "games" || view === "game") {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="4" y="7.5" width="16" height="9" rx="3" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M9 10.5v3M7.5 12h3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="15.7" cy="11.2" r="1" fill="currentColor" />
-        <circle cx="17.8" cy="13.3" r="1" fill="currentColor" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M19.5 12a7.5 7.5 0 0 0-.08-1.08l2.04-1.58-2-3.46-2.45.7a7.72 7.72 0 0 0-1.88-1.08L14.7 3h-4.02l-.43 2.5a7.72 7.72 0 0 0-1.88 1.08l-2.45-.7-2 3.46 2.04 1.58a7.5 7.5 0 0 0 0 2.16L3.92 14.66l2 3.46 2.45-.7a7.72 7.72 0 0 0 1.88 1.08l.43 2.5h4.02l.43-2.5a7.72 7.72 0 0 0 1.88-1.08l2.45.7 2-3.46-2.04-1.58c.05-.35.08-.71.08-1.08z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export default function App() {
-  const [activeView, setActiveView] = useState<View>("games");
+  const [activeView, setActiveView] = useState<AppView>("home");
   const [selectedGameId, setSelectedGameId] = useState("");
 	const gamesRefreshSequence = useRef(0);
 
-  const navHistoryRef = useRef<NavSnapshot[]>([{ view: "games", selectedGameId: "" }]);
+  const navHistoryRef = useRef<NavSnapshot[]>([{ view: "home", selectedGameId: "" }]);
   const navCursorRef = useRef(0);
   const mainPanelRef = useRef<HTMLElement>(null);
   const [canGoBack, setCanGoBack] = useState(false);
@@ -113,7 +76,8 @@ export default function App() {
   const previousUpdateLifecycleRef = useRef<AppUpdateState["lifecycle"] | null>(null);
 
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const [addGameSignal, setAddGameSignal] = useState(0);
+  const [addGameOpen, setAddGameOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   const [newName, setNewName] = useState("");
   const [newPath, setNewPath] = useState("");
@@ -135,7 +99,7 @@ export default function App() {
     setCanGoForward(navCursorRef.current < navHistoryRef.current.length - 1);
   }
 
-  function pushNavigation(view: View, gameId = "") {
+  function pushNavigation(view: AppView, gameId = "") {
     const current = navHistoryRef.current[navCursorRef.current];
     if (current && current.view === view && current.selectedGameId === gameId) {
       return;
@@ -256,6 +220,10 @@ export default function App() {
   // Listing the cloud is a provider round trip, so it runs on its own slow cadence.
   async function refreshRecoveryLibrary() {
     try { setRecoveryLibrary(await api.getRecoveryLibrary()); } catch { /* keep the last list */ }
+  }
+
+  async function refreshActivityEvents() {
+    try { setActivityEvents(await api.getActivity()); } catch { /* keep the last list */ }
   }
 
   async function refreshActivityData() {
@@ -391,41 +359,30 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (activeView !== "games") return;
     void refreshRecoveryLibrary();
     const timer = window.setInterval(() => { if (!document.hidden) void refreshRecoveryLibrary(); }, RECOVERY_LIBRARY_REFRESH_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [activeView, status?.protectionTarget]);
+  }, [status?.protectionTarget]);
 
   useEffect(() => {
     mainPanelRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [activeView, selectedGameId]);
 
-    let timer: number | undefined;
-
-    if (activeView === "settings") {
-      void refreshActivityData();
-      timer = window.setInterval(() => {
-        if (!document.hidden) void refreshActivityData();
-      }, VIEW_REFRESH_INTERVAL_MS);
-    } else if (activeView === "games" || activeView === "game") {
-      void refreshGamesData();
-      timer = window.setInterval(() => {
-        if (!document.hidden) void refreshGamesData();
-      }, VIEW_REFRESH_INTERVAL_MS);
-    }
-
-    return () => {
-      if (timer !== undefined) {
-        window.clearInterval(timer);
-      }
-    };
-  }, [activeView]);
-
+  // The sidebar shows every game's status, so the games list refreshes in all views;
+  // activity events are only needed on Home and Settings.
   useEffect(() => {
-    if (activeView !== "games" && activeView !== "game" && activeView !== "settings") return;
-    const refreshOnFocus = () => void (activeView === "settings" ? refreshActivityData() : refreshGamesData());
-    window.addEventListener("focus", refreshOnFocus);
-    return () => window.removeEventListener("focus", refreshOnFocus);
+    const tick = () => {
+      if (document.hidden) return;
+      void refreshGamesData();
+      if (activeView !== "game") void refreshActivityEvents();
+    };
+    tick();
+    const timer = window.setInterval(tick, VIEW_REFRESH_INTERVAL_MS);
+    window.addEventListener("focus", tick);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", tick);
+    };
   }, [activeView]);
 
   useEffect(() => {
@@ -491,7 +448,7 @@ export default function App() {
     if (!stillExists) {
       setSelectedGameId("");
       if (activeView === "game") {
-        pushNavigation("games");
+        pushNavigation("home");
       }
     }
   }, [activeView, games, selectedGameId]);
@@ -503,14 +460,8 @@ export default function App() {
     return games.find((game) => game.id === selectedGameId) ?? null;
   }, [games, selectedGameId]);
 
-  const isDarkTheme = settings.themeMode === "dark";
-
-  const currentViewTitle = useMemo(() => {
-    if (activeView === "game" && selectedGame) {
-      return selectedGame.name;
-    }
-    return viewTitle[activeView];
-  }, [activeView, selectedGame]);
+  const systemPrefersDark = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)").matches : true;
+  const isDarkTheme = settings.themeMode === "dark" || (settings.themeMode === "system" && systemPrefersDark);
 
   async function onAddGame(e: FormEvent): Promise<boolean> {
     e.preventDefault();
@@ -541,7 +492,7 @@ export default function App() {
       await api.deleteGame(id);
       if (selectedGameId === id) {
         setSelectedGameId("");
-        pushNavigation("games");
+        pushNavigation("home");
       }
       setToast("Game removed");
       await refreshGamesData();
@@ -753,7 +704,7 @@ export default function App() {
   }
 
   async function onQuickThemeToggle() {
-    const themeMode = settings.themeMode === "dark" ? "light" : "dark";
+    const themeMode = isDarkTheme ? "light" : "dark";
     setSettings((current) => ({ ...current, themeMode }));
     try { await api.saveSettings({ themeMode }); } catch (err) { setError(toFriendlyError(err)); }
   }
@@ -1057,102 +1008,81 @@ export default function App() {
     active: Boolean(status?.activeJobId),
   });
 
+  const saveTone = sidebarSaveStatus.tone === "success" ? "ok" : sidebarSaveStatus.tone === "syncing" ? "busy" : sidebarSaveStatus.tone === "error" ? "err" : "warn";
+  const targetLabel = status?.protectionTarget === "google_drive" ? "Google Drive" : status?.protectionTarget === "folder" ? "Synced folder" : "This PC only";
+  const updateVisible = Boolean(updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle));
+  const installBlocked = games.some((game) => game.running) || Boolean(status?.activeJobId);
+
   return (
-    <div className="app-layout" data-theme={isDarkTheme ? "dark" : "light"}>
-      <header className="app-utility">
-        <div className="topbar-brand">
-          <img className="topbar-brand-logo" src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" />
+    <div className="app" data-theme={isDarkTheme ? "dark" : "light"}>
+      <header className="toolbar">
+        <div className="toolbar-brand"><img src={isDarkTheme ? roveReversedLogo : roveLogo} alt="Rove" /></div>
+        <div className="toolbar-nav">
+          <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back" title="Back"><ChevronLeft aria-hidden="true" size={18} /></button>
+          <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward" title="Forward"><ChevronRight aria-hidden="true" size={18} /></button>
         </div>
-        <div className="history-nav">
-          <button className="icon-btn" disabled={!canGoBack} onClick={goBack} type="button" aria-label="Back"><ChevronLeft aria-hidden="true" size={18} /></button>
-          <button className="icon-btn" disabled={!canGoForward} onClick={goForward} type="button" aria-label="Forward"><ChevronRight aria-hidden="true" size={18} /></button>
-        </div>
-        <p className="app-utility-title">{currentViewTitle}</p>
-        <div className="app-utility-actions">
-          <button className="icon-btn theme-toggle" type="button" onClick={() => void onQuickThemeToggle()} aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"} title={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}>{isDarkTheme ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}</button>
-          {updateState && ["available", "downloading", "ready", "installing", "error"].includes(updateState.lifecycle) ? (
-            <button
-              className="update-indicator"
-              type="button"
-              onClick={() => updateState.lifecycle === "ready" ? void onInstallUpdate() : pushNavigation("settings")}
-              disabled={updateState.lifecycle === "downloading" || updateState.lifecycle === "installing"}
-            >
-              {updateActionLabel(updateState)}
-            </button>
-          ) : null}
-        </div>
+        <label className="search">
+          <Search aria-hidden="true" size={15} />
+          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search your library" aria-label="Search your library" />
+        </label>
+        <div className="toolbar-spacer" />
+        {updateVisible && updateState ? (
+          <button className="pill pill-btn" type="button" onClick={() => updateState.lifecycle === "ready" ? void onInstallUpdate() : pushNavigation("settings")} disabled={updateState.lifecycle === "downloading" || updateState.lifecycle === "installing"}>
+            {updateActionLabel(updateState)}
+          </button>
+        ) : null}
+        <button className="icon-btn" type="button" onClick={() => void onQuickThemeToggle()} aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"} title={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}>{isDarkTheme ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}</button>
       </header>
 
-      <aside className="sidebar">
-        <nav className="side-nav">
-          {navItems.map((item) => {
-            const isActive = activeView === item.id || (item.id === "games" && activeView === "game");
-            const count = item.id === "games" ? games.length : 0;
-            return (
-            <button
-              key={item.id}
-              className={`side-link ${isActive ? "active" : ""}`}
-              onClick={() => pushNavigation(item.id)}
-              type="button"
-            >
-              <span className="side-icon">
-                <NavIcon view={item.id} />
-              </span>
-              <span className="side-label">{item.label}</span>
-              {count > 0 ? <span className="nav-count">{count}</span> : null}
-            </button>
-            );
-          })}
-        </nav>
-        <div className="sidebar-status">
-          <span>Game saves</span>
-          <strong className={sidebarSaveStatus.tone}>{sidebarSaveStatus.label}</strong>
-        </div>
-      </aside>
+      <Sidebar
+        view={activeView}
+        games={games}
+        selectedGameId={selectedGameId}
+        query={query}
+        recoveryLibrary={recoveryLibrary}
+        onHome={() => pushNavigation("home")}
+        onOpenGame={openGame}
+        onAddGame={() => setAddGameOpen(true)}
+        onRestore={(entry) => void onRestoreRecoveryEntry(entry)}
+        onOpenSettings={() => pushNavigation("settings")}
+      />
 
-      <main className="main-panel" ref={mainPanelRef}>
-        {error ? <div className="banner error">{error}</div> : null}
-        {updateState && !updateDismissed && ["available", "downloading", "ready", "error"].includes(updateState.lifecycle) ? (
-          <div className="banner toast update-banner">
-            <p>
-              {updateState.lifecycle === "ready"
-                ? `Version ${updateState.availableVersion} is verified and ready to install.`
-                : updateState.lifecycle === "downloading"
-                  ? `Downloading version ${updateState.availableVersion}: ${formatBytes(updateState.downloadedBytes)}${updateState.totalBytes ? ` of ${formatBytes(updateState.totalBytes)}` : ""}.`
-                  : updateState.lifecycle === "error"
-                    ? updateState.error ?? "The update needs attention. Your current installation is unchanged."
-                    : `New version ${updateState.availableVersion} is available. You are on ${updateState.currentVersion}.`}
-            </p>
-            <div className="update-banner-actions">
-              {updateState.lifecycle === "available" || updateState.lifecycle === "error" ? <button className="btn primary" type="button" onClick={() => void (updateState.lifecycle === "available" ? onDownloadUpdate() : onCheckForUpdate())}>{updateState.lifecycle === "available" ? "Download" : "Retry"}</button> : null}
-              {updateState.lifecycle === "ready" ? <button className="btn primary" type="button" disabled={games.some((game) => game.running) || Boolean(status?.activeJobId)} onClick={() => void onInstallUpdate()}>Install update</button> : null}
-              {updateState.lifecycle === "ready" ? <button className="btn" type="button" onClick={() => setUpdateNotesOpen(true)}>What's new</button> : null}
-              <button className="btn" type="button" onClick={() => setUpdateDismissed(true)}>Dismiss</button>
-            </div>
+      <main className="main" ref={mainPanelRef}>
+        {error || (updateState && !updateDismissed && ["available", "downloading", "ready", "error"].includes(updateState.lifecycle)) ? (
+          <div className="banner-strip">
+            {error ? <div className="banner error" role="alert"><span>{error}</span></div> : null}
+            {updateState && !updateDismissed && ["available", "downloading", "ready", "error"].includes(updateState.lifecycle) ? (
+              <div className="banner">
+                <span>
+                  {updateState.lifecycle === "ready"
+                    ? `Version ${updateState.availableVersion} is verified and ready to install.`
+                    : updateState.lifecycle === "downloading"
+                      ? `Downloading version ${updateState.availableVersion}: ${formatBytes(updateState.downloadedBytes)}${updateState.totalBytes ? ` of ${formatBytes(updateState.totalBytes)}` : ""}.`
+                      : updateState.lifecycle === "error"
+                        ? updateState.error ?? "The update needs attention. Your current installation is unchanged."
+                        : `New version ${updateState.availableVersion} is available. You are on ${updateState.currentVersion}.`}
+                </span>
+                {updateState.lifecycle === "available" || updateState.lifecycle === "error" ? <button className="btn sm primary" type="button" onClick={() => void (updateState.lifecycle === "available" ? onDownloadUpdate() : onCheckForUpdate())}>{updateState.lifecycle === "available" ? "Download" : "Retry"}</button> : null}
+                {updateState.lifecycle === "ready" ? <button className="btn sm primary" type="button" disabled={installBlocked} onClick={() => void onInstallUpdate()}>Install update</button> : null}
+                {updateState.lifecycle === "ready" ? <button className="btn sm" type="button" onClick={() => setUpdateNotesOpen(true)}>What's new</button> : null}
+                <button className="btn sm ghost" type="button" onClick={() => setUpdateDismissed(true)}>Dismiss</button>
+              </div>
+            ) : null}
           </div>
         ) : null}
-        {toast ? <div className="banner toast">{toast}</div> : null}
 
-        {activeView === "games" ? (
-          <GamesView
+        {activeView === "home" ? (
+          <HomeView
             games={games}
-            newName={newName}
-            newPath={newPath}
-            newExecutablePath={newExecutablePath}
-            newCoverImageData={newCoverImageData}
-            newVersion={newVersion}
-            onNewNameChange={setNewName}
-            onBrowseSaveFolder={() => void onBrowseNewSaveFolder()}
-            onBrowseExecutable={() => void onBrowseNewExecutablePath()}
-            onNewCoverImageChange={setNewCoverImageData}
-            onNewVersionChange={setNewVersion}
-            onAddGame={onAddGame}
-            onOpenGame={openGame}
+            status={status}
             recoveryLibrary={recoveryLibrary}
-            onRestoreRecovery={(entry) => void onRestoreRecoveryEntry(entry)}
-            cloudTarget={status?.protectionTarget ?? "local"}
+            activityEvents={activityEvents}
+            safeTime={safeTime}
+            targetLabel={targetLabel}
+            onAddGame={() => setAddGameOpen(true)}
+            onOpenGame={openGame}
+            onRestore={(entry) => void onRestoreRecoveryEntry(entry)}
             onOpenSettings={() => pushNavigation("settings")}
-            openAddSignal={addGameSignal}
           />
         ) : null}
 
@@ -1162,7 +1092,6 @@ export default function App() {
             exportPath={exportPath}
             importPath={importPath}
             mergeOnImport={mergeOnImport}
-            onBack={() => pushNavigation("games")}
             onPlay={() => void onPlaySelectedGame()}
             onOpenSettings={() => pushNavigation("settings")}
             onCreateShortcut={() => void onCreateRoveShortcut()}
@@ -1194,7 +1123,7 @@ export default function App() {
             safeDateTime={safeDateTime}
             formatBytes={formatBytes}
             syncJob={syncJobs.find((job) => job.gameId === selectedGameId) ?? null}
-			provider={status?.provider}
+            provider={status?.provider}
             syncConflicts={syncConflicts}
             onResolveSyncConflict={(id, action) => void onResolveSyncConflict(id, action)}
           />
@@ -1251,6 +1180,32 @@ export default function App() {
         ) : null}
       </main>
 
+      <footer className="statusbar">
+        <span className="status-item" role="status"><span className={`dot ${saveTone}`} aria-hidden="true" />{sidebarSaveStatus.label}</span>
+        <span className="status-item">{targetLabel}</span>
+        {status?.pending ? <span className="status-item">{status.pending} waiting to upload</span> : null}
+        <span className="spacer" />
+        {updateState?.currentVersion ? <span className="status-item">Rove {updateState.currentVersion}</span> : null}
+      </footer>
+
+      {toast ? <div className="toast" role="status">{toast}</div> : null}
+
+      <AddGameDialog
+        open={addGameOpen}
+        newName={newName}
+        newPath={newPath}
+        newExecutablePath={newExecutablePath}
+        newCoverImageData={newCoverImageData}
+        newVersion={newVersion}
+        onNameChange={setNewName}
+        onVersionChange={setNewVersion}
+        onBrowseSaveFolder={() => void onBrowseNewSaveFolder()}
+        onBrowseExecutable={() => void onBrowseNewExecutablePath()}
+        onCoverChange={setNewCoverImageData}
+        onSubmit={onAddGame}
+        onClose={() => setAddGameOpen(false)}
+      />
+
       {onboardingOpen ? (
         <Onboarding
           destination={settings.protectionTarget}
@@ -1260,23 +1215,22 @@ export default function App() {
           onChooseLocal={() => applyDestination("local", settings.syncRoot)}
           onConnectDrive={onConnectGoogleDrive}
           onChooseFolder={onboardingPickFolder}
-          onAddGame={() => { pushNavigation("games"); setAddGameSignal((n) => n + 1); }}
+          onAddGame={() => setAddGameOpen(true)}
           onFinish={finishOnboarding}
         />
       ) : null}
 
       {launchUpdatePromptOpen && updateState?.availableVersion ? (
-        <div className="add-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) resolveLaunchUpdateChoice("cancel"); }}>
-          <section className="add-modal update-launch-dialog" role="dialog" aria-modal="true" aria-labelledby="update-launch-title">
-            <div className="modal-head">
+        <div className="scrim" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) resolveLaunchUpdateChoice("cancel"); }}>
+          <section className="dialog" role="dialog" aria-modal="true" aria-labelledby="update-launch-title">
+            <div className="dialog-head">
               <div>
-                <span className="eyebrow">APPLICATION.UPDATE</span>
-                <h2 id="update-launch-title">Version {updateState.availableVersion} is available</h2>
+                                <h2 id="update-launch-title">Version {updateState.availableVersion} is available</h2>
               </div>
             </div>
             <p>Rove can download the signed update in the background while your game launches. Installation will wait until every tracked game and sync job has finished.</p>
             {updateState.notes ? <div className="update-notes">{updateState.notes}</div> : null}
-            <div className="modal-actions">
+            <div className="dialog-actions">
               <button className="btn primary" autoFocus type="button" onClick={() => resolveLaunchUpdateChoice("download")}>Download and play</button>
               <button className="btn" type="button" onClick={() => resolveLaunchUpdateChoice("later")}>Not now</button>
               <button className="btn" type="button" onClick={() => resolveLaunchUpdateChoice("cancel")}>Cancel launch</button>
@@ -1286,20 +1240,19 @@ export default function App() {
       ) : null}
 
       {updateNotesOpen && updateState?.lifecycle === "ready" && updateState.availableVersion ? (
-        <div className="add-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUpdateNotesOpen(false); }}>
-          <section className="add-modal update-notes-dialog" role="dialog" aria-modal="true" aria-labelledby="update-notes-title" aria-describedby="update-notes-copy">
-            <div className="modal-head">
+        <div className="scrim" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setUpdateNotesOpen(false); }}>
+          <section className="dialog wide" role="dialog" aria-modal="true" aria-labelledby="update-notes-title" aria-describedby="update-notes-copy">
+            <div className="dialog-head">
               <div>
-                <span className="eyebrow">APPLICATION.UPDATE</span>
-                <h2 id="update-notes-title">What's new in v{updateState.availableVersion}</h2>
+                                <h2 id="update-notes-title">What's new in v{updateState.availableVersion}</h2>
               </div>
             </div>
             <p id="update-notes-copy">The signed update is downloaded and verified. Review the release notes, then install whenever no tracked game or sync job is active.</p>
             <div className="update-notes" tabIndex={0} aria-label={`Release notes for version ${updateState.availableVersion}`}>
               {updateState.notes || "No release notes were supplied for this update."}
             </div>
-            {games.some((game) => game.running) || Boolean(status?.activeJobId) ? <p className="snapshot-meta">Installation is waiting for tracked games and active sync work to finish.</p> : null}
-            <div className="modal-actions">
+            {games.some((game) => game.running) || Boolean(status?.activeJobId) ? <p className="hint">Installation is waiting for tracked games and active sync work to finish.</p> : null}
+            <div className="dialog-actions">
               <button className="btn primary" autoFocus type="button" disabled={games.some((game) => game.running) || Boolean(status?.activeJobId)} onClick={() => { setUpdateNotesOpen(false); void onInstallUpdate(); }}>Install update</button>
               <button className="btn" type="button" onClick={() => setUpdateNotesOpen(false)}>Install later</button>
             </div>

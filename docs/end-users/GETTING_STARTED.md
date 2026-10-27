@@ -4,6 +4,8 @@
 
 On first launch Rove shows a short setup: a welcome, a choice of save location (this PC only, Google Drive, or a synced folder), and your first game. If saves already exist in the chosen location, finish setup and restore them from **Library → In your cloud**. You can skip setup and change everything later in Settings.
 
+![First-run setup: choosing where saves are kept](../images/onboarding-location.webp)
+
 ## Choose the save folder
 
 Add the folder containing actual progress files, not the installation folder unless the game stores saves there. Select the executable so Rove can detect play/exit and refuse unsafe restore.
@@ -28,7 +30,7 @@ Rove application updates are optional. If prompted before launching a game, **Do
 
 ## Second computer
 
-Connect the same provider, then open **Library → In your cloud**. Choose **Restore** next to the game, then select the newly installed executable and a new or empty save folder. Rove restores the revision and links the local game to its existing cloud identity in one confirmation flow. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
+Connect the same provider, then look under **In your cloud** on Home or in the sidebar. Choose **Restore** next to the game, then select the newly installed executable and a new or empty save folder. Rove restores the revision and links the local game to its existing cloud identity in one confirmation flow. If the destination already contains saves, add it as a game and review differences; fresh recovery deliberately refuses non-empty folders.
 
 ## Different Rove versions
 
